@@ -15,7 +15,6 @@ const App = () => {
       // backgroundColor="#4f84c4"
       translucent={false}
     />
-  
     <NavigationContainer>
       <StackNavigation />
     </NavigationContainer>
