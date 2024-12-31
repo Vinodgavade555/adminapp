@@ -1,4 +1,4 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import React, {useCallback, useEffect, useState} from 'react';
 import {
@@ -11,6 +11,7 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   TouchableOpacity,
+  Image,
 } from 'react-native';
 import {Button, Checkbox, IconButton} from 'react-native-paper';
 import {Formik} from 'formik';
@@ -18,53 +19,59 @@ import * as Yup from 'yup';
 import GlobalStyle from '../../Global_CSS/GlobalStyle';
 import {colors} from '../../Global_CSS/TheamColors';
 import ReusableTextInput from '../../Constant/CustomTextInput';
+import AuthViewController from '../../Redux/Action/AuthViewController';
+import { useDispatch } from 'react-redux';
 
 const LoginScreen = () => {
   const navigation = useNavigation();
   const [checked, setChecked] = useState(false);
   const [ispasswordVisible, setpasswordVisibility] = useState(false);
+  const {login} = AuthViewController();
+  const dispatch = useDispatch();
 
-  useEffect(() => {
-    handleLoadingCredentials();
-  }, []);
+  // useEffect(() => {
+  //   handleLoadingCredentials();
+  // }, []);
 
-  const handleLoadingCredentials = async () => {
-    try {
-      const userdata = await AsyncStorage.getItem('UserData');
-      if (userdata) {
-        Alert.alert('Welcome ', userdata);
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Unable to load credentials');
-    }
-  };
+  // const handleLoadingCredentials = async () => {
+  //   try {
+  //     const userdata = await AsyncStorage.getItem('UserData');
+  //     if (userdata) {
+  //       Alert.alert('Welcome ', userdata);
+  //     }
+  //   } catch (error) {
+  //     Alert.alert('Error', 'Unable to load credentials');
+  //   }
+  // };
 
   const loginSchema = Yup.object().shape({
-    emailOrPhone: Yup.string()
+    identifier: Yup.string()
       .test(
-        'emailOrPhone',
+        'identifier',
         'Please enter a valid email or phone number',
         value =>
           Yup.string().email().isValidSync(value) || /^[0-9]{10}$/.test(value),
       )
       .required('Email or phone number is required'),
     password: Yup.string()
-      .min(8, 'Password must be at least 8 characters')
+      .min(8, 'password must be at least 8 characters')
       .matches(
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-        'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
+        'password must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
       )
-      .required('Password is required'),
+      .required('password is required'),
   });
 
   const handleSubmit = async values => {
     try {
       const UserData = {
-        emailOrPhone: values.emailOrPhone,
+        identifier: values.identifier,
         password: values.password,
       };
-      await AsyncStorage.setItem('userdata', JSON.stringify(UserData));
-      navigation.navigate('DefaultScreen');
+      dispatch(login(UserData));
+
+      // await AsyncStorage.setItem('userdata', JSON.stringify(UserData));
+      // navigation.navigate('DefaultScreen');
     } catch (error) {
       Alert.alert('Error saving credentials');
     }
@@ -104,7 +111,7 @@ const LoginScreen = () => {
           <Text style={styles.heading}>Admin</Text>
           <Text style={styles.Subheading}>Login</Text>
           <Formik
-            initialValues={{emailOrPhone: '', password: ''}}
+             initialValues={{identifier: '', password: ''}}
             validationSchema={loginSchema}
             onSubmit={handleSubmit}>
             {({handleChange, values, handleSubmit}) => (
@@ -113,8 +120,8 @@ const LoginScreen = () => {
                   <ReusableTextInput
                     name="emailOrPhone"
                     label="Email/Mobile Number"
-                    value={values.emailOrPhone} // Explicitly passing value
-                    onChangeText={handleChange('emailOrPhone')} // Explicitly passing handler
+                    value={values.identifier}
+                     onChangeText={handleChange('identifier')}
                   />
                   <View style={styles.passwordContainer}>
                     <View flex={1}>
@@ -122,8 +129,8 @@ const LoginScreen = () => {
                         name="password"
                         label="Password"
                         secureTextEntry={!ispasswordVisible}
-                        value={values.password} // Explicitly passing value
-                        onChangeText={handleChange('password')} // Explicitly passing handler
+                        value={values.password}
+                      onChangeText={handleChange('password')}
                       />
                     </View>
                     <IconButton
@@ -154,6 +161,33 @@ const LoginScreen = () => {
                       Login
                     </Button>
                   </View>
+                  <View>
+                    <View style={styles.socialContainer_Heading}>
+                      <View style={styles.sociallineContainer} />
+                      <Text style={styles.socialtextContainer}>OR</Text>
+                      <View style={styles.sociallineContainer} />
+                    </View>
+                    <View style={styles.socialContainer}>
+                      <Image
+                        style={styles.socialImages}
+                        source={require('../../Assets/Images/google_icon.png')}
+                      />
+                      <Image
+                        style={styles.socialImages}
+                        source={require('../../Assets/Images/linkedin_icon.png')}
+                      />
+                    </View>
+                  </View>
+                  <View style={styles.signupContainer}>
+                    <Text style={styles.signupText1}>
+                      Don't have an account?
+                    </Text>
+                    <TouchableOpacity
+                      onPress={() => navigation.push('SignupScreen')}>
+                      <Text style={styles.signupText2}>Create account</Text>
+                    </TouchableOpacity>
+                  </View>
+
                 </View>
               </>
             )}

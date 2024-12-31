@@ -1,25 +1,30 @@
 import React from 'react';
-import {StatusBar} from 'react-native';
-import { colors } from './src/Global_CSS/TheamColors';
-import { NavigationContainer } from '@react-navigation/native';
+import {NavigationContainer} from '@react-navigation/native';
 import StackNavigation from './src/Navigation/stackNavigation';
-import { PaperProvider } from 'react-native-paper';
+import {PaperProvider} from 'react-native-paper';
+import {StatusBar} from 'react-native';
+import {Provider} from 'react-redux';
+import {colors} from './src/Global_CSS/TheamColors';
+import {ToastProvider} from 'react-native-toast-notifications';
+import store from './src/Redux/Store';
 
 const App = () => {
   return (
-    <PaperProvider>
-    <StatusBar
-      barStyle="light-content"
-      // backgroundColor="#004466"
-      backgroundColor={colors.primary}
-      // backgroundColor="#4f84c4"
-      translucent={false}
-    />
-  
-    <NavigationContainer>
-      <StackNavigation />
-    </NavigationContainer>
-  </PaperProvider>
+    <Provider store={store}>
+      <ToastProvider>
+        <PaperProvider>
+          <StatusBar
+            barStyle="light-content"
+            backgroundColor={colors.primary}
+            translucent={false}
+          />
+        
+          <NavigationContainer>
+            <StackNavigation />
+          </NavigationContainer>
+        </PaperProvider>
+      </ToastProvider>
+    </Provider>
   );
 };
 
