@@ -391,9 +391,7 @@ const UserAppliesScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  console.log('JobList', JSON.stringify(JobList, null, 2));
-
-  const handleViewAll = job => {
+  const handleViewApplicants = job => {
     setSelectedJob(job);
     setModalVisible(true);
   };
@@ -402,35 +400,37 @@ const UserAppliesScreen = () => {
     setSelectedCandidate(candidate);
     setCandidateModalVisible(true);
   };
+  // console.log('JobList', JSON.stringify(JobList, null, 2));
+  const preprocessData = (data = []) => {
+    // Validate that data is an array
+    if (!Array.isArray(data)) {
+      console.warn('preprocessData received invalid data:', data);
+      return [];
+    }
 
-  const preprocessData = data => {
+    // Map through each item to extract specific fields
     return data.map(job => ({
-      ...job,
-      applications: job.applications.map(application => ({
-        ...application,
-        candidateDetails: {
-          ...application.candidateDetails,
-          formattedDate: moment(application.candidateDetails.date).format(
-            'DD MMM YYYY',
-          ),
-        },
-      })),
+      createdAt: moment(job.created_at).format('DD MMM YYYY'),
+      jobTitle: job.job_title?.title || null, // Extract title safely
+      applicantCount: job.applicant_count || 0, // Default to 0 if undefined
     }));
   };
 
-  const processedJobDetails = preprocessData(jobDetails);
+  console.log('preprocessData', JSON.stringify(preprocessData, null, 2));
 
+  const processedJobs = preprocessData(JobList.results || []);
+  console.log('JobList', JSON.stringify(processedJobs, null, 2));
   return (
     <View style={styles.container}>
       <CustomDataTable
         columns={[
-          {header: 'Date', field: 'date'},
+          {header: 'Date', field: 'createdAt'},
           {header: 'Job Title', field: 'jobTitle'},
-          {header: 'Application Count', field: 'applicationCount'},
+          {header: 'Application Count', field: 'applicantCount'},
           {header: 'Job Applications', field: 'action'},
         ]}
-        data={processedJobDetails}
-        actions={[{label: 'View All Applications', onPress: handleViewAll}]}
+        data={processedJobs}
+        actions={[{label: 'View All Applications', onPress: handleViewApplicants}]}
         rowsPerPageOptions={rowsPerPageOptions}
       />
 
