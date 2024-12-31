@@ -117,3 +117,12 @@ dependencies {
         implementation jscFlavor
     }
 }
+
+apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")
+// apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
+project.ext.vectoricons = [
+    iconFontNames: ['MaterialCommunityIcons.ttf','MaterialIcons.ttf', 'EvilIcons.ttf','Feather.ttf',"FontAwesome.ttf","Ionicons.ttf" ] // Specify font files
+]
+project.ext.react = [
+    enableHermes: false,  // or true if you intend to use Hermes
+]
