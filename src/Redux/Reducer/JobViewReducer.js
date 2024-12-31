@@ -51,6 +51,7 @@ const jobReducer = (state = initialState, action) => {
     case 'JOB_APPLIED_SUCCESSFULLY':
       return {
         ...state,
+        ApplyJob: action.payload,
         error: null,
       };
 

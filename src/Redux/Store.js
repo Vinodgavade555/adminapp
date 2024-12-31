@@ -1,11 +1,11 @@
 import {applyMiddleware, combineReducers, createStore} from 'redux';
 import {thunk} from 'redux-thunk';
 import authReducer from './Reducer/AuthReducer';
-import jobReducer from './Reducer/JobViewReducer';
+import JobViewController from './Action/JobViewController';
  
 const rootReducer = combineReducers({
   auth: authReducer,
-  Jobs: jobReducer,
+  Job: JobViewController,
  
 });
  

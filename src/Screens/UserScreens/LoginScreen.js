@@ -20,7 +20,7 @@ import GlobalStyle from '../../Global_CSS/GlobalStyle';
 import {colors} from '../../Global_CSS/TheamColors';
 import ReusableTextInput from '../../Constant/CustomTextInput';
 import AuthViewController from '../../Redux/Action/AuthViewController';
-import { useDispatch } from 'react-redux';
+import {useDispatch} from 'react-redux';
 
 const LoginScreen = () => {
   const navigation = useNavigation();
@@ -111,7 +111,7 @@ const LoginScreen = () => {
           <Text style={styles.heading}>Admin</Text>
           <Text style={styles.Subheading}>Login</Text>
           <Formik
-             initialValues={{identifier: '', password: ''}}
+            initialValues={{identifier: '', password: ''}}
             validationSchema={loginSchema}
             onSubmit={handleSubmit}>
             {({handleChange, values, handleSubmit}) => (
@@ -121,7 +121,7 @@ const LoginScreen = () => {
                     name="emailOrPhone"
                     label="Email/Mobile Number"
                     value={values.identifier}
-                     onChangeText={handleChange('identifier')}
+                    onChangeText={handleChange('identifier')}
                   />
                   <View style={styles.passwordContainer}>
                     <View flex={1}>
@@ -130,7 +130,7 @@ const LoginScreen = () => {
                         label="Password"
                         secureTextEntry={!ispasswordVisible}
                         value={values.password}
-                      onChangeText={handleChange('password')}
+                        onChangeText={handleChange('password')}
                       />
                     </View>
                     <IconButton
@@ -161,33 +161,6 @@ const LoginScreen = () => {
                       Login
                     </Button>
                   </View>
-                  <View>
-                    <View style={styles.socialContainer_Heading}>
-                      <View style={styles.sociallineContainer} />
-                      <Text style={styles.socialtextContainer}>OR</Text>
-                      <View style={styles.sociallineContainer} />
-                    </View>
-                    <View style={styles.socialContainer}>
-                      <Image
-                        style={styles.socialImages}
-                        source={require('../../Assets/Images/google_icon.png')}
-                      />
-                      <Image
-                        style={styles.socialImages}
-                        source={require('../../Assets/Images/linkedin_icon.png')}
-                      />
-                    </View>
-                  </View>
-                  <View style={styles.signupContainer}>
-                    <Text style={styles.signupText1}>
-                      Don't have an account?
-                    </Text>
-                    <TouchableOpacity
-                      onPress={() => navigation.push('SignupScreen')}>
-                      <Text style={styles.signupText2}>Create account</Text>
-                    </TouchableOpacity>
-                  </View>
-
                 </View>
               </>
             )}
