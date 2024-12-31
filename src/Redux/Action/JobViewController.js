@@ -117,21 +117,20 @@ const JobViewController = () => {
     }
   };
 
-  const GetApplyJob = requestData => async dispatch => {
+  const GetApplyJob = user_id => async dispatch => {
     dispatch({type: 'LOADING', payload: true});
 
     try {
       const response = await axios.get(
-        `http://15.206.149.28/api/job-application/`,
-        requestData,
+        `http://15.206.149.28/api/jobs/`,
       );
-      // console.log(
-      //   '****************************job-application response***************************',
-      // );
-      // console.log(response);
+      console.log(
+        '****************************job-apply response***************************',
+      );
 
       const jsonString = JSON.stringify(response.data);
       const data = JSON.parse(jsonString);
+      console.log(data);
 
       dispatch({type: 'JOB_APPLIED_SUCCESSFULLY', payload: data});
 
