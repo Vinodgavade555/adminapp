@@ -65,9 +65,57 @@ const JobViewController = () => {
     }
   };
 
+  const GetAppliedJobSeekerList = job_id => async dispatch => {
+    dispatch({type: 'LOADING', payload: true});
+
+    try {
+      const response = await axios.get(
+        `http://15.206.149.28/api/job/${job_id}/applied-users`,
+      );
+      console.log(
+        `****************************job-GetAppliedJobSeekerList response***************************
+        http://15.206.149.28/api/job/${job_id}/applied-users/`,
+      );
+      // console.log('response', response);
+
+      const jsonString = JSON.stringify(response.data);
+      const data = JSON.parse(jsonString);
+      console.log(data);
+
+      dispatch({type: 'APPLIED_JOB_SEEKER_LIST_SUCCESS', payload: data});
+
+      dispatch({type: 'LOADING', payload: false});
+    } catch (error) {
+      console.log('error', error.response);
+
+      dispatch({type: 'LOADING', payload: false});
+      Toast.show(
+        error.response?.data?.non_field_errors[0]
+          ? error.response.data.non_field_errors[0]
+          : 'Something went wrong,Please Try again!',
+        {
+          type: 'danger',
+          placement: 'top',
+          duration: 4000,
+          offset: 100,
+          animationType: 'slide-in',
+        },
+      );
+      dispatch({
+        type: 'APPLIED_JOB_SEEKER_LIST_FAILURE',
+        payload: {
+          error: error.response?.data?.non_field_errors
+            ? error.response.data.non_field_errors[0]
+            : error?.response?.data,
+        },
+      });
+    }
+  };
+
   return {
     goBackScreen,
     GetJobList,
+    GetAppliedJobSeekerList,
   };
 };
 

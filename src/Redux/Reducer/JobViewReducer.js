@@ -1,6 +1,6 @@
 const initialState = {
   JobList: [],
-
+  JobSeekerList: [],
   error: null,
   isLoading: false, // Track loading for any API request
 };
@@ -27,7 +27,20 @@ const jobReducer = (state = initialState, action) => {
         ...state,
         error: action.payload.error,
       };
-    // Search Job List
+
+    // Job Seeker List
+    case 'APPLIED_JOB_SEEKER_LIST_SUCCESS':
+      return {
+        ...state,
+        JobSeekerList: action.payload,
+        error: null,
+      };
+
+    case 'APPLIED_JOB_SEEKER_LIST_FAILURE':
+      return {
+        ...state,
+        error: action.payload.error,
+      };
 
     default:
       return state;

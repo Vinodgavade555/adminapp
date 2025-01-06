@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Image,
   ScrollView,
@@ -12,6 +12,9 @@ import {colors} from '../../Global_CSS/TheamColors';
 import CustomDataTable from '../../Constant/CustomDataTable';
 import moment from 'moment';
 import ApplicationResponseChart from '../../Constant/ApplicationResponseChart';
+import {useDispatch, useSelector} from 'react-redux';
+import JobViewController from '../../Redux/Action/JobViewController';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const jobData = [
   {
     id: '1',
@@ -197,6 +200,29 @@ const jobData = [
 
 const HomeScreen = () => {
   const [activeTab, setActiveTab] = useState('Monthly');
+  const [id, setId] = useState(null);
+  const dispatch = useDispatch();
+
+  const {GetJobList} = JobViewController();
+  const {JobList} = useSelector(state => state.job);
+
+  useEffect(() => {
+    const getUserData = async () => {
+      try {
+        const userId = await AsyncStorage.getItem('user_data');
+        setId(userId);
+        if (userId) {
+          dispatch(GetJobList(userId));
+        }
+      } catch (error) {
+        console.error('Error reading value from AsyncStorage', error);
+      }
+    };
+
+    getUserData();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleTabChange = tab => {
     setActiveTab(tab);
@@ -241,7 +267,24 @@ const HomeScreen = () => {
     return data;
   };
 
-  const filteredData = updateDatesForTab(filterDataByTab());
+  const preprocessData = (data = []) => {
+    // Validate that data is an array
+    if (!Array.isArray(data)) {
+      console.warn('preprocessData received invalid data:', data);
+      return [];
+    }
+    // Map through each item to extract specific fields
+    return data.map(job => ({
+      createdAt: moment(job.created_at).format('DD MMM YYYY'),
+      jobTitle: job.job_title?.title || null, // Extract title safely
+      applicantCount: job.applicant_count || 0, // Default to 0 if undefined
+      openingsCount: job.openings || 0, // Default to 0 if undefined
+      workmode: job.employment_types?.join(', ') || '',
+      status: job.is_active ? 'Active' : 'Inactive',
+    }));
+  };
+
+  const processedJobs = preprocessData(JobList.results || []);
   return (
     <View style={styles.Maincontainer}>
       <ScrollView style={styles.container}>
@@ -282,16 +325,16 @@ const HomeScreen = () => {
           </View>
           <CustomDataTable
             columns={[
-              {header: 'Job Title', field: 'title'},
-              {header: 'Category', field: 'category'},
-              {header: 'Openings', field: 'openings'},
-              {header: 'Applications', field: 'applications'},
+              {header: 'Job Title', field: 'jobTitle'},
+              {header: 'Work Mode', field: 'workmode'},
+              {header: 'Openings', field: 'openingsCount'},
+              {header: 'Applications', field: 'applicantCount'},
               {
                 header: 'Status',
                 field: 'status',
               },
             ]}
-            data={filteredData} // Fallback to an empty array if undefined
+            data={processedJobs} // Fallback to an empty array if undefined
             rowsPerPageOptions={[5, 10]}
           />
         </View>
@@ -305,12 +348,10 @@ const styles = StyleSheet.create({
   Maincontainer: {
     flex: 1,
     padding: 12,
-
   },
   container: {
     flex: 1,
     backgroundColor: '#fff',
-
   },
   welcomeBanner: {
     width: '100%',

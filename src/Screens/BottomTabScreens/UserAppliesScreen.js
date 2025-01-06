@@ -1,5 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {
+  Dimensions,
+  Image,
   Modal,
   ScrollView,
   StyleSheet,
@@ -14,6 +16,8 @@ import CustomHeader from '../../Constant/CustomBackIcon';
 import JobViewController from '../../Redux/Action/JobViewController';
 import {useDispatch, useSelector} from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {BASE_URL} from '../../Services/baseAPI';
+const {width} = Dimensions.get('window'); // Get the screen width
 
 const jobDetails = [
   {
@@ -370,8 +374,8 @@ const UserAppliesScreen = () => {
   const [id, setId] = useState(null);
   const dispatch = useDispatch();
 
-  const {GetJobList} = JobViewController();
-  const {JobList} = useSelector(state => state.job);
+  const {GetJobList, GetAppliedJobSeekerList} = JobViewController();
+  const {JobList, JobSeekerList} = useSelector(state => state.job);
 
   useEffect(() => {
     const getUserData = async () => {
@@ -391,35 +395,66 @@ const UserAppliesScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleViewApplicants = job => {
-    setSelectedJob(job);
-    setModalVisible(true);
+  const handleViewApplicants = id => {
+    dispatch(GetAppliedJobSeekerList(id)); // Fetch job applicants
+
+    setSelectedJob(JobSeekerList); // Set the selected job ID
+    setModalVisible(true); // Show the modal
+  };
+  // console.log('selectedJob:', JSON.stringify(selectedJob, null, 2));
+  // const handleViewcandidateDetails = candidate => {
+  //   console.log('Candidate Details:', JSON.stringify(candidate, null, 2));
+
+  //   if (candidate?.id) {
+  //     setSelectedCandidate(candidate.id); // Set selected candidate
+  //     setCandidateModalVisible(true); // Open modal
+  //     console.log('Selected Candidate ID:', candidate.id);
+  //   } else {
+  //     console.error('Invalid candidate data received:', candidate);
+  //   }
+  // };
+
+  const handleViewcandidateDetails = candidateId => {
+    // Find the candidate in selectedJob using the `id`
+    const candidate = selectedJob.find(
+      job => job.user.id === candidateId.id,
+    )?.user;
+
+    // Debugging the found candidate
+    // console.log('View Candidate Details:', JSON.stringify(candidate, null, 2));
+
+    if (candidate) {
+      console.log('Selected Candidate:', candidate);
+      setSelectedCandidate(candidate); // Set the selected candidate
+      setCandidateModalVisible(true); // Open modal
+    } else {
+      console.error(`Candidate with ID ${candidateId.id} not found.`);
+    }
   };
 
-  const handleViewDetails = candidate => {
-    setSelectedCandidate(candidate);
-    setCandidateModalVisible(true);
-  };
-  // console.log('JobList', JSON.stringify(JobList, null, 2));
-  const preprocessData = (data = []) => {
-    // Validate that data is an array
+  console.log('data', JSON.stringify(selectedCandidate, null, 2));
+
+  const preprocessJobData = (data = []) => {
     if (!Array.isArray(data)) {
       console.warn('preprocessData received invalid data:', data);
       return [];
     }
-
-    // Map through each item to extract specific fields
     return data.map(job => ({
       createdAt: moment(job.created_at).format('DD MMM YYYY'),
       jobTitle: job.job_title?.title || null, // Extract title safely
-      applicantCount: job.applicant_count || 0, // Default to 0 if undefined
+      applicantCount: job.applicant_count || 0, // Default to 0 if undefined\
+      id: job.id,
     }));
   };
 
-  console.log('preprocessData', JSON.stringify(preprocessData, null, 2));
+  const processedJobs = preprocessJobData(JobList.results || []);
+  // console.log('JobList', JSON.stringify(processedJobs, null, 2));
 
-  const processedJobs = preprocessData(JobList.results || []);
-  console.log('JobList', JSON.stringify(processedJobs, null, 2));
+  // Function to handle modal close
+  const handleModalClose = () => {
+    setCandidateModalVisible(false); // Close modal
+    setSelectedCandidate(null); // Reset selected candidate to null
+  };
   return (
     <View style={styles.container}>
       <CustomDataTable
@@ -430,12 +465,17 @@ const UserAppliesScreen = () => {
           {header: 'Job Applications', field: 'action'},
         ]}
         data={processedJobs}
-        actions={[{label: 'View All Applications', onPress: handleViewApplicants}]}
+        actions={[
+          {
+            label: 'View All Applications',
+            onPress: job => handleViewApplicants(job.id),
+          },
+        ]}
         rowsPerPageOptions={rowsPerPageOptions}
       />
 
       {/* Modal for Applications */}
-      {selectedJob && (
+      {selectedJob && Array.isArray(selectedJob) && (
         <Modal
           animationType="slide"
           transparent={true}
@@ -443,35 +483,53 @@ const UserAppliesScreen = () => {
           onRequestClose={() => setModalVisible(false)}>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>
-                Applications for {selectedJob.jobTitle}
-              </Text>
+              <Text style={styles.modalTitle}>Applications</Text>
               <CustomDataTable
                 columns={[
                   {
                     header: 'Date Applied',
-                    field: 'candidateDetails.formattedDate',
+                    field: 'applicationDate',
                   },
                   {
                     header: 'Candidate Name',
-                    field: 'candidateDetails.candidateName',
+                    field: 'name',
                   },
                   {
                     header: 'Experience',
-                    field: 'candidateDetails.experience',
+                    field: 'experience',
                   },
                   {
                     header: 'Phone Number',
-                    field: 'candidateDetails.contact.phone',
+                    field: 'phoneNo',
                   },
-                  {header: 'Email', field: 'candidateDetails.contact.email'},
+                  {
+                    header: 'Email',
+                    field: 'email',
+                  },
                   {header: 'Candidate Details', field: 'action'},
                 ]}
-                data={selectedJob.applications} // Pass the applications array directly
+                data={selectedJob.map(application => ({
+                  id: application.user?.user_id, // Include the application ID here
+                  applicationDate: moment(application.application_date).format(
+                    'DD MMM YYYY',
+                  ),
+                  name:
+                    application.user?.first_name && application.user?.last_name
+                      ? `${application.user.first_name} ${application.user.last_name}`
+                      : application.user?.email || 'N/A',
+                  experience:
+                    application.user?.career_preferences?.[0]
+                      ?.current_total_exp || 'N/A',
+                  phoneNo: application.user?.mobile_number || 'N/A',
+                  email: application.user?.email || 'N/A',
+                }))}
                 actions={[
                   {
                     label: 'View Details',
-                    onPress: item => handleViewDetails(item.candidateDetails),
+                    onPress: application =>
+                      handleViewcandidateDetails(application),
+
+                    // Pass the application ID
                   },
                 ]}
                 rowsPerPageOptions={[5, 10]}
@@ -482,11 +540,11 @@ const UserAppliesScreen = () => {
       )}
 
       {/* Modal for Candidate Details */}
-      {selectedCandidate && (
+      {candidateModalVisible && (
         <Modal
           animationType="slide"
           transparent={true}
-          visible={candidateModalVisible}
+          visible={true}
           onRequestClose={() => setCandidateModalVisible(false)}>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
@@ -503,76 +561,275 @@ const UserAppliesScreen = () => {
               </View>
 
               <ScrollView>
-                <View style={styles.detailText}>
-                  <Text style={styles.boldText}>Name: </Text>
-                  <Text style={styles.OutputText}>
-                    {selectedCandidate.candidateName}
-                  </Text>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    backgroundColor: '#fafafa',
+                    padding: 12,
+                  }}>
+                  <Image
+                    source={
+                      selectedCandidate?.user?.profile_photo
+                        ? {uri: BASE_URL + selectedCandidate?.user?.profile_pic}
+                        : require('../../Assets/Images/Userimage.png')
+                    }
+                    style={styles.profileimage}
+                  />
+                  <View
+                    style={{
+                      flex: 1,
+                      flexDirection: 'column',
+                      marginHorizontal: 12,
+                    }}>
+                    {console.log(
+                      'selectedCandidate details ',
+                      selectedCandidate?.email,
+                    )}
+                    <Text style={styles.NameText}>
+                      {selectedCandidate?.first_name &&
+                      selectedCandidate?.last_name
+                        ? `${selectedCandidate?.first_name} ${selectedCandidate?.last_name}`
+                        : 'Candidate Name'}
+                    </Text>
+                    <Text style={styles.headlineText}>
+                      {selectedCandidate?.profile_headline ||
+                        'Experienced Mobile Developer | Proficient in React Native, Redux,and APIs'}
+                    </Text>
+                    {/* <Text style={styles.emailText}>
+                      {selectedCandidate?.user?.email || 'N/A'}
+                    </Text>
+                    <Text style={styles.mobilenumber}>
+                      {selectedCandidate?.user?.mobile_number || 'N/A'}
+                    </Text> */}
+                  </View>
                 </View>
-                <View style={styles.detailText}>
-                  <Text style={styles.boldText}>Date Applied: </Text>
-                  <Text style={styles.OutputText}>
-                    {selectedCandidate.formattedDate}
-                  </Text>
+
+                <View style={{marginTop: 12, paddingVertical: 4}}>
+                  <View style={styles.evensection}>
+                    <Text style={styles.boldText}>Email</Text>
+                    <Text style={styles.emailText}>
+                      {selectedCandidate?.email || 'N/A'}
+                    </Text>
+                  </View>
+                  <View style={styles.oddsection}>
+                    <Text style={styles.boldText}>Phone Number</Text>
+                    <Text style={styles.mobilenumber}>
+                      {selectedCandidate?.mobile_number || 'N/A'}
+                    </Text>
+                  </View>
+                  <View style={styles.evensection}>
+                    <Text style={styles.boldText}>Experience: </Text>
+                    <Text style={styles.OutputText}>
+                      {selectedCandidate?.career_preferences?.[0]
+                        ?.current_total_exp || 'N/A'}{' '}
+                      years
+                    </Text>
+                  </View>
+                  <View style={styles.oddsection}>
+                    <Text style={styles.boldText}>Address: </Text>
+                    <Text style={styles.OutputText}>
+                      {`${selectedCandidate?.career_preferences?.[0]?.current_city}`}
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      paddingHorizontal: 12,
+                      paddingVertical: 12,
+                      backgroundColor: '#fafafa',
+                    }}>
+                    <Text style={styles.boldText}>Skills</Text>
+                    <View style={styles.chipContainer}>
+                      {selectedCandidate?.key_skills?.length > 0 ? (
+                        selectedCandidate?.key_skills?.map((skill, index) => (
+                          <Text key={index} style={styles.chip}>
+                            {skill}
+                          </Text>
+                        ))
+                      ) : (
+                        <Text style={styles.OutputText}>
+                          No skills available
+                        </Text>
+                      )}
+                    </View>
+                  </View>
+                  <View
+                    style={{
+                      // paddingHorizontal: 12,
+                      paddingVertical: 12,
+                      backgroundColor: '#fff',
+                    }}>
+                    <Text style={[styles.boldText, {paddingHorizontal: 12}]}>
+                      IT Skills
+                    </Text>
+                    <ScrollView
+                      horizontal
+                      style={{flex: 1}}
+                      contentContainerStyle={{
+                        flexDirection: 'row',
+                        gap: 8, // Adding spacing between items
+                        paddingHorizontal: 10, // Optional padding for better alignment
+                      }}
+                      showsHorizontalScrollIndicator={false} // Hide scroll bar for a cleaner look
+                    >
+                      {selectedCandidate?.it_skills?.length > 0 ? (
+                        selectedCandidate?.it_skills.map((skill, index) => (
+                          <View
+                            key={`it_skill_${index}`}
+                            style={[
+                              styles.skillSection,
+                              {
+                                padding: 12,
+                                borderRadius: 8,
+                                backgroundColor: '#f1f1f1',
+                                color: colors.primary,
+                                justifyContent: 'flex-start',
+                              },
+                            ]}>
+                            <Text style={[styles.OutputText]}>
+                              {skill?.name === 'Other'
+                                ? skill?.othername
+                                : skill?.name || 'N/A'}
+                            </Text>
+                            <Text style={styles.OutputText}>
+                              {`${skill?.exp?.years || 0} years, ${
+                                skill?.exp?.months || 0
+                              } months`}
+                            </Text>
+                            <Text style={styles.OutputText}>
+                              <Text style={styles.boldText}>Last Used: </Text>
+                              {skill?.last_used || 'N/A'}
+                            </Text>
+                          </View>
+                        ))
+                      ) : (
+                        <Text style={styles.OutputText}>
+                          No IT skills available.
+                        </Text>
+                      )}
+                    </ScrollView>
+                  </View>
+                  <View
+                    style={{
+                      paddingHorizontal: 12,
+                      paddingVertical: 12,
+                      backgroundColor: '#fafafa',
+                    }}>
+                    <Text style={styles.boldText}> Education</Text>
+                    {selectedCandidate?.higher_edu?.length > 0 ? (
+                      selectedCandidate?.higher_edu?.map((edu, index) => (
+                        <View
+                          key={`edu_${index}`}
+                          style={[styles.section, {marginVertical: 12}]}>
+                          <View style={{flexDirection: 'row', gap: 8}}>
+                            <Text style={{color: colors.primary}}>
+                              {edu.course_name || 'N/A'} -
+                            </Text>
+                            <Text style={{color: colors.primary}}>
+                              {edu.specialization || 'N/A'} -
+                            </Text>
+                            <Text style={{color: colors.primary}}>
+                              {edu.duration?.start_year || 'N/A'} -{' '}
+                              {edu.duration?.end_year || 'N/A'}
+                            </Text>
+                          </View>
+                          <Text style={styles.OutputText}>
+                            {edu.university_name || 'N/A'}
+                          </Text>
+                        </View>
+                      ))
+                    ) : (
+                      <Text style={styles.OutputText}>
+                        No higher education records available.
+                      </Text>
+                    )}
+                  </View>
                 </View>
-                <View style={styles.detailText}>
-                  <Text style={styles.boldText}>Experience: </Text>
-                  <Text style={styles.OutputText}>
-                    {selectedCandidate.experience}
-                  </Text>
+                <View
+                  style={{
+                    paddingHorizontal: 12,
+                    paddingVertical: 12,
+                    backgroundColor: '#fff',
+                  }}>
+                  <Text style={[styles.boldText]}>Project details</Text>
+                  {selectedCandidate?.project_details?.length > 0 ? (
+                    selectedCandidate?.project_details?.map((pro, index) => (
+                      <View
+                        key={`pro_${index}`}
+                        style={[
+                          styles.section,
+                          {
+                            marginVertical: 12,
+                            padding: 12,
+                            backgroundColor: '#fafafa',
+                            borderRadius: 8,
+                          },
+                        ]}>
+                        <View style={{flexDirection: 'row', gap: 8}}>
+                          <Text
+                            style={{color: colors.primary, fontWeight: 'bold'}}>
+                            {pro.role || 'N/A'} /
+                          </Text>
+
+                          <Text style={styles.OutputText}>
+                            {pro.client || 'N/A'}
+                          </Text>
+                        </View>
+                        <Text style={{color: colors.primary}}>
+                          {pro.description || 'N/A'} -
+                        </Text>
+                        <View
+                          style={{
+                            // paddingHorizontal: 12,
+                            paddingVertical: 12,
+                          }}>
+                          <View style={styles.chipContainer}>
+                            {Array.isArray(pro?.skills_used) &&
+                            pro.skills_used.length > 0 ? (
+                              pro.skills_used.map((skill, index) => (
+                                <Text key={index} style={styles.chip}>
+                                  {skill}
+                                </Text>
+                              ))
+                            ) : (
+                              <Text style={styles.OutputText}>
+                                No skills available
+                              </Text>
+                            )}
+                          </View>
+                        </View>
+                      </View>
+                    ))
+                  ) : (
+                    <Text style={styles.OutputText}>
+                      No higher Project records available.
+                    </Text>
+                  )}
                 </View>
-                <View style={styles.detailText}>
-                  <Text style={styles.boldText}>Skills: </Text>
-                  <Text style={styles.OutputText}>
-                    {selectedCandidate.skills.join(', ')}
-                  </Text>
-                </View>
-                <View style={styles.detailText}>
-                  <Text style={styles.boldText}>Education: </Text>
-                  <Text style={styles.OutputText}>
-                    {selectedCandidate.education}
-                  </Text>
-                </View>
-                <View style={styles.detailText}>
-                  <Text style={styles.boldText}>Email: </Text>
-                  <Text style={styles.OutputText}>
-                    {selectedCandidate.contact.email}
-                  </Text>
-                </View>
-                <View style={styles.detailText}>
-                  <Text style={styles.boldText}>Phone: </Text>
-                  <Text style={styles.OutputText}>
-                    {selectedCandidate.contact.phone}
-                  </Text>
-                </View>
-                <View style={styles.detailText}>
-                  <Text style={styles.boldText}>Address: </Text>
-                  <Text style={styles.OutputText}>
-                    {`${selectedCandidate.address.city}, ${selectedCandidate.address.state}, ${selectedCandidate.address.country}`}
-                  </Text>
-                </View>
+
                 <View style={styles.detailText}>
                   <Text style={styles.boldText}>Profile Summary: </Text>
                   <Text style={styles.OutputText}>
-                    {selectedCandidate.profileSummary}
+                    {selectedCandidate?.profileSummary}
                   </Text>
                 </View>
                 <View style={styles.detailText}>
                   <Text style={styles.boldText}>Certifications: </Text>
                   <Text style={styles.OutputText}>
-                    {selectedCandidate.certifications.join(', ')}
+                    {selectedCandidate?.certifications?.join(', ')}
                   </Text>
                 </View>
                 <View style={styles.detailText}>
                   <Text style={styles.boldText}>Achievements: </Text>
                   <Text style={styles.OutputText}>
-                    {selectedCandidate.achievements.join(', ')}
+                    {selectedCandidate?.achievements?.join(', ')}
                   </Text>
                 </View>
               </ScrollView>
               <TouchableOpacity
                 style={styles.closeButton}
-                onPress={() => setCandidateModalVisible(false)}>
+                onPress={() => handleModalClose()}>
                 <Text style={styles.closeButtonText}>Close</Text>
               </TouchableOpacity>
             </View>
@@ -596,7 +853,7 @@ const styles = StyleSheet.create({
   modalContent: {
     flex: 1,
     backgroundColor: '#fff',
-    padding: 20,
+    padding: 12,
     borderRadius: 10,
     width: '100%',
     height: '100%',
@@ -626,13 +883,46 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   boldText: {
-    flex: 1,
+    width: width * 0.4,
     fontWeight: 'bold',
     color: 'gray',
     fontSize: 13,
   },
-  OutputText: {
+  chipContainer: {
     flex: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  chip: {
+    fontSize: 12,
+    padding: 8,
+    borderRadius: 5,
+    backgroundColor: '#f1f1f1',
+    color: colors.primary,
+  },
+  NameText: {
+    fontWeight: 'bold',
+    color: colors.primary,
+    fontSize: 16,
+  },
+  headlineText: {
+    fontWeight: '600',
+    color: colors.primary,
+    fontSize: 13,
+  },
+  emailText: {
+    fontWeight: '600',
+    color: colors.secondary,
+    fontSize: 13,
+  },
+  mobilenumber: {
+    fontWeight: '600',
+    color: colors.secondary,
+    fontSize: 13,
+  },
+  OutputText: {
+    width: width * 0.55,
     fontWeight: '600',
     color: colors.primary,
     fontSize: 13,
@@ -644,11 +934,33 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 10,
   },
+  profileimage: {
+    padding: 12,
+    width: 120,
+    height: 120,
+    borderRadius: 50,
+  },
   CandidatemodalTitle: {
     flex: 1,
     fontSize: 20,
     fontWeight: 'bold',
     color: colors.secondary,
+  },
+  educationItem: {
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  evensection: {
+    flexDirection: 'row',
+    backgroundColor: '#fafafa',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+  oddsection: {
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
   },
 });
 
