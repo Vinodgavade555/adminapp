@@ -4,24 +4,14 @@ import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons'; // You can use any icon library
 
 const CustomHeader = () => {
-  const navigation = useNavigation();
+  // const navigation = useNavigation();
 
-  const handleGoBack = () => {
-    if (navigation.canGoBack()) {
-      navigation.goBack(); // Navigate to the previous screen
-    } else {
-      navigation.navigate('Home'); // Fallback to a specific screen if no previous screen
-    }
-  };
+ 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity
-        onPress={handleGoBack}
-        style={styles.iconContainer}
-        accessible
-        accessibilityLabel="Go back">
+    <View style={[styles.container,styles.iconContainer]}>
+      
         <Icon name="arrow-back" size={24} color="black" />
-      </TouchableOpacity>
+     
     </View>
   );
 };

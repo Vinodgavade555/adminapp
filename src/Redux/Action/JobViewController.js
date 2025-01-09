@@ -23,21 +23,19 @@ const JobViewController = () => {
     navigation.goBack();
   };
 
-  const GetJobList = user_id => async dispatch => {
+  const GetJobList = (employer_id,page) => async dispatch => {
     dispatch({type: 'LOADING', payload: true});
 
     try {
-      const response = await axios.get(`http://15.206.149.28/api/jobs/`);
-      // console.log(
-      //   '****************************job-GetJobList response***************************',
-      // );
+      const response = await axios.get(
+        `http://15.206.149.28/api/jobs-by-employer/${employer_id}/?page=${page}`,
+      );
+
       const jsonString = JSON.stringify(response.data);
       const data = JSON.parse(jsonString);
-      // console.log(data);
-
-      dispatch({type: 'JOB_LIST_SUCCESS', payload: data});
-
+      console.log(data);
       dispatch({type: 'LOADING', payload: false});
+      dispatch({type: 'JOB_LIST_SUCCESS', payload: data});
     } catch (error) {
       console.log('error', error.response);
 
@@ -112,10 +110,56 @@ const JobViewController = () => {
     }
   };
 
+  const GetHomePageData = employer_id => async dispatch => {
+    dispatch({type: 'LOADING', payload: true});
+
+    try {
+      const response = await axios.get(
+        `http://15.206.149.28/api/employer-home-page-data/${employer_id}`,
+      );
+      console.log(
+        '****************************job-GetHomedata response***************************',
+        response,
+      );
+      const jsonString = JSON.stringify(response.data);
+      const data = JSON.parse(jsonString);
+      console.log(data);
+
+      dispatch({type: 'HOME_DATA_SUCCESS', payload: data});
+
+      dispatch({type: 'LOADING', payload: false});
+    } catch (error) {
+      console.log('error', error.response);
+
+      dispatch({type: 'LOADING', payload: false});
+      Toast.show(
+        error.response?.data?.non_field_errors[0]
+          ? error.response.data.non_field_errors[0]
+          : 'Something went wrong,Please Try again!',
+        {
+          type: 'danger',
+          placement: 'top',
+          duration: 4000,
+          offset: 100,
+          animationType: 'slide-in',
+        },
+      );
+      dispatch({
+        type: 'HOME_DATA_FAILURE',
+        payload: {
+          error: error.response?.data?.non_field_errors
+            ? error.response.data.non_field_errors[0]
+            : error?.response?.data,
+        },
+      });
+    }
+  };
+
   return {
     goBackScreen,
     GetJobList,
     GetAppliedJobSeekerList,
+    GetHomePageData,
   };
 };
 

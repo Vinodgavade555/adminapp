@@ -87,20 +87,21 @@ const AuthViewController = () => {
 
   const login = requestData => async dispatch => {
     dispatch({type: 'LOADING', payload: true});
-
+     console.log(requestData);
+     
     try {
-      const response = await axios.post('http://15.206.149.28/api/user/login/', requestData);
+      const response = await axios.post('http://15.206.149.28/api/employer/login/', requestData);
     
 
       // console.log(
       //   '****************************login response***************************',
       // );
-
+    // console.log(response);
+    const { message, user_id, access, refresh } = response.data; 
       const jsonString = JSON.stringify(response.data);
       const data = JSON.parse(jsonString);
 
-      // console.log(response);
-      const {access, user_id} = data;
+      // const {access, user_id} = data;
       // console.log('login data ', token, user);
 
       setAuthToken(access); // Set token in axios headers or AsyncStorage
@@ -120,7 +121,7 @@ const AuthViewController = () => {
       navigation.navigate('DefaultScreen');
 
     } catch (error) {
-      console.log('error', error.response);
+      console.log('error_____', error);
 
       dispatch({type: 'LOADING', payload: false});
       Toast.show(
