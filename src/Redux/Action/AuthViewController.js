@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import instance, {setAuthToken} from '../../Services/baseAPI';
 import axios from 'axios';
 
+export const  BASE_URL = 'http://15.206.149.28/';
 const AuthViewController = () => {
   const navigation = useNavigation();
   const goBackScreen = () => {

@@ -11,6 +11,8 @@ import ResetPasswordScreen from '../Screens/UserScreens/ResetPasswordScreen.js.j
 import DefaultScreen from '../Screens/DefaultScreen.js';
 import HomeScreen from '../Screens/BottomTabScreens/HomeScreen.js';
 import CustomNotificationScreen from '../Constant/CustomNotification.js';
+import JobDetailScreen from '../Components/JobDetail.js';
+import ViewApplicationsScreen from '../Components/ViewApplication.js';
 
 const StackNavigation = () => {
   const Stack = createNativeStackNavigator();
@@ -63,11 +65,11 @@ const StackNavigation = () => {
         options={{headerShown: false}}
       />
 
-
-
-
-
-
+      <Stack.Screen
+        name="JobDetail"
+        component={JobDetailScreen}
+        options={{headerShown: false}}
+      />
 
       <Stack.Screen
         name="Notification"
@@ -75,7 +77,12 @@ const StackNavigation = () => {
         options={{headerShown: false}}
       />
 
-   
+      <Stack.Screen
+      name='ApplicationPage'
+      component={ViewApplicationsScreen}
+      options={{headerShown: false}}
+      />
+
     </Stack.Navigator>
   );
 };

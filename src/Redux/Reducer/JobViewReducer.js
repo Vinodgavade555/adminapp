@@ -2,7 +2,9 @@ const initialState = {
   JobList: [],
   JobListPagination: {},
   JobSeekerList: [],
+  JobDetails:[],
   HomeData: [],
+  JobApplications:[],
   error: null,
   isLoading: false, // Track loading for any API request
 };
@@ -39,6 +41,33 @@ const jobReducer = (state = initialState, action) => {
         error: null,
       };
 
+      
+    // Job Details Success
+    case 'JOB_DETAILS_SUCCESS':
+      return {
+        ...state,
+        JobDetails: action.payload, // Store job details in the state
+        error: null,
+      };
+
+    // Job Details Failure
+    case 'JOB_DETAILS_FAILURE':
+      return {
+        ...state,
+        error: action.payload.error, // Store the error message for job details
+      };
+
+      case 'TOGGLE_JOB_STATUS_SUCCESS':
+      return {
+        ...state,
+        // JobDetails: action.payload,  // Updated job details after toggling status
+      };
+    case 'TOGGLE_JOB_STATUS_FAILURE':
+      return {
+        ...state,
+        error: action.payload.error,
+      };
+
     case 'JOB_LIST_FAILURE':
       return {
         ...state,
@@ -71,6 +100,21 @@ const jobReducer = (state = initialState, action) => {
       return {
         ...state,
         error: action.payload.error,
+      };
+      
+      // Job Applications Success 
+    case 'JOB_APPLICATIONS_SUCCESS':
+      return {
+        ...state,
+        JobApplications: action.payload, 
+        error: null,
+      };
+
+    // Job Applications Failure
+    case 'JOB_APPLICATIONS_FAILURE':
+      return {
+        ...state,
+        error: action.payload.error, 
       };
 
     default:

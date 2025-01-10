@@ -118,7 +118,7 @@ const HomeScreen = () => {
             source={require('../../Assets/Images/Admin.png')}
           />
         </View>
-        //Hero Scroll
+        
         <HeroScroll />
         <View style={styles.TableContainer}>
           <View style={styles.TableHeadingContainer}>
@@ -129,12 +129,16 @@ const HomeScreen = () => {
             HomeData.recent_jobs.map((job, index) => (
               <View key={index} style={styles.jobCard}>
                 <View style={styles.jobCardContent}>
-                <View style={styles.titleContainer}>
-          <Text style={styles.jobTitle}>{job.job_title?.title || 'No Title'}</Text>
-          <Text style={styles.jobDate}>
-            {job.created_at ? moment(job.created_at).format('DD MMM YYYY') : 'No Date'}
-          </Text>
-        </View>
+                  <View style={styles.titleContainer}>
+                    <Text style={styles.jobTitle}>
+                      {job.job_title?.title || 'No Title'}
+                    </Text>
+                    <Text style={styles.jobDate}>
+                      {job.created_at
+                        ? moment(job.created_at).format('DD MMM YYYY')
+                        : 'No Date'}
+                    </Text>
+                  </View>
                   {job.job_location && job.job_location.length > 0 ? (
                     <View style={styles.locationContainer}>
                       <Icon
@@ -158,8 +162,6 @@ const HomeScreen = () => {
                     </Text>
                   </View>
                 </View>
-
-                
               </View>
             ))
           ) : (
@@ -176,10 +178,12 @@ const styles = StyleSheet.create({
   Maincontainer: {
     flex: 1,
     padding: 12,
+    width:'100%'
   },
   container: {
     flex: 1,
     backgroundColor: colors.background,
+     width:'100%'
   },
   welcomeBanner: {
     width: '100%',
@@ -275,18 +279,18 @@ const styles = StyleSheet.create({
   },
   titleContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',  // Aligns title to the left and date to the right
-    alignItems: 'center',             // Vertically centers title and date
+    justifyContent: 'space-between', // Aligns title to the left and date to the right
+    alignItems: 'center', // Vertically centers title and date
   },
   jobTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',                    // Adjust as needed
+    color: '#333', // Adjust as needed
   },
   jobDate: {
     fontSize: 12,
-    color: '#888',                    // Lighter color for date
-    textAlign: 'right',               // Align the date to the right side
+    color: '#888', // Lighter color for date
+    textAlign: 'right', // Align the date to the right side
   },
   companyName: {
     fontSize: 16,
