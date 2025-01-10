@@ -15,196 +15,15 @@ import ApplicationResponseChart from '../../Constant/ApplicationResponseChart';
 import {useDispatch, useSelector} from 'react-redux';
 import JobViewController from '../../Redux/Action/JobViewController';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-const jobData = [
-  {
-    id: '1',
-    title: 'UI UX Designer',
-    category: 'Full Time',
-    openings: 12,
-    applications: 135,
-    status: 'Active',
-    date: '2024-12-01',
-  },
-  {
-    id: '2',
-    title: 'Full Stack Dev',
-    category: 'Full Time',
-    openings: 8,
-    applications: 100,
-    status: 'Inactive',
-    date: '2024-11-28',
-  },
-  {
-    id: '3',
-    title: 'DevOps',
-    category: 'Internship',
-    openings: 12,
-    applications: 5,
-    status: 'Active',
-    date: '2024-12-02',
-  },
-  {
-    id: '4',
-    title: 'Android Dev',
-    category: 'Full Time',
-    openings: 4,
-    applications: 45,
-    status: 'Active',
-    date: '2024-12-01',
-  },
-  {
-    id: '5',
-    title: 'IOS Developer',
-    category: 'Full Time',
-    openings: 18,
-    applications: 96,
-    status: 'Inactive',
-    date: '2024-12-04',
-  },
-  {
-    id: '6',
-    title: 'Project Manager',
-    category: 'Part Time',
-    openings: 3,
-    applications: 40,
-    status: 'Active',
-    date: '2024-12-02',
-  },
-  {
-    id: '7',
-    title: 'Data Analyst',
-    category: 'Full Time',
-    openings: 9,
-    applications: 120,
-    status: 'Active',
-    date: '2024-11-27',
-  },
-  {
-    id: '8',
-    title: 'Machine Learning Engineer',
-    category: 'Full Time',
-    openings: 5,
-    applications: 67,
-    status: 'Inactive',
-    date: '2024-11-28',
-  },
-  {
-    id: '9',
-    title: 'Backend Developer',
-    category: 'Full Time',
-    openings: 10,
-    applications: 200,
-    status: 'Active',
-    date: '2024-12-03',
-  },
-  {
-    id: '10',
-    title: 'Frontend Developer',
-    category: 'Full Time',
-    openings: 7,
-    applications: 150,
-    status: 'Inactive',
-    date: '2024-11-28',
-  },
-  {
-    id: '11',
-    title: 'Graphic Designer',
-    category: 'Part Time',
-    openings: 2,
-    applications: 30,
-    status: 'Active',
-    date: '2024-11-29',
-  },
-  {
-    id: '12',
-    title: 'QA Engineer',
-    category: 'Full Time',
-    openings: 6,
-    applications: 85,
-    status: 'Inactive',
-    date: '2024-12-01',
-  },
-  {
-    id: '13',
-    title: 'HR Manager',
-    category: 'Full Time',
-    openings: 3,
-    applications: 60,
-    status: 'Active',
-    date: '2024-11-27',
-  },
-  {
-    id: '14',
-    title: 'Cloud Engineer',
-    category: 'Full Time',
-    openings: 8,
-    applications: 110,
-    status: 'Active',
-    date: '2024-11-29',
-  },
-  {
-    id: '15',
-    title: 'Database Admin',
-    category: 'Internship',
-    openings: 1,
-    applications: 20,
-    status: 'Inactive',
-    date: '2024-12-02',
-  },
-  {
-    id: '16',
-    title: 'Digital Marketer',
-    category: 'Full Time',
-    openings: 4,
-    applications: 50,
-    status: 'Active',
-    date: '2024-11-30',
-  },
-  {
-    id: '17',
-    title: 'Content Writer',
-    category: 'Part Time',
-    openings: 3,
-    applications: 25,
-    status: 'Active',
-    date: '2024-12-04',
-  },
-  {
-    id: '18',
-    title: 'System Administrator',
-    category: 'Full Time',
-    openings: 5,
-    applications: 75,
-    status: 'Inactive',
-    date: '2024-12-01',
-  },
-  {
-    id: '19',
-    title: 'Sales Executive',
-    category: 'Full Time',
-    openings: 12,
-    applications: 140,
-    status: 'Active',
-    date: '2024-12-02',
-  },
-  {
-    id: '20',
-    title: 'Cybersecurity Analyst',
-    category: 'Full Time',
-    openings: 7,
-    applications: 90,
-    status: 'Active',
-    date: '2024-11-28',
-  },
-];
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const HomeScreen = () => {
   const [activeTab, setActiveTab] = useState('Monthly');
   const [id, setId] = useState(null);
   const dispatch = useDispatch();
 
-  const {GetJobList} = JobViewController();
-  const {JobList} = useSelector(state => state.job);
+  const {GetHomePageData} = JobViewController();
+  const {HomeData} = useSelector(state => state.job);
 
   useEffect(() => {
     const getUserData = async () => {
@@ -212,7 +31,7 @@ const HomeScreen = () => {
         const userId = await AsyncStorage.getItem('user_data');
         setId(userId);
         if (userId) {
-          dispatch(GetJobList(userId));
+          dispatch(GetHomePageData(userId));
         }
       } catch (error) {
         console.error('Error reading value from AsyncStorage', error);
@@ -270,7 +89,7 @@ const HomeScreen = () => {
   const preprocessData = (data = []) => {
     // Validate that data is an array
     if (!Array.isArray(data)) {
-      console.warn('preprocessData received invalid data:', data);
+      // console.warn('preprocessData received invalid data:', data);
       return [];
     }
     // Map through each item to extract specific fields
@@ -284,7 +103,7 @@ const HomeScreen = () => {
     }));
   };
 
-  const processedJobs = preprocessData(JobList.results || []);
+  const processedJobs = preprocessData(HomeData.recent_jobs || []);
   return (
     <View style={styles.Maincontainer}>
       <ScrollView style={styles.container}>
@@ -299,44 +118,55 @@ const HomeScreen = () => {
             source={require('../../Assets/Images/Admin.png')}
           />
         </View>
-
-        {/* Hero Scroll */}
+        
         <HeroScroll />
-
-        {/* Custom DataTable */}
         <View style={styles.TableContainer}>
           <View style={styles.TableHeadingContainer}>
             <Text style={styles.tableheading}>Recent Jobs</Text>
-            <View style={styles.tableheadingContainer}>
-              {['Monthly', 'Weekly', 'Today'].map(tab => (
-                <TouchableOpacity
-                  key={tab}
-                  onPress={() => handleTabChange(tab)}>
-                  <Text
-                    style={[
-                      styles.Tab,
-                      activeTab === tab && styles.activeTab, // Apply active style if this tab is active
-                    ]}>
-                    {tab}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
           </View>
-          <CustomDataTable
-            columns={[
-              {header: 'Job Title', field: 'jobTitle'},
-              {header: 'Work Mode', field: 'workmode'},
-              {header: 'Openings', field: 'openingsCount'},
-              {header: 'Applications', field: 'applicantCount'},
-              {
-                header: 'Status',
-                field: 'status',
-              },
-            ]}
-            data={processedJobs} // Fallback to an empty array if undefined
-            rowsPerPageOptions={[5, 10]}
-          />
+
+          {HomeData.recent_jobs && HomeData.recent_jobs.length > 0 ? (
+            HomeData.recent_jobs.map((job, index) => (
+              <View key={index} style={styles.jobCard}>
+                <View style={styles.jobCardContent}>
+                  <View style={styles.titleContainer}>
+                    <Text style={styles.jobTitle}>
+                      {job.job_title?.title || 'No Title'}
+                    </Text>
+                    <Text style={styles.jobDate}>
+                      {job.created_at
+                        ? moment(job.created_at).format('DD MMM YYYY')
+                        : 'No Date'}
+                    </Text>
+                  </View>
+                  {job.job_location && job.job_location.length > 0 ? (
+                    <View style={styles.locationContainer}>
+                      <Icon
+                        name="map-marker"
+                        size={14}
+                        color={colors.primary}
+                        style={styles.locationIcon}
+                      />
+                      <Text style={styles.companyLocation}>
+                        {job.job_location.join(', ')}
+                      </Text>
+                    </View>
+                  ) : null}
+                  <View style={{flexDirection: 'row'}}>
+                    <Text style={styles.applications}>
+                      Applications: {job.applicant_count || 0} |
+                    </Text>
+
+                    <Text style={styles.openings}>
+                      Openings: {job.openings || 0}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            ))
+          ) : (
+            <Text>No recent jobs available</Text>
+          )}
         </View>
         <ApplicationResponseChart />
       </ScrollView>
@@ -348,10 +178,12 @@ const styles = StyleSheet.create({
   Maincontainer: {
     flex: 1,
     padding: 12,
+    width:'100%'
   },
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.background,
+     width:'100%'
   },
   welcomeBanner: {
     width: '100%',
@@ -438,6 +270,68 @@ const styles = StyleSheet.create({
     color: '#fff',
     backgroundColor: colors.primary,
     fontWeight: 'bold',
+  },
+  jobCard: {
+    marginVertical: 8,
+    padding: 12,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between', // Aligns title to the left and date to the right
+    alignItems: 'center', // Vertically centers title and date
+  },
+  jobTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333', // Adjust as needed
+  },
+  jobDate: {
+    fontSize: 12,
+    color: '#888', // Lighter color for date
+    textAlign: 'right', // Align the date to the right side
+  },
+  companyName: {
+    fontSize: 16,
+    color: '#555',
+  },
+  companyDescription: {
+    fontSize: 14,
+    color: '#777',
+  },
+  companyTagline: {
+    fontSize: 14,
+    color: '#888',
+  },
+  companyWebsite: {
+    fontSize: 14,
+    color: '#0066cc',
+  },
+  locationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  locationIcon: {
+    marginRight: 4, // Space between the icon and text
+  },
+  companyLocation: {
+    fontSize: 11,
+    color: '#555',
+  },
+  applications: {
+    fontSize: 11,
+    color: colors.primary,
+  },
+  openings: {
+    fontSize: 11,
+    color: colors.primary,
+    marginLeft: 4,
+  },
+  jobDate: {
+    fontSize: 12,
+    color: '#888',
+    marginTop: 4,
   },
 });
 

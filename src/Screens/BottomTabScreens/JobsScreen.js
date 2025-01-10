@@ -1,470 +1,249 @@
-import React from 'react';
-import {StyleSheet, View} from 'react-native';
-import CustomDataTable from '../../Constant/CustomDataTable';
+import React, {useEffect, useState} from 'react';
+import {
+  ActivityIndicator,
+  Dimensions,
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import JobViewController from '../../Redux/Action/JobViewController';
+import {useNavigation} from '@react-navigation/native';
+const {width} = Dimensions.get('window'); // Get the screen width
+import {colors} from '../../Global_CSS/TheamColors';
+import moment from 'moment';
+import Icon from 'react-native-vector-icons/Ionicons';
 
-const columns = [
-  {header: 'Date', field: 'date'},
-  {header: 'Job Title', field: 'jobTitle'},
-  {header: 'Vacancies', field: 'vacancies'},
-  {header: 'Experience', field: 'experience'},
-  {header: 'Salary', field: 'salary'},
-  {header: 'Know More', field: 'Know More'},
-
-];
-const jobData = [
-  {
-    date: '2024-12-01',
-    jobTitle: 'Software Engineer',
-    vacancies: 5,
-    experience: '2-4 years',
-    salary: '$80,000 - $100,000',
-  },
-  {
-    date: '2024-12-01',
-    jobTitle: 'Data Scientist',
-    vacancies: 3,
-    experience: '3-5 years',
-    salary: '$90,000 - $120,000',
-  },
-  {
-    date: '2024-12-02',
-    jobTitle: 'Product Manager',
-    vacancies: 2,
-    experience: '5+ years',
-    salary: '$100,000 - $130,000',
-  },
-  {
-    date: '2024-12-02',
-    jobTitle: 'UI/UX Designer',
-    vacancies: 4,
-    experience: '1-3 years',
-    salary: '$70,000 - $90,000',
-  },
-  {
-    date: '2024-12-03',
-    jobTitle: 'Marketing Specialist',
-    vacancies: 6,
-    experience: '2-4 years',
-    salary: '$60,000 - $80,000',
-  },
-  {
-    date: '2024-12-03',
-    jobTitle: 'DevOps Engineer',
-    vacancies: 3,
-    experience: '3-6 years',
-    salary: '$85,000 - $110,000',
-  },
-  {
-    date: '2024-12-04',
-    jobTitle: 'Business Analyst',
-    vacancies: 5,
-    experience: '2-4 years',
-    salary: '$75,000 - $95,000',
-  },
-  {
-    date: '2024-12-04',
-    jobTitle: 'Human Resources Manager',
-    vacancies: 2,
-    experience: '4+ years',
-    salary: '$65,000 - $85,000',
-  },
-  {
-    date: '2024-12-05',
-    jobTitle: 'Full Stack Developer',
-    vacancies: 4,
-    experience: '3-5 years',
-    salary: '$85,000 - $105,000',
-  },
-  {
-    date: '2024-12-05',
-    jobTitle: 'Cybersecurity Analyst',
-    vacancies: 3,
-    experience: '2-5 years',
-    salary: '$90,000 - $115,000',
-  },
-  {
-    date: '2024-12-06',
-    jobTitle: 'Network Administrator',
-    vacancies: 4,
-    experience: '2-4 years',
-    salary: '$70,000 - $90,000',
-  },
-  {
-    date: '2024-12-06',
-    jobTitle: 'Database Administrator',
-    vacancies: 3,
-    experience: '3-5 years',
-    salary: '$80,000 - $100,000',
-  },
-  {
-    date: '2024-12-07',
-    jobTitle: 'Quality Assurance Engineer',
-    vacancies: 5,
-    experience: '2-4 years',
-    salary: '$75,000 - $95,000',
-  },
-  {
-    date: '2024-12-07',
-    jobTitle: 'Systems Analyst',
-    vacancies: 4,
-    experience: '3-5 years',
-    salary: '$80,000 - $100,000',
-  },
-  {
-    date: '2024-12-08',
-    jobTitle: 'Technical Support Specialist',
-    vacancies: 6,
-    experience: '1-3 years',
-    salary: '$60,000 - $80,000',
-  },
-  {
-    date: '2024-12-08',
-    jobTitle: 'IT Project Manager',
-    vacancies: 2,
-    experience: '5+ years',
-    salary: '$95,000 - $120,000',
-  },
-  {
-    date: '2024-12-09',
-    jobTitle: 'Machine Learning Engineer',
-    vacancies: 3,
-    experience: '3-5 years',
-    salary: '$100,000 - $130,000',
-  },
-  {
-    date: '2024-12-09',
-    jobTitle: 'Cloud Architect',
-    vacancies: 2,
-    experience: '5+ years',
-    salary: '$110,000 - $140,000',
-  },
-  {
-    date: '2024-12-10',
-    jobTitle: 'Mobile Application Developer',
-    vacancies: 4,
-    experience: '2-4 years',
-    salary: '$80,000 - $100,000',
-  },
-  {
-    date: '2024-12-10',
-    jobTitle: 'Frontend Developer',
-    vacancies: 5,
-    experience: '2-4 years',
-    salary: '$75,000 - $95,000',
-  },
-  {
-    date: '2024-12-11',
-    jobTitle: 'Backend Developer',
-    vacancies: 4,
-    experience: '3-5 years',
-    salary: '$80,000 - $100,000',
-  },
-  {
-    date: '2024-12-11',
-    jobTitle: 'Data Analyst',
-    vacancies: 5,
-    experience: '2-4 years',
-    salary: '$70,000 - $90,000',
-  },
-  {
-    date: '2024-12-12',
-    jobTitle: 'SEO Specialist',
-    vacancies: 3,
-    experience: '2-4 years',
-    salary: '$60,000 - $80,000',
-  },
-  {
-    date: '2024-12-12',
-    jobTitle: 'Content Writer',
-    vacancies: 6,
-    experience: '1-3 years',
-    salary: '$50,000 - $70,000',
-  },
-  {
-    date: '2024-12-13',
-    jobTitle: 'Graphic Designer',
-    vacancies: 4,
-    experience: '2-4 years',
-    salary: '$60,000 - $80,000',
-  },
-  {
-    date: '2024-12-13',
-    jobTitle: 'Sales Manager',
-    vacancies: 3,
-    experience: '4+ years',
-    salary: '$80,000 - $100,000',
-  },
-  {
-    date: '2024-12-14',
-    jobTitle: 'Customer Service Representative',
-    vacancies: 6,
-    experience: '1-3 years',
-    salary: '$40,000 - $60,000',
-  },
-  {
-    date: '2024-12-14',
-    jobTitle: 'Financial Analyst',
-    vacancies: 4,
-    experience: '2-4 years',
-    salary: '$70,000 - $90,000',
-  },
-  {
-    date: '2024-12-15',
-    jobTitle: 'Operations Manager',
-    vacancies: 3,
-    experience: '4+ years',
-    salary: '$85,000 - $105,000',
-  },
-  {
-    date: '2024-12-15',
-    jobTitle: 'Accountant',
-    vacancies: 5,
-    experience: '2-4 years',
-    salary: '$60,000 - $80,000',
-  },
-  {
-    date: '2024-12-16',
-    jobTitle: 'Legal Advisor',
-    vacancies: 2,
-    experience: '5+ years',
-    salary: '$90,000 - $120,000',
-  },
-  {
-    date: '2024-12-16',
-    jobTitle: 'Procurement Specialist',
-    vacancies: 4,
-    experience: '3-5 years',
-    salary: '$70,000 - $90,000',
-  },
-  {
-    date: '2024-12-17',
-    jobTitle: 'Supply Chain Manager',
-    vacancies: 3,
-    experience: '4+ years',
-    salary: '$85,000 - $110,000',
-  },
-  {
-    date: '2024-12-17',
-    jobTitle: 'Research Scientist',
-    vacancies: 2,
-    experience: '5+ years',
-    salary: '$95,000 - $125,000',
-  },
-  {
-    date: '2024-12-18',
-    jobTitle: 'Laboratory Technician',
-    vacancies: 5,
-    experience: '1-3 years',
-    salary: '$50,000 - $70,000',
-  },
-  {
-    date: '2024-12-18',
-    jobTitle: 'Mechanical Engineer',
-    vacancies: 4,
-    experience: '2-4 years',
-    salary: '$75,000 - $95,000',
-  },
-  {
-    date: '2024-12-19',
-    jobTitle: 'Electrical Engineer',
-    vacancies: 3,
-    experience: '3-5 years',
-    salary: '$80,000 - $100,000',
-  },
-  {
-    date: '2024-12-19',
-    jobTitle: 'Civil Engineer',
-    vacancies: 4,
-    experience: '2-4 years',
-    salary: '$70,000 - $90,000',
-  },
-  {
-    date: '2024-12-20',
-    jobTitle: 'Architect',
-    vacancies: 3,
-    experience: '3-5 years',
-    salary: '$80,000 - $100,000',
-  },
-  {
-    date: '2024-12-20',
-    jobTitle: 'Environmental Engineer',
-    vacancies: 2,
-    experience: '4+ years',
-    salary: '$85,000 - $110,000',
-  },
-  {
-    date: '2024-12-21',
-    jobTitle: 'Chemical Engineer',
-    vacancies: 3,
-    experience: '3-5 years',
-    salary: '$80,000 - $100,000',
-  },
-  {
-    date: '2024-12-21',
-    jobTitle: 'Biomedical Engineer',
-    vacancies: 2,
-    experience: '3-5 years',
-    salary: '$85,000 - $105,000',
-  },
-  {
-    date: '2024-12-22',
-    jobTitle: 'Pharmacist',
-    vacancies: 4,
-    experience: '2-4 years',
-    salary: '$75,000 - $95,000',
-  },
-  {
-    date: '2024-12-22',
-    jobTitle: 'Pharmaceutical Scientist',
-    vacancies: 3,
-    experience: '3-5 years',
-    salary: '$85,000 - $110,000',
-  },
-  {
-    date: '2024-12-23',
-    jobTitle: 'Nurse',
-    vacancies: 6,
-    experience: '1-3 years',
-    salary: '$60,000 - $80,000',
-  },
-  {
-    date: '2024-12-23',
-    jobTitle: 'Medical Doctor',
-    vacancies: 2,
-    experience: '5+ years',
-    salary: '$120,000 - $160,000',
-  },
-  {
-    date: '2024-12-24',
-    jobTitle: 'Surgeon',
-    vacancies: 1,
-    experience: '7+ years',
-    salary: '$150,000 - $200,000',
-  },
-  {
-    date: '2024-12-24',
-    jobTitle: 'Dentist',
-    vacancies: 2,
-    experience: '5+ years',
-    salary: '$120,000 - $150,000',
-  },
-  {
-    date: '2024-12-25',
-    jobTitle: 'Veterinarian',
-    vacancies: 3,
-    experience: '3-5 years',
-    salary: '$85,000 - $110,000',
-  },
-  {
-    date: '2024-12-25',
-    jobTitle: 'Social Worker',
-    vacancies: 4,
-    experience: '1-3 years',
-    salary: '$45,000 - $65,000',
-  },
-  {
-    date: '2024-12-26',
-    jobTitle: 'Teacher',
-    vacancies: 6,
-    experience: '2-4 years',
-    salary: '$50,000 - $70,000',
-  },
-  {
-    date: '2024-12-26',
-    jobTitle: 'Professor',
-    vacancies: 2,
-    experience: '7+ years',
-    salary: '$90,000 - $130,000',
-  },
-  {
-    date: '2024-12-27',
-    jobTitle: 'School Counselor',
-    vacancies: 3,
-    experience: '2-4 years',
-    salary: '$60,000 - $80,000',
-  },
-  {
-    date: '2024-12-27',
-    jobTitle: 'Librarian',
-    vacancies: 3,
-    experience: '1-3 years',
-    salary: '$50,000 - $65,000',
-  },
-  {
-    date: '2024-12-28',
-    jobTitle: 'Research Assistant',
-    vacancies: 5,
-    experience: '1-2 years',
-    salary: '$45,000 - $60,000',
-  },
-  {
-    date: '2024-12-28',
-    jobTitle: 'Marketing Manager',
-    vacancies: 3,
-    experience: '4+ years',
-    salary: '$85,000 - $110,000',
-  },
-  {
-    date: '2024-12-29',
-    jobTitle: 'Sales Representative',
-    vacancies: 6,
-    experience: '1-3 years',
-    salary: '$50,000 - $70,000',
-  },
-  {
-    date: '2024-12-29',
-    jobTitle: 'E-commerce Manager',
-    vacancies: 3,
-    experience: '3-5 years',
-    salary: '$75,000 - $95,000',
-  },
-  {
-    date: '2024-12-30',
-    jobTitle: 'Social Media Manager',
-    vacancies: 4,
-    experience: '2-4 years',
-    salary: '$65,000 - $85,000',
-  },
-  {
-    date: '2024-12-30',
-    jobTitle: 'Public Relations Specialist',
-    vacancies: 3,
-    experience: '2-4 years',
-    salary: '$60,000 - $80,000',
-  },
-  {
-    date: '2024-12-31',
-    jobTitle: 'Event Coordinator',
-    vacancies: 5,
-    experience: '1-3 years',
-    salary: '$50,000 - $70,000',
-  },
-  {
-    date: '2024-12-31',
-    jobTitle: 'Graphic Designer',
-    vacancies: 6,
-    experience: '2-4 years',
-    salary: '$60,000 - $80,000',
-  },
-];
-
-const rowsPerPageOptions = [10, 20];
 const JobsScreen = () => {
+  const [id, setId] = useState(null);
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
+  const onFocus = useNavigation();
+  const {GetJobList} = JobViewController();
+  const {JobList, JobListPagination, isLoading} = useSelector(
+    state => state.job,
+  );
+
+  useEffect(() => {
+    const getUserData = async () => {
+      try {
+        const userId = await AsyncStorage.getItem('user_data');
+        setId(userId);
+        if (JobList?.length == 0) {
+          dispatch(GetJobList(userId, 1)); // Fetch job list on component mount
+        }
+      } catch (error) {
+        console.error('Error reading value from AsyncStorage', error);
+      }
+    };
+    getUserData();
+  }, [onFocus]);
+
+  // console.log('data', JobList[0]);
+
+  // Handle fetching more jobs when the user scrolls to the bottom
+  const loadMoreJobs = () => {
+    if (!isLoading && id && JobListPagination.next_page_number) {
+      dispatch(GetJobList(id, JobListPagination.next_page_number)); // Dispatch the action to load more jobs
+    }
+  };
+
+  function formatAmount(value) {
+    if (value >= 10000000) {
+      return (value / 10000000).toFixed(1) + ' Cr';
+    } else if (value >= 100000) {
+      return (value / 100000).toFixed(1) + ' Lac';
+    } else if (value >= 1000) {
+      return (value / 1000).toFixed(1) + ' K';
+    } else {
+      return value.toString();
+    }
+  }
+
+  const handleCardPress = (jobId) => {
+    navigation.navigate('JobDetail', {jobId:jobId}); 
+    // console.log(jobId);
+    
+  };
+
   return (
-    <View style={styles.container}>
-      <CustomDataTable
-        columns={columns}
-        data={jobData}
-        rowsPerPageOptions={rowsPerPageOptions}
+    <View style={styles.Container}>
+      <FlatList
+        data={JobList}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({item}) => (
+          <TouchableOpacity 
+          style={styles.card}
+          onPress={() => handleCardPress(item.id)}
+          >
+            <View style={styles.innerContainer}>
+              <View style={styles.titleContainer}>
+                <Text style={styles.jobTitle}>
+                  {item?.job_title?.title || 'No Title'}
+                </Text>
+                <Text style={styles.jobDate}>
+                  {item?.created_at
+                    ? moment(item.created_at).format('D MMM')
+                    : 'No Date'}
+                </Text>
+              </View>
+              {item?.job_location && item?.job_location?.length > 0 ? (
+                <View style={styles.locationContainer}>
+                  <Icon
+                    name="location-sharp"
+                    size={14}
+                    color={colors.primary} // You can replace this with your colors.primary
+                    style={styles.locationIcon}
+                  />
+                  <Text style={styles.companyLocation}>
+                    {item.job_location.join(', ')}
+                  </Text>
+                </View>
+              ) : null}
+
+              <View style={{flexDirection: 'row'}}>
+                {item?.experience_level && (
+                  <View style={styles.experienceContainer}>
+                    <Icon
+                      name="briefcase"
+                      size={12}
+                      color={colors.primary}
+                      style={styles.experienceIcon}
+                    />
+                    <Text style={styles.experienceText}>
+                      {item.experience_level.minYear} -{' '}
+                      {item.experience_level.maxYear} years
+                    </Text>
+                  </View>
+                )}
+                {item?.salary?.yearly && (
+                  <View style={styles.salaryContainer}>
+                    <Icon
+                      name="cash"
+                      size={12}
+                      color={colors.primary}
+                      style={styles.salaryIcon}
+                    />
+                    <Text style={styles.salaryText}>
+                      {formatAmount(item.salary.yearly.min)} -{' '}
+                      {formatAmount(item.salary.yearly.max)}{' '}
+                      {item.salary.yearly.currency}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </View>
+
+            <View style={{flexDirection: 'row',marginTop:8}}>
+              <Text style={styles.applications}>
+                Applications: {item?.applicant_count || 0} 
+              </Text>
+              {/* <Text style={styles.openings}>
+                Openings: {item?.openings || 0}
+              </Text> */}
+            </View>
+          </TouchableOpacity>
+        )}
+        onEndReached={loadMoreJobs} // Trigger when the end of the list is reached
+        onEndReachedThreshold={0.5} // When half of the list is visible
+        ListFooterComponent={
+          isLoading ? <ActivityIndicator size="large" /> : null
+        }
       />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  Container: {
     flex: 1,
+    backgroundColor: colors.background,
+    width: '100%',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+
+  card: {
+    marginVertical: 8, // Reduce margin between cards
+    padding: 12, // Less padding inside the card
     backgroundColor: '#fff',
+    borderRadius: 8,
+    width: '100%',
+    alignSelf: 'center',
+  },
+  innerContainer: {
+    backgroundColor: '#fafafa',
+    padding: 8,
+    borderRadius: 8,
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+
+  jobTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+
+  jobDate: {
+    fontSize: 11,
+    color: '#888',
+  },
+  locationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  locationIcon: {
+    marginRight: 4, // Space between the icon and text
+  },
+  companyLocation: {
+    fontSize: 11,
+    color: '#555',
+  },
+  salaryContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 8,
+  },
+
+  salaryIcon: {
+    marginRight: 4,
+  },
+
+  salaryText: {
+    fontSize: 11,
+    color: '#555',
+  },
+
+  experienceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+
+    margin: 2,
+  },
+
+  experienceIcon: {
+    marginRight: 4,
+  },
+
+  experienceText: {
+    fontSize: 11,
+    color: '#555',
+  },
+  applications: {
+    fontSize: 11,
+    color: colors.primary,
+  },
+  openings: {
+    fontSize: 11,
+    color: colors.primary,
+    marginLeft: 4,
   },
 });
 

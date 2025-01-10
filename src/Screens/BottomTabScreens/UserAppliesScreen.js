@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {
   Dimensions,
   Image,
+  Linking,
   Modal,
   ScrollView,
   StyleSheet,
@@ -19,352 +20,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {BASE_URL} from '../../Services/baseAPI';
 const {width} = Dimensions.get('window'); // Get the screen width
 
-const jobDetails = [
-  {
-    id: 1,
-    date: '2024-12-01',
-    jobTitle: 'Software Engineer',
-    applicationCount: 120,
-    applications: [
-      {
-        id: 1,
-        candidateDetails: {
-          candidateName: 'John Doe',
-          date: '2024-12-01',
-          statusHistory: [
-            {
-              status: 'Applied',
-              date: '2024-12-01',
-              message: 'Application submitted.',
-            },
-          ],
-          experience: '3 years',
-          skills: ['JavaScript', 'React', 'Node.js'],
-          education: 'B.Tech in Computer Science',
-          contact: {
-            email: 'johndoe@gmail.com',
-            phone: '+1-123-456-7890',
-          },
-          address: {
-            city: 'San Francisco',
-            state: 'California',
-            country: 'USA',
-          },
-          resumeLink: 'https://example.com/resume/johndoe',
-          profileSummary: 'Motivated software engineer...',
-          certifications: ['Certified JavaScript Developer'],
-          achievements: ['Built a high-traffic e-commerce platform.'],
-        },
-      },
-      {
-        id: 2,
-        candidateDetails: {
-          candidateName: 'Jane Smith',
-          date: '2024-12-01',
-          statusHistory: [
-            {
-              status: 'Applied',
-              date: '2024-12-01',
-              message: 'Application submitted.',
-            },
-            {
-              status: 'Interview Scheduled',
-              date: '2024-12-02',
-              message: 'Interview scheduled.',
-            },
-          ],
-          experience: '4 years',
-          skills: ['Python', 'SQL', 'Data Visualization'],
-          education: 'M.Sc. in Data Science',
-          contact: {
-            email: 'janesmith@gmail.com',
-            phone: '+1-987-654-3210',
-          },
-          address: {
-            city: 'New York',
-            state: 'New York',
-            country: 'USA',
-          },
-          resumeLink: 'https://example.com/resume/janesmith',
-          profileSummary: 'Data analyst with hands-on experience...',
-          certifications: ['Google Data Analytics Certificate'],
-          achievements: ['Automated reporting processes.'],
-        },
-      },
-    ],
-  },
-  {
-    id: 2,
-    date: '2024-12-02',
-    jobTitle: 'Data Analyst',
-    applicationCount: 95,
-    applications: [
-      {
-        id: 3,
-        date: '2024-12-01',
-        candidateDetails: {
-          candidateName: 'Alex Johnson',
-          statusHistory: [
-            {
-              status: 'Applied',
-              date: '2024-12-01',
-              message: 'Application submitted.',
-            },
-          ],
-          experience: '2 years',
-          skills: ['Excel', 'Tableau', 'SQL'],
-          education: 'B.A. in Economics',
-          contact: {
-            email: 'alexj@gmail.com',
-            phone: '+1-123-555-7890',
-          },
-          address: {
-            city: 'Seattle',
-            state: 'Washington',
-            country: 'USA',
-          },
-          resumeLink: 'https://example.com/resume/alexj',
-          profileSummary: 'Entry-level data analyst...',
-          certifications: ['Certified Tableau Analyst'],
-          achievements: ['Built an interactive dashboard.'],
-        },
-      },
-      {
-        id: 4,
-        candidateDetails: {
-          candidateName: 'Emma White',
-          statusHistory: [
-            {
-              status: 'Applied',
-              date: '2024-12-01',
-              message: 'Application submitted.',
-            },
-            {
-              status: 'Application Viewed',
-              date: '2024-12-02',
-              message: 'Application reviewed.',
-            },
-          ],
-          experience: '3 years',
-          skills: ['SQL', 'Power BI', 'Python'],
-          education: 'B.Sc. in Computer Science',
-          contact: {
-            email: 'emmaw@gmail.com',
-            phone: '+1-222-654-3210',
-          },
-          address: {
-            city: 'Austin',
-            state: 'Texas',
-            country: 'USA',
-          },
-          resumeLink: 'https://example.com/resume/emmaw',
-          profileSummary: 'Experienced data analyst...',
-          certifications: ['Microsoft Power BI Certificate'],
-          achievements: ['Streamlined data pipelines.'],
-        },
-      },
-    ],
-  },
-  {
-    id: 3,
-    date: '2024-12-03',
-    jobTitle: 'Backend Developer',
-    applicationCount: 110,
-    applications: [
-      {
-        id: 5,
-        candidateDetails: {
-          candidateName: 'Michael Green',
-          statusHistory: [
-            {
-              status: 'Applied',
-              date: '2024-12-02',
-              message: 'Application submitted.',
-            },
-          ],
-          experience: '5 years',
-          skills: ['Node.js', 'Express', 'MongoDB'],
-          education: 'M.Sc. in Software Engineering',
-          contact: {
-            email: 'michaelg@gmail.com',
-            phone: '+1-321-876-5432',
-          },
-          address: {
-            city: 'Chicago',
-            state: 'Illinois',
-            country: 'USA',
-          },
-          resumeLink: 'https://example.com/resume/michaelg',
-          profileSummary: 'Backend developer specializing in APIs...',
-          certifications: ['Certified Backend Specialist'],
-          achievements: ['Optimized API performance by 50%.'],
-        },
-      },
-      {
-        id: 6,
-        candidateDetails: {
-          candidateName: 'Sophia Brown',
-          statusHistory: [
-            {
-              status: 'Applied',
-              date: '2024-12-02',
-              message: 'Application submitted.',
-            },
-          ],
-          experience: '4 years',
-          skills: ['Java', 'Spring Boot', 'Docker'],
-          education: 'B.Sc. in Computer Science',
-          contact: {
-            email: 'sophiab@gmail.com',
-            phone: '+1-444-765-8765',
-          },
-          address: {
-            city: 'San Diego',
-            state: 'California',
-            country: 'USA',
-          },
-          resumeLink: 'https://example.com/resume/sophiab',
-          profileSummary: 'Efficient backend engineer...',
-          certifications: ['Java Certified Professional'],
-          achievements: ['Automated CI/CD pipelines.'],
-        },
-      },
-    ],
-  },
-  {
-    id: 4,
-    date: '2024-12-04',
-    jobTitle: 'Frontend Developer',
-    applicationCount: 130,
-    applications: [
-      {
-        id: 7,
-        candidateDetails: {
-          candidateName: 'Liam Turner',
-          statusHistory: [
-            {
-              status: 'Applied',
-              date: '2024-12-03',
-              message: 'Application submitted.',
-            },
-          ],
-          experience: '3 years',
-          skills: ['React', 'JavaScript', 'HTML/CSS'],
-          education: 'B.Sc. in Web Development',
-          contact: {
-            email: 'liamt@gmail.com',
-            phone: '+1-555-543-1234',
-          },
-          address: {
-            city: 'Denver',
-            state: 'Colorado',
-            country: 'USA',
-          },
-          resumeLink: 'https://example.com/resume/liamt',
-          profileSummary: 'Skilled in building responsive UIs...',
-          certifications: ['React Developer Certificate'],
-          achievements: ['Built interactive dashboards.'],
-        },
-      },
-      {
-        id: 8,
-        candidateDetails: {
-          candidateName: 'Olivia Green',
-          statusHistory: [
-            {
-              status: 'Applied',
-              date: '2024-12-03',
-              message: 'Application submitted.',
-            },
-          ],
-          experience: '2 years',
-          skills: ['Angular', 'HTML/CSS', 'JavaScript'],
-          education: 'B.A. in Graphic Design',
-          contact: {
-            email: 'oliviag@gmail.com',
-            phone: '+1-111-432-8765',
-          },
-          address: {
-            city: 'Los Angeles',
-            state: 'California',
-            country: 'USA',
-          },
-          resumeLink: 'https://example.com/resume/oliviag',
-          profileSummary: 'Frontend developer with creative designs...',
-          certifications: ['Angular Developer Certificate'],
-          achievements: ['Improved load time by 40%.'],
-        },
-      },
-    ],
-  },
-  {
-    id: 5,
-    date: '2024-12-05',
-    jobTitle: 'Data Scientist',
-    applicationCount: 90,
-    applications: [
-      {
-        id: 9,
-        candidateDetails: {
-          candidateName: 'Emily Johnson',
-          statusHistory: [
-            {
-              status: 'Applied',
-              date: '2024-12-04',
-              message: 'Application submitted.',
-            },
-          ],
-          experience: '5 years',
-          skills: ['Python', 'R', 'Machine Learning'],
-          education: 'M.Sc. in Data Science',
-          contact: {
-            email: 'emilyj@gmail.com',
-            phone: '+1-789-543-2109',
-          },
-          address: {
-            city: 'Austin',
-            state: 'Texas',
-            country: 'USA',
-          },
-          resumeLink: 'https://example.com/resume/emilyj',
-          profileSummary: 'Expert in machine learning models...',
-          certifications: ['Certified Data Scientist'],
-          achievements: ['Developed AI models for predictive analytics.'],
-        },
-      },
-      {
-        id: 10,
-        candidateDetails: {
-          candidateName: 'Noah Williams',
-          statusHistory: [
-            {
-              status: 'Applied',
-              date: '2024-12-04',
-              message: 'Application submitted.',
-            },
-          ],
-          experience: '3 years',
-          skills: ['Python', 'Data Visualization', 'TensorFlow'],
-          education: 'B.Sc. in Mathematics',
-          contact: {
-            email: 'noahw@gmail.com',
-            phone: '+1-222-876-5432',
-          },
-          address: {
-            city: 'San Francisco',
-            state: 'California',
-            country: 'USA',
-          },
-          resumeLink: 'https://example.com/resume/noahw',
-          profileSummary: 'Data scientist with expertise in AI...',
-          certifications: ['TensorFlow Certified Developer'],
-          achievements: ['Built real-time dashboards.'],
-        },
-      },
-    ],
-  },
-];
-
 const rowsPerPageOptions = [10, 20];
 const UserAppliesScreen = () => {
   const [selectedJob, setSelectedJob] = useState(null);
@@ -374,8 +29,16 @@ const UserAppliesScreen = () => {
   const [id, setId] = useState(null);
   const dispatch = useDispatch();
 
-  const {GetJobList, GetAppliedJobSeekerList} = JobViewController();
-  const {JobList, JobSeekerList} = useSelector(state => state.job);
+  // const {GetJobList, GetAppliedJobSeekerList} = JobViewController();
+  // const {JobList, JobSeekerList} = useSelector(state => state.job);
+
+  const {GetJobList} = JobViewController();
+  const {JobList} = useSelector(state => state.job);
+
+  console.log('$$$$$$$$$$$$$$',GetJobList);
+  
+
+  
 
   useEffect(() => {
     const getUserData = async () => {
@@ -401,18 +64,6 @@ const UserAppliesScreen = () => {
     setSelectedJob(JobSeekerList); // Set the selected job ID
     setModalVisible(true); // Show the modal
   };
-  // console.log('selectedJob:', JSON.stringify(selectedJob, null, 2));
-  // const handleViewcandidateDetails = candidate => {
-  //   console.log('Candidate Details:', JSON.stringify(candidate, null, 2));
-
-  //   if (candidate?.id) {
-  //     setSelectedCandidate(candidate.id); // Set selected candidate
-  //     setCandidateModalVisible(true); // Open modal
-  //     console.log('Selected Candidate ID:', candidate.id);
-  //   } else {
-  //     console.error('Invalid candidate data received:', candidate);
-  //   }
-  // };
 
   const handleViewcandidateDetails = candidateId => {
     // Find the candidate in selectedJob using the `id`
@@ -469,6 +120,10 @@ const UserAppliesScreen = () => {
           {
             label: 'View All Applications',
             onPress: job => handleViewApplicants(job.id),
+          },
+          {
+            label: 'Applies',
+            onPress: job => handleApplies(job.id), // Replace handleApplies with your function for handling the "Applies" action
           },
         ]}
         rowsPerPageOptions={rowsPerPageOptions}
@@ -549,9 +204,9 @@ const UserAppliesScreen = () => {
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <View style={styles.modalHeader}>
-                <View>
+                <TouchableOpacity onPress={() => handleModalClose()}>
                   <CustomHeader />
-                </View>
+                </TouchableOpacity>
                 <View>
                   <Text style={styles.CandidatemodalTitle}>
                     Candidate Details
@@ -572,7 +227,7 @@ const UserAppliesScreen = () => {
                   <Image
                     source={
                       selectedCandidate?.user?.profile_photo
-                        ? {uri: BASE_URL + selectedCandidate?.user?.profile_pic}
+                        ? {uri: BASE_URL + selectedCandidate?.profile_photo}
                         : require('../../Assets/Images/Userimage.png')
                     }
                     style={styles.profileimage}
@@ -620,19 +275,44 @@ const UserAppliesScreen = () => {
                     </Text>
                   </View>
                   <View style={styles.evensection}>
-                    <Text style={styles.boldText}>Experience: </Text>
+                    <Text style={styles.boldText}>Experience </Text>
                     <Text style={styles.OutputText}>
-                      {selectedCandidate?.career_preferences?.[0]
-                        ?.current_total_exp || 'N/A'}{' '}
+                      {selectedCandidate?.career_preferences?.[0]?.total_exp ||
+                        'N/A'}{' '}
                       years
                     </Text>
                   </View>
                   <View style={styles.oddsection}>
-                    <Text style={styles.boldText}>Address: </Text>
+                    <Text style={styles.boldText}>Address </Text>
                     <Text style={styles.OutputText}>
-                      {`${selectedCandidate?.career_preferences?.[0]?.current_city}`}
+                      {`${
+                        selectedCandidate?.basic_details?.[0]?.home_city ||
+                        'N/A'
+                      }, ${
+                        selectedCandidate?.basic_details?.[0]?.country || 'N/A'
+                      }`}
                     </Text>
                   </View>
+                  <View style={styles.evensection}>
+                    <Text style={styles.boldText}>Current Annual Salary </Text>
+                    <Text style={styles.OutputText}>
+                      {selectedCandidate?.career_preferences?.[0]?.annual_salary
+                        ?.amount
+                        ? `${
+                            selectedCandidate?.career_preferences?.[0]
+                              ?.annual_salary?.currency
+                          } ${selectedCandidate?.career_preferences?.[0]?.annual_salary?.amount.toLocaleString()}`
+                        : 'N/A'}
+                    </Text>
+                  </View>
+                  <View style={styles.oddsection}>
+                    <Text style={styles.boldText}>Notice Period</Text>
+                    <Text style={styles.OutputText}>
+                      {selectedCandidate?.career_preferences?.[0]
+                        ?.notice_period || 'N/A'}
+                    </Text>
+                  </View>
+                  {/* Skills */}
                   <View
                     style={{
                       paddingHorizontal: 12,
@@ -654,18 +334,20 @@ const UserAppliesScreen = () => {
                       )}
                     </View>
                   </View>
+
+                  {/* It Skills ans experience */}
                   <View
                     style={{
                       // paddingHorizontal: 12,
                       paddingVertical: 12,
-                      backgroundColor: '#fff',
+                      // backgroundColor: '#fff',
                     }}>
-                    <Text style={[styles.boldText, {paddingHorizontal: 12}]}>
-                      IT Skills
+                    <Text
+                      style={[styles.boldTextSkill, {paddingHorizontal: 12}]}>
+                      IT Skills & Experience
                     </Text>
                     <ScrollView
                       horizontal
-                      style={{flex: 1}}
                       contentContainerStyle={{
                         flexDirection: 'row',
                         gap: 8, // Adding spacing between items
@@ -684,22 +366,23 @@ const UserAppliesScreen = () => {
                                 borderRadius: 8,
                                 backgroundColor: '#f1f1f1',
                                 color: colors.primary,
-                                justifyContent: 'flex-start',
+                                height: 'auto',
+                                flex: 1,
+                                // justifyContent: 'flex-start',
                               },
                             ]}>
-                            <Text style={[styles.OutputText]}>
+                            <Text
+                              style={{
+                                fontWeight: '600',
+                                color: colors.primary,
+                                fontSize: 13,
+                              }}>
                               {skill?.name === 'Other'
                                 ? skill?.othername
                                 : skill?.name || 'N/A'}
-                            </Text>
-                            <Text style={styles.OutputText}>
-                              {`${skill?.exp?.years || 0} years, ${
+                              {` (${skill?.exp?.years || 0}.${
                                 skill?.exp?.months || 0
-                              } months`}
-                            </Text>
-                            <Text style={styles.OutputText}>
-                              <Text style={styles.boldText}>Last Used: </Text>
-                              {skill?.last_used || 'N/A'}
+                              } year)`}
                             </Text>
                           </View>
                         ))
@@ -710,35 +393,60 @@ const UserAppliesScreen = () => {
                       )}
                     </ScrollView>
                   </View>
+
+                  <View>
+                    <Text style={styles.boldText}>Career Preferences</Text>
+
+                  </View>
+
+                  {/* Education */}
                   <View
                     style={{
                       paddingHorizontal: 12,
                       paddingVertical: 12,
                       backgroundColor: '#fafafa',
                     }}>
-                    <Text style={styles.boldText}> Education</Text>
+                    <Text style={styles.boldText}>Education</Text>
                     {selectedCandidate?.higher_edu?.length > 0 ? (
-                      selectedCandidate?.higher_edu?.map((edu, index) => (
-                        <View
-                          key={`edu_${index}`}
-                          style={[styles.section, {marginVertical: 12}]}>
-                          <View style={{flexDirection: 'row', gap: 8}}>
-                            <Text style={{color: colors.primary}}>
-                              {edu.course_name || 'N/A'} -
-                            </Text>
-                            <Text style={{color: colors.primary}}>
-                              {edu.specialization || 'N/A'} -
-                            </Text>
-                            <Text style={{color: colors.primary}}>
-                              {edu.duration?.start_year || 'N/A'} -{' '}
-                              {edu.duration?.end_year || 'N/A'}
+                      <ScrollView
+                        horizontal
+                        contentContainerStyle={{
+                          flexDirection: 'row',
+                          gap: 12,
+                        }}
+                        showsHorizontalScrollIndicator={false} // Hides the horizontal scrollbar
+                      >
+                        {selectedCandidate?.higher_edu?.map((edu, index) => (
+                          <View
+                            key={`edu_${index}`}
+                            style={[
+                              styles.section,
+                              {
+                                padding: 12,
+                                backgroundColor: '#fff',
+                                borderRadius: 8,
+                                height: 'auto',
+                                flex: 1,
+                              },
+                            ]}>
+                            <View style={{flexDirection: 'row', gap: 8}}>
+                              <Text style={{color: colors.primary}}>
+                                {edu.course_name || 'N/A'} -
+                              </Text>
+                              <Text style={{color: colors.primary}}>
+                                {edu.specialization || 'N/A'} -
+                              </Text>
+                              <Text style={{color: colors.primary}}>
+                                {edu.duration?.start_year || 'N/A'} -{' '}
+                                {edu.duration?.end_year || 'N/A'}
+                              </Text>
+                            </View>
+                            <Text style={styles.OutputText}>
+                              {edu.university_name || 'N/A'}
                             </Text>
                           </View>
-                          <Text style={styles.OutputText}>
-                            {edu.university_name || 'N/A'}
-                          </Text>
-                        </View>
-                      ))
+                        ))}
+                      </ScrollView>
                     ) : (
                       <Text style={styles.OutputText}>
                         No higher education records available.
@@ -746,6 +454,7 @@ const UserAppliesScreen = () => {
                     )}
                   </View>
                 </View>
+                {/* //Project Details */}
                 <View
                   style={{
                     paddingHorizontal: 12,
@@ -754,56 +463,265 @@ const UserAppliesScreen = () => {
                   }}>
                   <Text style={[styles.boldText]}>Project details</Text>
                   {selectedCandidate?.project_details?.length > 0 ? (
-                    selectedCandidate?.project_details?.map((pro, index) => (
-                      <View
-                        key={`pro_${index}`}
-                        style={[
-                          styles.section,
-                          {
-                            marginVertical: 12,
-                            padding: 12,
-                            backgroundColor: '#fafafa',
-                            borderRadius: 8,
-                          },
-                        ]}>
-                        <View style={{flexDirection: 'row', gap: 8}}>
-                          <Text
-                            style={{color: colors.primary, fontWeight: 'bold'}}>
-                            {pro.role || 'N/A'} /
-                          </Text>
-
-                          <Text style={styles.OutputText}>
-                            {pro.client || 'N/A'}
-                          </Text>
-                        </View>
-                        <Text style={{color: colors.primary}}>
-                          {pro.description || 'N/A'} -
-                        </Text>
+                    <ScrollView
+                      horizontal
+                      contentContainerStyle={{
+                        flexDirection: 'row', // Ensures project sections are displayed horizontally
+                        gap: 16, // Adds spacing between each project section
+                      }}
+                      showsHorizontalScrollIndicator={false} // Hides the horizontal scrollbar
+                    >
+                      {selectedCandidate?.project_details?.map((pro, index) => (
                         <View
-                          style={{
-                            // paddingHorizontal: 12,
-                            paddingVertical: 12,
-                          }}>
-                          <View style={styles.chipContainer}>
+                          key={`pro_${index}`}
+                          style={[
+                            styles.section,
+                            {
+                              padding: 12,
+                              backgroundColor: '#fafafa',
+                              borderRadius: 8,
+                              width: width * 0.7, // Fixed width for each project section (you can adjust this based on your design)
+                            },
+                          ]}>
+                          {pro.role ? (
+                            <Text
+                              style={{
+                                color: colors.primary,
+                                fontWeight: 'bold',
+                              }}>
+                              {pro.role}
+                            </Text>
+                          ) : null}
+
+                          <View style={{marginVertical: 6}}>
+                            {pro.title && (
+                              <Text style={styles.OutputText}>{pro.title}</Text>
+                            )}
+
+                            {pro.description ? (
+                              <Text style={{color: colors.primary}}>
+                                {pro.description}
+                              </Text>
+                            ) : null}
+
+                            {pro.worked_duration?.from &&
+                              pro.worked_duration?.till && (
+                                <Text style={styles.OutputTextWork}>
+                                  Worked Duration :
+                                  {moment(pro.worked_duration.from).format(
+                                    'D MMM YY',
+                                  )}{' '}
+                                  -{' '}
+                                  {moment(pro.worked_duration.till).format(
+                                    'D MMM YY',
+                                  )}
+                                </Text>
+                              )}
+                          </View>
+
+                          <View style={{paddingVertical: 4}}>
                             {Array.isArray(pro?.skills_used) &&
                             pro.skills_used.length > 0 ? (
-                              pro.skills_used.map((skill, index) => (
-                                <Text key={index} style={styles.chip}>
-                                  {skill}
-                                </Text>
-                              ))
-                            ) : (
-                              <Text style={styles.OutputText}>
-                                No skills available
-                              </Text>
-                            )}
+                              <View style={styles.chipContainer}>
+                                {pro.skills_used.map((skill, index) => (
+                                  <Text key={index} style={styles.chip}>
+                                    {skill}
+                                  </Text>
+                                ))}
+                              </View>
+                            ) : null}
                           </View>
                         </View>
-                      </View>
-                    ))
+                      ))}
+                    </ScrollView>
                   ) : (
                     <Text style={styles.OutputText}>
                       No higher Project records available.
+                    </Text>
+                  )}
+                </View>
+
+                {/* Languages */}
+                <View
+                  style={{
+                    paddingHorizontal: 12,
+                    paddingVertical: 12,
+                    backgroundColor: '#fafafa',
+                  }}>
+                  <Text style={styles.boldText}>Languages</Text>
+                  {selectedCandidate?.languages?.length > 0 ? (
+                    <ScrollView
+                      horizontal
+                      contentContainerStyle={{
+                        flexDirection: 'row',
+                        gap: 12,
+                      }}
+                      showsHorizontalScrollIndicator={false} // Hides the horizontal scrollbar
+                    >
+                      {selectedCandidate?.languages?.map((language, index) => (
+                        <View
+                          key={`language_${index}`}
+                          style={[
+                            styles.section,
+                            {
+                              padding: 12,
+                              backgroundColor: '#fff',
+                              borderRadius: 8,
+                              height: 'auto',
+                              flex: 1,
+                            },
+                          ]}>
+                          <View style={{flexDirection: 'row', gap: 8}}>
+                            <Text
+                              style={{
+                                color: colors.primary,
+                                fontWeight: 'bold',
+                              }}>
+                              {language.name || 'N/A'}
+                            </Text>
+                          </View>
+                          <Text style={styles.OutputText}>
+                            {language.comfortable_in?.join(', ') || 'N/A'}
+                          </Text>
+                        </View>
+                      ))}
+                    </ScrollView>
+                  ) : (
+                    <Text style={styles.OutputText}>
+                      No language records available.
+                    </Text>
+                  )}
+                </View>
+
+                {/* accomplishments */}
+
+                <View
+                  style={{
+                    paddingHorizontal: 12,
+                    paddingVertical: 12,
+                    backgroundColor: '#fafafa',
+                  }}>
+                  <Text style={styles.boldText}>Accomplishments</Text>
+                  {selectedCandidate?.accomplishments?.length > 0 ? (
+                    <ScrollView
+                      horizontal
+                      contentContainerStyle={{
+                        flexDirection: 'row',
+                        gap: 12, // Space between items
+                      }}
+                      showsHorizontalScrollIndicator={false} // Optional: hides the scroll indicator
+                    >
+                      {selectedCandidate?.accomplishments?.map(
+                        (accomplishment, index) => (
+                          <View
+                            key={`accomplishment_${index}`}
+                            style={[
+                              styles.section,
+                              {
+                                padding: 12,
+                                backgroundColor: '#fff',
+                                borderRadius: 8,
+                                minWidth: 250, // Minimum width for each accomplishment card
+                                marginRight: 12, // Space between cards horizontally
+                              },
+                            ]}>
+                            
+                            <Text
+                              style={{
+                                color: colors.primary,
+                                fontWeight: 'bold',
+                                marginBottom: 4, // Space below the title
+                              }}>
+                              {accomplishment.title || 'N/A'}
+                            </Text>
+
+                            
+                            {accomplishment.certificationProvider && (
+                              <Text style={styles.OutputText}>
+                                <Text style={{fontWeight: 'bold'}}>
+                                  Certification Provider:{' '}
+                                </Text>
+                                {accomplishment.certificationProvider || 'N/A'}
+                              </Text>
+                            )}
+
+                            
+                            {accomplishment.description && (
+                              <Text style={styles.OutputText}>
+                                <Text style={{fontWeight: 'bold'}}>
+                                  Description:{' '}
+                                </Text>
+                                {accomplishment.description ||
+                                  'No description available'}
+                              </Text>
+                            )}
+
+                           
+                            {accomplishment.issued_date && (
+                              <Text style={styles.OutputText}>
+                                <Text style={{fontWeight: 'bold'}}>
+                                  Issued Date:{' '}
+                                </Text>
+                                {accomplishment.issued_date || 'N/A'}
+                              </Text>
+                            )}
+
+                          
+                            {accomplishment.expiry_date && (
+                              <Text style={styles.OutputText}>
+                                <Text style={{fontWeight: 'bold'}}>
+                                  Expiry Date:{' '}
+                                </Text>
+                                {accomplishment.expiry_date || 'N/A'}
+                              </Text>
+                            )}
+
+                            {/* Published Date */}
+                            {accomplishment.published_date && (
+                              <Text style={styles.OutputText}>
+                                <Text style={{fontWeight: 'bold'}}>
+                                  Published Date:{' '}
+                                </Text>
+                                {accomplishment.published_date || 'N/A'}
+                              </Text>
+                            )}
+
+                            
+                            {accomplishment.url && (
+                              <Text
+                                style={styles.OutputText}
+                                onPress={() =>
+                                  Linking.openURL(accomplishment.url)
+                                }>
+                                <Text style={{fontWeight: 'bold'}}>Link: </Text>
+                                {accomplishment.url}
+                              </Text>
+                            )}
+
+                            {/* Name */}
+                            {accomplishment.name && (
+                              <Text style={styles.OutputText}>
+                                <Text style={{fontWeight: 'bold'}}>Name: </Text>
+                                {accomplishment.name || 'N/A'}
+                              </Text>
+                            )}
+
+                            {/* Title (again if you want to show it at the bottom as well) */}
+                            {accomplishment.title && (
+                              <Text style={styles.OutputText}>
+                                <Text style={{fontWeight: 'bold'}}>
+                                  Title:{' '}
+                                </Text>
+                                {accomplishment.title || 'N/A'}
+                              </Text>
+                            )}
+                          </View>
+                        ),
+                      )}
+                    </ScrollView>
+                  ) : (
+                    <Text style={styles.OutputText}>
+                      No accomplishments records available.
                     </Text>
                   )}
                 </View>
@@ -881,12 +799,21 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 10,
+    paddingHorizontal: 12,
   },
   boldText: {
     width: width * 0.4,
     fontWeight: 'bold',
     color: 'gray',
     fontSize: 13,
+    marginBottom: 8,
+  },
+  boldTextSkill: {
+    width: width * 0.6,
+    fontWeight: 'bold',
+    color: 'gray',
+    fontSize: 13,
+    marginBottom: 8,
   },
   chipContainer: {
     flex: 1,
@@ -923,6 +850,12 @@ const styles = StyleSheet.create({
   },
   OutputText: {
     width: width * 0.55,
+    fontWeight: '600',
+    color: colors.primary,
+    fontSize: 13,
+  },
+  OutputTextWork: {
+    width: width * 0.7,
     fontWeight: '600',
     color: colors.primary,
     fontSize: 13,

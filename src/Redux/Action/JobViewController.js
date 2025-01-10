@@ -23,21 +23,20 @@ const JobViewController = () => {
     navigation.goBack();
   };
 
-  const GetJobList = user_id => async dispatch => {
+  const GetJobList = (employer_id, page) => async dispatch => {
     dispatch({type: 'LOADING', payload: true});
 
     try {
-      const response = await axios.get(`http://15.206.149.28/api/jobs/`);
-      // console.log(
-      //   '****************************job-GetJobList response***************************',
-      // );
+      const response = await axios.get(
+        `http://15.206.149.28/api/jobs-by-employer/${employer_id}/?page=${page}`,
+      );
+
+      // console.log(response);
       const jsonString = JSON.stringify(response.data);
       const data = JSON.parse(jsonString);
-      // console.log(data);
-
-      dispatch({type: 'JOB_LIST_SUCCESS', payload: data});
 
       dispatch({type: 'LOADING', payload: false});
+      dispatch({type: 'JOB_LIST_SUCCESS', payload: data});
     } catch (error) {
       console.log('error', error.response);
 
@@ -72,15 +71,15 @@ const JobViewController = () => {
       const response = await axios.get(
         `http://15.206.149.28/api/job/${job_id}/applied-users`,
       );
-      console.log(
-        `****************************job-GetAppliedJobSeekerList response***************************
-        http://15.206.149.28/api/job/${job_id}/applied-users/`,
-      );
+      // console.log(
+      //   `****************************job-GetAppliedJobSeekerList response***************************
+      //   http://15.206.149.28/api/job/${job_id}/applied-users/`,
+      // );
       // console.log('response', response);
 
       const jsonString = JSON.stringify(response.data);
       const data = JSON.parse(jsonString);
-      console.log(data);
+      // console.log(data);
 
       dispatch({type: 'APPLIED_JOB_SEEKER_LIST_SUCCESS', payload: data});
 
@@ -112,10 +111,197 @@ const JobViewController = () => {
     }
   };
 
+  const GetHomePageData = employer_id => async dispatch => {
+    dispatch({type: 'LOADING', payload: true});
+
+    try {
+      const response = await axios.get(
+        `http://15.206.149.28/api/employer-home-page-data/${employer_id}`,
+      );
+      // console.log(
+      //   '****************************job-GetHomedata response***************************',
+      //   response,
+      // );
+      const jsonString = JSON.stringify(response.data);
+      const data = JSON.parse(jsonString);
+      // console.log(data);
+
+      dispatch({type: 'HOME_DATA_SUCCESS', payload: data});
+
+      dispatch({type: 'LOADING', payload: false});
+    } catch (error) {
+      console.log('error', error.response);
+
+      dispatch({type: 'LOADING', payload: false});
+      Toast.show(
+        error.response?.data?.non_field_errors[0]
+          ? error.response.data.non_field_errors[0]
+          : 'Something went wrong,Please Try again!',
+        {
+          type: 'danger',
+          placement: 'top',
+          duration: 4000,
+          offset: 100,
+          animationType: 'slide-in',
+        },
+      );
+      dispatch({
+        type: 'HOME_DATA_FAILURE',
+        payload: {
+          error: error.response?.data?.non_field_errors
+            ? error.response.data.non_field_errors[0]
+            : error?.response?.data,
+        },
+      });
+    }
+  };
+
+  const GetJobDetails = (job_id, employer_id) => async dispatch => {
+    dispatch({type: 'LOADING', payload: true});
+
+    try {
+      const response = await axios.get(
+        `http://15.206.149.28/api/job/${job_id}/`,
+        {
+          params: {
+            employer_id: employer_id,
+          },
+        },
+      );
+      // console.log(
+      //   '****************************jobdetails response***************************',
+      // );
+
+      // console.log(`http://15.206.149.28/api/jobs-by-employer/${job_id}/`);
+      const jsonString = JSON.stringify(response.data);
+      const data = JSON.parse(jsonString);
+      // console.log(data);
+
+      dispatch({type: 'JOB_DETAILS_SUCCESS', payload: data});
+
+      dispatch({type: 'LOADING', payload: false});
+    } catch (error) {
+      console.log('error', error.response);
+
+      dispatch({type: 'LOADING', payload: false});
+      Toast.show(
+        error.response?.data?.non_field_errors[0]
+          ? error.response.data.non_field_errors[0]
+          : 'Something went wrong,Please Try again!',
+        {
+          type: 'danger',
+          placement: 'top',
+          duration: 4000,
+          offset: 100,
+          animationType: 'slide-in',
+        },
+      );
+      dispatch({
+        type: 'JOB_DETAILS_FAILURE',
+        payload: {
+          error: error.response?.data?.non_field_errors
+            ? error.response.data.non_field_errors[0]
+            : error?.response?.data,
+        },
+      });
+    }
+  };
+
+  const ToggleJobStatus = (job_id, data, employer_id) => async dispatch => {
+    dispatch({type: 'LOADING', payload: true});
+
+    try {
+      // Call the toggle-status API endpoint
+      const response = await axios.put(
+        `http://15.206.149.28/api/job/${job_id}/toggle-status/`,
+        data,
+      );
+
+      dispatch(GetJobDetails(job_id, employer_id));
+      dispatch({type: 'TOGGLE_JOB_STATUS_SUCCESS', payload: response.data});
+      dispatch({type: 'LOADING', payload: false});
+    } catch (error) {
+      console.log('error', error.response);
+
+      dispatch({type: 'LOADING', payload: false});
+
+      Toast.show(
+        error.response?.data?.non_field_errors[0]
+          ? error.response.data.non_field_errors[0]
+          : 'Something went wrong, Please try again!',
+        {
+          type: 'danger',
+          placement: 'top',
+          duration: 4000,
+          offset: 100,
+          animationType: 'slide-in',
+        },
+      );
+
+      dispatch({
+        type: 'TOGGLE_JOB_STATUS_FAILURE',
+        payload: {
+          error: error.response?.data?.non_field_errors
+            ? error.response.data.non_field_errors[0]
+            : error?.response?.data,
+        },
+      });
+    }
+  };
+
+  const GetJobApplications = (job_id) => async dispatch => {
+    dispatch({type: 'LOADING', payload: true});
+
+    try {
+      const response = await axios.get(
+        `http://15.206.149.28/api/jobs/applications/${job_id}`,
+
+      );
+      
+      // console.log(
+      //     '****************************job-GetHomedata response***************************',
+      //     response,
+      //   );
+
+      
+      const jsonString = JSON.stringify(response.data);
+      const data = JSON.parse(jsonString);
+
+      dispatch({type: 'LOADING', payload: false});
+      dispatch({type: 'JOB_APPLICATIONS_SUCCESS', payload: data});
+    } catch (error) {
+      dispatch({type: 'LOADING', payload: false});
+      Toast.show(
+        error.response?.data?.non_field_errors[0]
+          ? error.response.data.non_field_errors[0]
+          : 'Something went wrong, Please try again!',
+        {
+          type: 'danger',
+          placement: 'top',
+          duration: 4000,
+          offset: 100,
+          animationType: 'slide-in',
+        },
+      );
+      dispatch({
+        type: 'JOB_APPLICATIONS_FAILURE',
+        payload: {
+          error: error.response?.data?.non_field_errors
+            ? error.response.data.non_field_errors[0]
+            : error?.response?.data,
+        },
+      });
+    }
+  };
+
   return {
     goBackScreen,
     GetJobList,
     GetAppliedJobSeekerList,
+    GetHomePageData,
+    GetJobDetails,
+    ToggleJobStatus,
+    GetJobApplications
   };
 };
 

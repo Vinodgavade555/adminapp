@@ -12,7 +12,14 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {Picker} from '@react-native-picker/picker';
 import {colors} from '../Global_CSS/TheamColors';
 
-const CustomDataTable = ({columns, data, actions, rowsPerPageOptions}) => {
+const CustomDataTable = ({
+  columns,
+  data,
+  actions,
+  rowsPerPageOptions,
+  action,
+  onToggleJobStatus,
+}) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(rowsPerPageOptions[0]);
   const totalPages = Math.ceil(data.length / rowsPerPage);
@@ -47,21 +54,19 @@ const CustomDataTable = ({columns, data, actions, rowsPerPageOptions}) => {
   const renderStatusBadge = status => {
     const badgeStyle = [
       styles.statusBadge,
-      status === 'Active'
-        ? {color: '#6fcf97'}
-        : {color: '#fa976e'},
+      status === 'Active' ? {color: '#6fcf97'} : {color: '#fa976e'},
     ];
     const textStyle = {
-      marginTop:8,
+      marginTop: 8,
       // height: 30,
       color: '#fff',
       fontWeight: 'bold',
-paddingVertical:8,
+      paddingVertical: 8,
     };
 
     return (
       <View style={badgeStyle}>
-        <Text style={[textStyle,badgeStyle]}>{status}</Text>
+        <Text style={[textStyle, badgeStyle]}>{status}</Text>
       </View>
     );
   };
@@ -92,7 +97,21 @@ paddingVertical:8,
                 ]}>
                 {columns.map((column, colIndex) => (
                   <Text key={colIndex} style={styles.cell}>
-                    {column.field === 'candidateDetails.contact.email' ? (
+                    {column.field === 'jobTitle' ? (
+                      <TouchableOpacity
+                        onPress={() => onJobTitlePress(item)} // Trigger onJobTitlePress with the current job item
+                        style={styles.jobTitleContainer}>
+                        <Text style={styles.jobTitleText}>
+                          {getValueFromPath(item, column.field)}
+                        </Text>
+                        <Ionicons
+                          name="eye-outline"
+                          size={22}
+                          color={colors.secondary}
+                          style={styles.eyeIcon}
+                        />
+                      </TouchableOpacity>
+                    ) : column.field === 'candidateDetails.contact.email' ? (
                       <TouchableOpacity
                         onPress={() =>
                           handleEmailPress(getValueFromPath(item, column.field))
@@ -117,31 +136,29 @@ paddingVertical:8,
                     ) : column.field === 'status' ? (
                       renderStatusBadge(getValueFromPath(item, column.field))
                     ) : column.field === 'action' && actions ? (
-                      actions.map((action, actionIndex) => (
-                        <TouchableOpacity
-                          key={actionIndex}
-                          onPress={() => action.onPress(item)}
-                          style={styles.actionButton}>
-                          <Text style={styles.actionText}>{action.label}</Text>
-                        </TouchableOpacity>
-                      ))
+                      <View
+                        style={{
+                          flex: 1,
+                          flexDirection: 'column',
+                          height: 50,
+                          alignItems: 'center',
+                        }}>
+                        {actions.map((action, actionIndex) => (
+                          <TouchableOpacity
+                            key={actionIndex}
+                            onPress={() => action.onPress(item)} // Trigger the action here
+                            style={styles.actionButton}>
+                            <Text style={styles.actionText}>
+                              {action.label}
+                            </Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
                     ) : (
                       getValueFromPath(item, column.field)
                     )}
                   </Text>
                 ))}
-                {/* {actions?.length > 0 && (
-                  <View style={styles.cell}>
-                    {actions.map((action, actionIndex) => (
-                      <TouchableOpacity
-                        key={actionIndex}
-                        onPress={() => action.onPress(item)}
-                        style={styles.actionButton}>
-                        <Text style={styles.actionText}>{action.label}</Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                )} */}
               </View>
             ))}
           </ScrollView>
@@ -228,6 +245,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
+    flex: 1,
+    minHeight: 85,
+
+    alignItems: 'center',
   },
   evenRow: {
     backgroundColor: '#f9f9f9',
@@ -235,8 +256,8 @@ const styles = StyleSheet.create({
   cell: {
     minWidth: 200,
     width: 200,
-    minHeight: 50,
-    height: 50,
+    minHeight: 60,
+    height: 70,
     // padding:12,
     textAlign: 'center',
     textAlignVertical: 'center',
@@ -279,6 +300,23 @@ const styles = StyleSheet.create({
     color: '#000',
     fontSize: 14,
   },
+  jobTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    height: '100%',
+  },
+  jobTitleText: {
+    fontSize: 14,
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    textDecorationLine: 'underline',
+    color: colors.secondary,
+  },
+  eyeIcon: {
+    marginLeft: 4,
+  },
   phoneLink: {
     color: colors.secondary,
     textAlign: 'center',
@@ -294,9 +332,9 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     paddingHorizontal: 8,
-    paddingVertical: 16,
-    // backgroundColor: '#e3f0e9',
-
+    paddingVertical: 8,
+    backgroundColor: '#e3f0e9',
+    marginBottom: 4,
     borderRadius: 4,
     alignItems: 'center',
   },
@@ -312,6 +350,29 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     alignSelf: 'center',
+  },
+  cellContainer: {
+    minWidth: 200,
+    width: 200,
+    minHeight: 60,
+    height: 70,
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    borderRightWidth: 1,
+    borderRightColor: '#eee',
+    fontSize: 12,
+  },
+  toggleButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    backgroundColor: '#4caf50',
+    borderRadius: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  toggleButtonText: {
+    color: '#fff',
+    fontSize: 14,
   },
 });
 

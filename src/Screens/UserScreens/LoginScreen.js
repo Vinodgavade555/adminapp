@@ -53,13 +53,13 @@ const LoginScreen = () => {
           Yup.string().email().isValidSync(value) || /^[0-9]{10}$/.test(value),
       )
       .required('Email or phone number is required'),
-    password: Yup.string()
-      .min(8, 'password must be at least 8 characters')
-      .matches(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-        'password must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
-      )
-      .required('password is required'),
+    // password: Yup.string()
+    //   .min(8, 'password must be at least 8 characters')
+    //   .matches(
+    //     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+    //     'password must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
+    //   )
+    //   .required('password is required'),
   });
 
   const handleSubmit = async values => {
