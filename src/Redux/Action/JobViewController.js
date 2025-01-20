@@ -8,6 +8,7 @@ import instance from '../../Services/baseAPI';
 const JobViewController = () => {
   const navigation = useNavigation();
   const [_userId, set_userId] = useState();
+
   useEffect(() => {
     const getUserData = async () => {
       try {
@@ -295,9 +296,7 @@ const JobViewController = () => {
     dispatch({type: 'LOADING', payload: true});
 
     try {
-      const response = await instance.get(
-        `/filter-users-for-job/${job_id}`,
-      );
+      const response = await instance.get(`/filter-users-for-job/${job_id}`);
       // console.log(
       //   `****************************job-GetJobInvitation response***************************
       //   http://15.206.149.28/api/job/${job_id}/applied-users/`,
@@ -514,10 +513,7 @@ const JobViewController = () => {
     dispatch({type: 'LOADING', payload: true});
 
     try {
-      const response = await instance.post(
-        `/save-candidate/`,
-        requestData,
-      );
+      const response = await instance.post(`/save-candidate/`, requestData);
       // console.log(response);
       const jsonString = JSON.stringify(response.data);
       const data = JSON.parse(jsonString);
@@ -555,13 +551,11 @@ const JobViewController = () => {
     }
   };
 
-  const GetSavedJobs = recruiter_id  => async dispatch => {
+  const GetSavedJobs = recruiter_id => async dispatch => {
     dispatch({type: 'LOADING', payload: true});
 
     try {
-      const response = await instance.get(
-        `/save-candidate/${recruiter_id }/`,
-      );
+      const response = await instance.get(`/save-candidate/${recruiter_id}/`);
       // console.log(
       //   '****************************job-saved response***************************',
       // );
@@ -599,6 +593,96 @@ const JobViewController = () => {
     }
   };
 
+  const GetFilterdJobs = queryParams => async dispatch => {
+    dispatch({type: 'LOADING', payload: true});
+    // const queryString = new URLSearchParams(queryParams).toString();
+
+    try {
+      const response = await axios.get(
+        `http://15.206.149.28/api/filter-users/?${queryParams}`,
+      );
+      console.log(
+        '****************************job-GetFilterdJobs response***************************',
+      );
+      // console.log('queryParams', queryParams);
+      console.log(`http://15.206.149.28/api/filter-users/?${queryParams}`);
+
+      const jsonString = JSON.stringify(response.data);
+      const data = JSON.parse(jsonString);
+      // console.log(data);
+
+      dispatch({type: 'FILTER_JOB_SUCCESS', payload: data});
+
+      dispatch({type: 'LOADING', payload: false});
+    } catch (error) {
+      console.log('error', error.response);
+
+      dispatch({type: 'LOADING', payload: false});
+      Toast.show(
+        error.response?.data?.non_field_errors[0]
+          ? error.response.data.non_field_errors[0]
+          : 'Something went wrong,Please Try again!',
+        {
+          type: 'danger',
+          placement: 'top',
+          duration: 4000,
+          offset: 100,
+          animationType: 'slide-in',
+        },
+      );
+      dispatch({
+        type: 'FILTER_JOB_FAILURE',
+        payload: {
+          error: error.response?.data?.non_field_errors
+            ? error.response.data.non_field_errors[0]
+            : error?.response?.data,
+        },
+      });
+    }
+  };
+
+  const GetFiltermasterData = user_id => async dispatch => {
+    try {
+      const response = await axios.get(
+        `http://15.206.149.28/api/filter-master-data/`,
+      );
+      // console.log(
+      //   '****************************job-GetFiltermasterData response***************************',
+      // );
+      const jsonString = JSON.stringify(response.data);
+      const data = JSON.parse(jsonString);
+      // console.log(data);
+
+      dispatch({type: 'FILTER_MASTER_DATA_SUCCESS', payload: data});
+
+      dispatch({type: 'LOADING', payload: false});
+    } catch (error) {
+      console.log('error', error.response);
+
+      dispatch({type: 'LOADING', payload: false});
+      Toast.show(
+        error.response?.data?.non_field_errors[0]
+          ? error.response.data.non_field_errors[0]
+          : 'Something went wrong,Please Try again!',
+        {
+          type: 'danger',
+          placement: 'top',
+          duration: 4000,
+          offset: 100,
+          animationType: 'slide-in',
+        },
+      );
+      dispatch({
+        type: 'FILTER_MASTER_DATA_FAILURE',
+        payload: {
+          error: error.response?.data?.non_field_errors
+            ? error.response.data.non_field_errors[0]
+            : error?.response?.data,
+        },
+      });
+    }
+  };
+
   return {
     goBackScreen,
     GetJobList,
@@ -613,7 +697,9 @@ const JobViewController = () => {
     toggleshortlistUser,
     GetUserShortlistedList,
     ToggleSaveJob,
-    GetSavedJobs
+    GetSavedJobs,
+    GetFilterdJobs,
+    GetFiltermasterData,
   };
 };
 
