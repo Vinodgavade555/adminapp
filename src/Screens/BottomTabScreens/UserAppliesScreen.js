@@ -29,16 +29,10 @@ const UserAppliesScreen = () => {
   const [id, setId] = useState(null);
   const dispatch = useDispatch();
 
-  // const {GetJobList, GetAppliedJobSeekerList} = JobViewController();
-  // const {JobList, JobSeekerList} = useSelector(state => state.job);
-
   const {GetJobList} = JobViewController();
   const {JobList} = useSelector(state => state.job);
 
-  console.log('$$$$$$$$$$$$$$',GetJobList);
-  
-
-  
+  // console.log('$$$$$$$$$$$$$$', JobList);
 
   useEffect(() => {
     const getUserData = async () => {
@@ -59,10 +53,10 @@ const UserAppliesScreen = () => {
   }, []);
 
   const handleViewApplicants = id => {
-    dispatch(GetAppliedJobSeekerList(id)); // Fetch job applicants
+    dispatch(GetAppliedJobSeekerList(id));
 
-    setSelectedJob(JobSeekerList); // Set the selected job ID
-    setModalVisible(true); // Show the modal
+    setSelectedJob(JobSeekerList);
+    setModalVisible(true);
   };
 
   const handleViewcandidateDetails = candidateId => {
@@ -396,7 +390,6 @@ const UserAppliesScreen = () => {
 
                   <View>
                     <Text style={styles.boldText}>Career Preferences</Text>
-
                   </View>
 
                   {/* Education */}
@@ -454,6 +447,7 @@ const UserAppliesScreen = () => {
                     )}
                   </View>
                 </View>
+                
                 {/* //Project Details */}
                 <View
                   style={{
@@ -625,7 +619,6 @@ const UserAppliesScreen = () => {
                                 marginRight: 12, // Space between cards horizontally
                               },
                             ]}>
-                            
                             <Text
                               style={{
                                 color: colors.primary,
@@ -635,7 +628,6 @@ const UserAppliesScreen = () => {
                               {accomplishment.title || 'N/A'}
                             </Text>
 
-                            
                             {accomplishment.certificationProvider && (
                               <Text style={styles.OutputText}>
                                 <Text style={{fontWeight: 'bold'}}>
@@ -645,7 +637,6 @@ const UserAppliesScreen = () => {
                               </Text>
                             )}
 
-                            
                             {accomplishment.description && (
                               <Text style={styles.OutputText}>
                                 <Text style={{fontWeight: 'bold'}}>
@@ -656,7 +647,6 @@ const UserAppliesScreen = () => {
                               </Text>
                             )}
 
-                           
                             {accomplishment.issued_date && (
                               <Text style={styles.OutputText}>
                                 <Text style={{fontWeight: 'bold'}}>
@@ -666,7 +656,6 @@ const UserAppliesScreen = () => {
                               </Text>
                             )}
 
-                          
                             {accomplishment.expiry_date && (
                               <Text style={styles.OutputText}>
                                 <Text style={{fontWeight: 'bold'}}>
@@ -686,7 +675,6 @@ const UserAppliesScreen = () => {
                               </Text>
                             )}
 
-                            
                             {accomplishment.url && (
                               <Text
                                 style={styles.OutputText}
@@ -898,3 +886,70 @@ const styles = StyleSheet.create({
 });
 
 export default UserAppliesScreen;
+
+// import React from 'react';
+// import {View, Text, StyleSheet, ScrollView} from 'react-native';
+
+// const UserAppliesScreen = ({route}) => {
+//   const {data, page} = route.params;
+//   console.log(data, page);
+//   console.log('Full Data:', JSON.stringify(data, null, 2));
+
+//   return (
+//     <ScrollView style={styles.container}>
+//       <Text style={styles.title}>User {page} Details</Text>
+//       {page == 'job_invitation' ? (
+//         <>
+//           <Text style={styles.label}>send invitation</Text>
+//         </>
+//       ) : (
+//         <>
+//           <Text style={styles.label}>Schedule interview</Text>
+//         </>
+//       )}
+
+//       <Text style={styles.label}>
+//         {data?.user?.first_name || 'N/A'} {data?.user?.last_name || 'N/A'}
+//       </Text>
+
+//       <Text style={styles.label}>Email: {data?.user?.email || 'N/A'}</Text>
+
+//       {/* Status and Page */}
+//       <Text style={styles.label}>Status:</Text>
+//       <Text style={styles.value}>{data?.status || 'N/A'}</Text>
+
+//       <Text style={styles.label}>Page:</Text>
+//       <Text style={styles.value}>{page}</Text>
+//     </ScrollView>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     padding: 16,
+//   },
+//   title: {
+//     fontSize: 22,
+//     fontWeight: 'bold',
+//     marginBottom: 16,
+//   },
+//   sectionTitle: {
+//     fontSize: 18,
+//     fontWeight: 'bold',
+//     marginTop: 16,
+//     marginBottom: 8,
+//     color: '#007BFF',
+//   },
+//   label: {
+//     fontSize: 16,
+//     fontWeight: 'bold',
+//     marginTop: 8,
+//   },
+//   value: {
+//     fontSize: 16,
+//     color: 'gray',
+//   },
+// });
+
+// export default UserAppliesScreen;

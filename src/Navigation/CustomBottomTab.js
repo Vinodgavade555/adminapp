@@ -14,6 +14,8 @@ import HomeComponent from '../Screens/BottomTabScreens/HomeScreen';
 import {colors} from '../Global_CSS/TheamColors';
 import JobsScreen from '../Screens/BottomTabScreens/JobsScreen';
 import UserAppliesScreen from '../Screens/BottomTabScreens/UserAppliesScreen';
+import ShortlistCandidate from '../Screens/BottomTabScreens/ShortlistedCandidatePage';
+import AnalyticPage from '../Screens/BottomTabScreens/AnalyticPage';
 
 const CustomBottomTab = () => {
   const [selectedTab, setSelectedTab] = useState('Home');
@@ -56,8 +58,11 @@ const CustomBottomTab = () => {
 
       case 'Jobs':
         return <JobsScreen />;
-      case 'Applies':
-        return <UserAppliesScreen />;
+      case 'AnalyticPage':
+        return <AnalyticPage />;
+      case 'ShortlistCandidate':
+      return <ShortlistCandidate />;
+      
 
       default:
         return <HomeComponent />;
@@ -70,8 +75,9 @@ const CustomBottomTab = () => {
         <View style={styles.content}>{renderContent()}</View>
         <View style={styles.tabContainer}>
           {renderTab('Home', 'home', 'Home')}
-          {renderTab('Applies', 'send', 'Applies')}
+          {renderTab('AnalyticPage', 'analytics', 'Analytics')}
           {renderTab('Jobs', 'mail-sharp', 'Jobs')}
+          {renderTab('ShortlistCandidate', 'checkmark-circle', 'Shortlisted Cadidate')}
         </View>
       </View>
     </PaperProvider>
@@ -114,7 +120,7 @@ const styles = StyleSheet.create({
   },
   tabContainer: {
     flexDirection: 'row',
-    height: 60,
+    height: 70,
     // borderTopWidth: 1,
     // borderColor: colors.primary,
     backgroundColor: colors.primary,
@@ -126,7 +132,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
   },
   tabText: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#fff',
   },
   selectedTabText: {

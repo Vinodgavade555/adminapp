@@ -16,7 +16,7 @@ const SplashScreen = () => {
         const token = await AsyncStorage.getItem('token'); // Get token from AsyncStorage
         if (token) {
           // Validate the token or proceed to the main screen
-          await checkLoginStatus()(dispatch => {}); // Invoke checkLoginStatus action
+          
           navigation.replace('DefaultScreen');
         } else {
           navigation.replace('LoginScreen');
