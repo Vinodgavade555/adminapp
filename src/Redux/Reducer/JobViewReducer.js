@@ -8,6 +8,7 @@ const initialState = {
   JobInvitations: [],
   shortlistedUsers: [],
   UserShortlitedList:[],
+  CandidateReview:null,
   SavedJobs:null,
   error: null,
   isLoading: false, // Track loading for any API request
@@ -199,6 +200,31 @@ const jobReducer = (state = initialState, action) => {
         ...state,
         error: action.payload.error, // Store the error message for job details
       };
+
+      case 'CANDIDATE_REVIEW_SAVED_SUCCESS':
+        return {
+          ...state,
+          CandidateReview: action.payload, // Store job details in the state
+          error: null,
+        };
+  
+      case 'CANDIDATE_REVIEW_SAVED_UNSUCCESS':
+        return {
+          ...state,
+          error: action.payload.error, // Store the error message for job details
+        };
+        case 'REVIEW_ADDED_SUCCESSFULLY':
+          return {
+            ...state,
+            error: null,
+          };
+    
+        // Job Applications Failure
+        case 'REVIEW_ADDED_UNSUCCESSFULLY':
+          return {
+            ...state,
+            error: action.payload.error,
+          };
 
       
 

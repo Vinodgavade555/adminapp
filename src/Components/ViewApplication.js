@@ -30,7 +30,7 @@ const ViewApplicationsScreen = ({route}) => {
     setSelectedTab(tab);
   };
 
-  console.log(GetJobApplications);
+  // console.log(GetJobApplications);
   
 
   const handleToggleViewMore = index => {
@@ -67,7 +67,7 @@ const ViewApplicationsScreen = ({route}) => {
       recruiter_id: id,
       is_shortlist_by_recruiter: true,
     };
-    console.log('job', jobId, 'usr', item.id, 'recri', id);
+    // console.log('job', jobId, 'usr', item.id, 'recri', id);
 
 
     dispatch(toggleshortlistUser(shortlistData));
@@ -81,7 +81,7 @@ const ViewApplicationsScreen = ({route}) => {
       is_shortlist_by_recruiter: false,
     };
 
-    console.log('job', jobId, 'usr', item.id, 'recri', id);
+    // console.log('job', jobId, 'usr', item.id, 'recri', id);
 
     dispatch(toggleshortlistUser(shortlistData)); // Call the action
   };

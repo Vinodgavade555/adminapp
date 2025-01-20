@@ -21,14 +21,12 @@ const UserCard = ({item, jobId, page_name, index, isHorizontal}) => {
   const [id, setId] = useState('');
   const isFocus = useIsFocused();
   const transformJobSeekerProfile = (userData) => {
-    // Extract the job_seeker_profile object
     const { job_seeker_profile, ...rest } = userData;
   
     if (!job_seeker_profile) {
-      return rest; // Return as is if no job_seeker_profile exists
+      return rest; 
     }
   
-    // Merge the job_seeker_profile keys into the outer object
     return {
       ...rest,
       ...job_seeker_profile,
@@ -88,7 +86,7 @@ const UserCard = ({item, jobId, page_name, index, isHorizontal}) => {
 
     console.log('job', jobId, 'usr', item.id, 'recri', id);
 
-    dispatch(toggleshortlistUser(shortlistData)); // Call the action
+    dispatch(toggleshortlistUser(shortlistData)); 
   };
 
   const handleSaveToggle = async () => {
@@ -150,7 +148,6 @@ const UserCard = ({item, jobId, page_name, index, isHorizontal}) => {
         styles.applicationItem,
         {
           width: isHorizontal ? _width * 0.8 : _width - 24, // If horizontal scroll, set width to 70% of screen
-          height: 'auto',
         },
       ]}
       onPress={() => {
