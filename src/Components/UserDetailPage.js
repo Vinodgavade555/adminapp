@@ -16,6 +16,7 @@ import {useDispatch} from 'react-redux';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useIsFocused} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import ReviewPage from '../Constant/CustomReviewPage';
 
 const UserDetailScreen = ({route, onShortlist}) => {
   const {data, page} = route.params;
@@ -89,7 +90,7 @@ const UserDetailScreen = ({route, onShortlist}) => {
   };
   const buttonBackgroundColor =
     statusColors[status]?.background || defaultColor;
-  const buttonTextColor = statusColors[status]?.text || '#ffffff'; // Default text color is white
+  const buttonTextColor = statusColors[status]?.text || '#ffffff'; 
 
   const handleToggle = () => {
     setIsShortlisted(!isShortlisted); // Toggle the state
@@ -121,52 +122,47 @@ const UserDetailScreen = ({route, onShortlist}) => {
     }
   };
 
-  const getFormattedNoticePeriod = (noticePeriod) => {
-    if (!noticePeriod) return 'N/A'; // If no notice period, return 'N/A'
-  
-    // If notice period is "Immediate", show immediate availability
+  const getFormattedNoticePeriod = noticePeriod => {
+    if (!noticePeriod) return 'N/A'; 
+
     if (noticePeriod.toLowerCase() === 'immediate') {
       return 'Immediate Available ';
     }
-  
-    // If notice period is in days, return the number of days available
+
     const daysMatch = noticePeriod.match(/(\d+)\s*(day|days?)/i);
     if (daysMatch) {
       const days = parseInt(daysMatch[1], 10);
       return `${days} days availability`;
     }
-  
-    // If notice period is in months, convert to days (assuming 1 month = 30 days)
+
     const monthsMatch = noticePeriod.match(/(\d+)\s*(month|months?)/i);
     if (monthsMatch) {
       const months = parseInt(monthsMatch[1], 10);
-      const days = months * 30; // Converting months to days (30 days per month)
+      const days = months * 30;
       return `${days} days availability`;
     }
-  
-    // Return the original notice period if it's neither "Immediate", in days, nor in months
+
     return noticePeriod;
   };
-  
 
   const getOnlineStatus = (isOnline, lastSeen) => {
     if (isOnline) {
       return {
-        onlineStatus: 'Online',
+        onlineStatus: 'Currently Online', // Display if the user is online
         statusColor: 'gray',
-        dotColor: '#28a745',
+        dotColor: '#28a745', // Green for online
       };
     }
 
     // Display last seen time if available, otherwise show "Offline"
     const lastSeenTime = lastSeen
-      ? `Last seen: ${moment(lastSeen).format('MMMM Do YYYY, h:mm:ss a')}`
+      ? `Last seen: ${moment(lastSeen).format('Do MMM YY, h:mm:ss a')}`
       : 'Offline';
 
     return {
       onlineStatus: lastSeenTime,
       statusColor: 'gray',
-      dotColor: '#ff0000',
+      dotColor: '#ff0000', // Red for offline
     };
   };
 
@@ -207,17 +203,12 @@ const UserDetailScreen = ({route, onShortlist}) => {
       case 'Profile Details':
         return (
           <ScrollView
-            style={{flex: 1}}
+            // style={{flex: 1}}
             contentContainerStyle={{paddingBottom: 20}} // Ensures space at the bottom
             showsVerticalScrollIndicator={false} // Optional: hides the vertical scrollbar
           >
             {/* Skills */}
-            <View
-              style={{
-                paddingHorizontal: 12,
-                paddingVertical: 12,
-                backgroundColor: '#fafafa',
-              }}>
+            <View>
               <Text style={styles.boldText}>Skills</Text>
               <View style={styles.chipContainer}>
                 {user?.key_skills?.length > 0 ? (
@@ -239,9 +230,7 @@ const UserDetailScreen = ({route, onShortlist}) => {
                 paddingVertical: 12,
                 // backgroundColor: '#fff',
               }}>
-              <Text style={[styles.boldTextSkill, {paddingHorizontal: 12}]}>
-                IT Skills & Experience
-              </Text>
+              <Text style={[styles.boldTextSkill]}>IT Skills & Experience</Text>
               <ScrollView
                 contentContainerStyle={{
                   flexDirection: 'column',
@@ -284,17 +273,15 @@ const UserDetailScreen = ({route, onShortlist}) => {
               </ScrollView>
             </View>
 
-            <View>
-              <Text style={styles.boldText}>Career Preferences</Text>
-            </View>
-
             {/* Education */}
             <View
-              style={{
-                paddingHorizontal: 12,
-                paddingVertical: 12,
-                backgroundColor: '#fafafa',
-              }}>
+              style={
+                {
+                  // paddingHorizontal: 12,
+                  // paddingVertical: 12,
+                  // backgroundColor: '#fafafa',
+                }
+              }>
               <Text style={styles.boldText}>Education</Text>
               {user?.higher_edu?.length > 0 ? (
                 <ScrollView
@@ -313,6 +300,7 @@ const UserDetailScreen = ({route, onShortlist}) => {
                           borderRadius: 8,
                           height: 'auto',
                           flex: 1,
+                          backgroundColor: '#fafafa',
                         },
                       ]}>
                       <View style={{flexDirection: 'row', gap: 8}}>
@@ -361,10 +349,10 @@ const UserDetailScreen = ({route, onShortlist}) => {
                       style={[
                         styles.section,
                         {
-                          padding: 12,
+                          paddingHorizontal: 12,
                           backgroundColor: '#fafafa',
                           borderRadius: 8,
-                          width: width * 0.7, // Fixed width for each project section (you can adjust this based on your design)
+                          width: width * 0.8,
                         },
                       ]}>
                       {pro.role ? (
@@ -426,12 +414,7 @@ const UserDetailScreen = ({route, onShortlist}) => {
             </View>
 
             {/* Languages */}
-            <View
-              style={{
-                paddingHorizontal: 12,
-                paddingVertical: 12,
-                backgroundColor: '#fafafa',
-              }}>
+            <View style={{}}>
               <Text style={styles.boldText}>Languages</Text>
               {user?.languages?.length > 0 ? (
                 <ScrollView
@@ -447,11 +430,13 @@ const UserDetailScreen = ({route, onShortlist}) => {
                       style={[
                         styles.section,
                         {
-                          padding: 12,
+                          paddingVertical: 12,
+                          paddingHorizontal: 12,
                           backgroundColor: '#fff',
                           borderRadius: 8,
                           height: 'auto',
                           flex: 1,
+                          backgroundColor: '#fafafa',
                         },
                       ]}>
                       {/* Language Name with Proficiency Levels in Parentheses */}
@@ -486,9 +471,7 @@ const UserDetailScreen = ({route, onShortlist}) => {
             {/* accomplishments */}
             <View
               style={{
-                paddingHorizontal: 12,
                 paddingVertical: 12,
-                backgroundColor: '#fafafa',
               }}>
               <Text style={styles.boldText}>Accomplishments</Text>
               {user?.accomplishments?.length > 0 ? (
@@ -509,8 +492,9 @@ const UserDetailScreen = ({route, onShortlist}) => {
                           padding: 12,
                           backgroundColor: '#fff',
                           borderRadius: 8,
-                          minWidth: 250, // Minimum width for each accomplishment card
-                          marginRight: 12, // Space between cards horizontally
+                          minWidth: 200, // Minimum width for each accomplishment card
+                          marginRight: 8, // Space between cards horizontally
+                          backgroundColor: '#fafafa',
                         },
                       ]}>
                       <Text
@@ -624,7 +608,11 @@ const UserDetailScreen = ({route, onShortlist}) => {
       case 'Resume':
         return <View></View>;
       case 'Review':
-        return <View> </View>;
+        return (
+          <View>
+            <ReviewPage />
+          </View>
+        );
       default:
         return null;
     }
@@ -701,15 +689,14 @@ const UserDetailScreen = ({route, onShortlist}) => {
               />
               {/* Status Text */}
               <Text style={[styles.statusText, {color: statusColor}]}>
-                Currently {onlineStatus}
+                {onlineStatus}
               </Text>
             </View>
 
             <Text style={styles.emailText}>{data?.user?.email || 'N/A'}</Text>
-            {/* <Text style={styles.headlineText}>
-              {user?.profile_headline ||
-                'Experienced Mobile Developer | Proficient in React Native, Redux,and APIs'}
-            </Text> */}
+            {user?.mobile_number ? (
+              <Text style={styles.mobilenumber}>{user?.mobile_number}</Text>
+            ) : null}
             <Text style={styles.OutputText}>
               {getFormattedNoticePeriod(
                 user?.career_preferences?.[0]?.notice_period,
@@ -786,12 +773,6 @@ const UserDetailScreen = ({route, onShortlist}) => {
         </View>
 
         <View style={{marginTop: 12, paddingVertical: 4}}>
-          <View style={styles.evensection}>
-            <Text style={styles.boldText}>Phone Number</Text>
-            <Text style={styles.mobilenumber}>
-              {user?.mobile_number || 'N/A'}
-            </Text>
-          </View>
           <View style={styles.tabContainer}>
             <TouchableOpacity
               style={[
@@ -820,8 +801,6 @@ const UserDetailScreen = ({route, onShortlist}) => {
           </View>
           <View style={styles.contentContainer}>{renderTabs()}</View>
         </View>
-
-        {/* //Project Details */}
       </ScrollView>
 
       {showButtons && (
@@ -1045,11 +1024,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginLeft: 4,
   },
-  iconTextContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginLeft: 6,
-  },
+
   applicationNoticeText: {
     fontSize: 12,
     color: '#000',
@@ -1092,20 +1067,6 @@ const styles = StyleSheet.create({
     // paddingVertical: 8,
     paddingHorizontal: 12,
     marginTop: 8,
-  },
-
-  evensection: {
-    flexDirection: 'row',
-    backgroundColor: '#fafafa',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  oddsection: {
-    flexDirection: 'row',
-    backgroundColor: '#fff',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    // marginTop: 8,
   },
 
   buttonText: {

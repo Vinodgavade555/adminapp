@@ -31,7 +31,7 @@ const JobInvitationPage = ({route}) => {
       [index]: !prevState[index],
     }));
   };
-  console.log(GetJobInvitation);
+  // console.log(GetJobInvitation);
   
 
   useEffect(() => {

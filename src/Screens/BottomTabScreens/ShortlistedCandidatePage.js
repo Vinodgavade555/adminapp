@@ -1,42 +1,3 @@
-// import React, { useEffect, useState } from 'react';
-// import { View, Text } from 'react-native';
-// import JobViewController from '../../Redux/Action/JobViewController';
-// import { useDispatch, useSelector } from 'react-redux';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
-// import { useIsFocused, useNavigation } from '@react-navigation/native';
-
-// const ShortlistCandidate = () => {
-//   const [id,setId] = useState();
-//   const dispatch = useDispatch();
-//   const { GetUserShortlistedList,toggleshortlistUser } = JobViewController();
-//   const { UserShortlitedList } = useSelector((state) => state.job); // Fixed syntax
-//   const isFocus = useIsFocused();
-//   const navigation = useNavigation();
-
-//   console.log(UserShortlitedList);
-
-//   useEffect(() => {
-//     const getUserData = async () => {
-//       try {
-//         const id = await AsyncStorage.getItem('user_data'); // Wait for the value to be retrieved
-//         setId(id);
-//         dispatch(GetUserShortlistedList(id));
-//       } catch (error) {
-//         console.error('Error reading value from AsyncStorage', error);
-//       }
-//     };
-//     getUserData();
-//   }, [isFocus]);
-
-//   return (
-//     <View>
-//       <Text>Shortlist Candidate</Text>
-//     </View>
-//   );
-// };
-
-// export default ShortlistCandidate;
-
 import React, {useEffect, useState} from 'react';
 import {
   View,
@@ -58,7 +19,6 @@ const ShortlistCandidate = () => {
   const {UserShortlitedList, loading, error} = useSelector(state => state.job);
   const isFocus = useIsFocused();
 
-
   // console.log('UserShortlitedList:', UserShortlitedList);
 
   useEffect(() => {
@@ -66,7 +26,7 @@ const ShortlistCandidate = () => {
       try {
         const id = await AsyncStorage.getItem('user_data');
         setId(id);
-        dispatch(GetUserShortlistedList(id)); 
+        dispatch(GetUserShortlistedList(id));
       } catch (error) {
         console.error('Error reading value from AsyncStorage', error);
       }
@@ -89,17 +49,17 @@ const ShortlistCandidate = () => {
   }
 
   return (
-    <ScrollView style={{paddingHorizontal:12,paddingVertical:18}}>
+    <ScrollView style={{paddingHorizontal: 12, paddingVertical: 18}}>
       <Text>Shortlisted Candidates</Text>
       {UserShortlitedList?.results &&
       UserShortlitedList?.results?.length > 0 ? (
         UserShortlitedList?.results?.map((item, index) => {
-          const user = item.user_id; 
+          const user = item.user_id;
           return (
             <UserCard
               key={index}
-              item={user} 
-              userId={user} 
+              item={user}
+              userId={user}
               page_name={'job_invitation'}
             />
           );
