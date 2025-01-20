@@ -16,7 +16,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useDispatch, useSelector} from 'react-redux';
 import {useIsFocused} from '@react-navigation/native';
 import JobViewController from '../Redux/Action/JobViewController';
-import {BASE_URL} from '../Services/baseAPI';
+import { BASE_URL } from '../Redux/Action/AuthViewController';
+
 
 const JobDetailScreen = ({route, navigation}) => {
   const {jobId} = route.params; // Get company data from params
@@ -80,7 +81,7 @@ const JobDetailScreen = ({route, navigation}) => {
           <TouchableOpacity
             style={[
               styles.button,
-              {backgroundColor: JobDetails.is_active ? '#FF5722 ' : 'green'},
+              {backgroundColor: JobDetails.is_active ? 'red ' : 'green'},
             ]}
             onPress={toggleHandler}>
             <Text style={styles.buttonText}>
@@ -93,11 +94,13 @@ const JobDetailScreen = ({route, navigation}) => {
         <View style={styles.companyInfoContainer}>
           <View style={styles.companyInfo}>
             <View style={styles.logoContainer}>
+              {/* {console.log( JobDetails?.company?.logo)
+              } */}
               <Image
                 source={
                   JobDetails?.company?.logo
                     ? {uri: BASE_URL + JobDetails?.company?.logo}
-                    : require('../Assets/CompanyLogo/Swatsan.png')
+                    : require('../Assets/CompanyLogo/Swatsan1.jpeg')
                 }
                 style={styles.logo}
               />
@@ -183,7 +186,7 @@ const JobDetailScreen = ({route, navigation}) => {
                 <TouchableOpacity
                   style={[styles.cardButton, {backgroundColor: '#FF7043'}]} // Green background for "Invite"
                   onPress={() => {
-                    /* Add your invite action here */
+                    navigation.navigate('InvitationPage', { jobId: JobDetails?.id });
                   }}>
                   <Text style={styles.cardbuttonInviteText}>Invite</Text>
                 </TouchableOpacity>
@@ -191,9 +194,24 @@ const JobDetailScreen = ({route, navigation}) => {
 
               <View style={styles.ButtonfildContainer}>
                 <TouchableOpacity
-                  style={[styles.cardButton, {backgroundColor: '#FFC107'}]}>
+                  style={[styles.cardButton, {backgroundColor: '#FFC107'}]}
+                  onPress={() => {
+                    navigation.navigate('ShortlistUser', { jobId: JobDetails?.id });
+                  }}>
                   <Text style={styles.cardbuttonText}>
                     Shortlisted Candidate
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.ButtonfildContainer}>
+                <TouchableOpacity
+                  style={[styles.cardButton, {backgroundColor: '#dd99ff'}]}
+                  onPress={() => {
+                    navigation.navigate('SaveUserPage', { jobId: JobDetails?.id });
+                  }}>
+                  
+                  <Text style={styles.cardbuttonText}>
+                    Saved User List
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -410,6 +428,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     resizeMode: 'contain', // Adjusts the image to cover the container uniformly
+
   },
 
   jobDetailsContainer: {

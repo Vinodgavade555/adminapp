@@ -42,7 +42,7 @@ const JobsScreen = () => {
     getUserData();
   }, [onFocus]);
 
-  // console.log('data', JobList[0]);
+  // console.log('data', JobList);
 
   // Handle fetching more jobs when the user scrolls to the bottom
   const loadMoreJobs = () => {

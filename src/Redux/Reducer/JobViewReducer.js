@@ -2,9 +2,13 @@ const initialState = {
   JobList: [],
   JobListPagination: {},
   JobSeekerList: [],
-  JobDetails:[],
+  JobDetails: [],
   HomeData: [],
-  JobApplications:[],
+  JobApplications: null,
+  JobInvitations: [],
+  shortlistedUsers: [],
+  UserShortlitedList:[],
+  SavedJobs:null,
   error: null,
   isLoading: false, // Track loading for any API request
 };
@@ -41,7 +45,6 @@ const jobReducer = (state = initialState, action) => {
         error: null,
       };
 
-      
     // Job Details Success
     case 'JOB_DETAILS_SUCCESS':
       return {
@@ -57,7 +60,7 @@ const jobReducer = (state = initialState, action) => {
         error: action.payload.error, // Store the error message for job details
       };
 
-      case 'TOGGLE_JOB_STATUS_SUCCESS':
+    case 'TOGGLE_JOB_STATUS_SUCCESS':
       return {
         ...state,
         // JobDetails: action.payload,  // Updated job details after toggling status
@@ -101,12 +104,12 @@ const jobReducer = (state = initialState, action) => {
         ...state,
         error: action.payload.error,
       };
-      
-      // Job Applications Success 
+
+    // Job Applications Success
     case 'JOB_APPLICATIONS_SUCCESS':
       return {
         ...state,
-        JobApplications: action.payload, 
+        JobApplications: action.payload,
         error: null,
       };
 
@@ -114,8 +117,90 @@ const jobReducer = (state = initialState, action) => {
     case 'JOB_APPLICATIONS_FAILURE':
       return {
         ...state,
-        error: action.payload.error, 
+        error: action.payload.error,
       };
+
+    case 'APPLICATION_JOB_STATUS_SUCCESS':
+      return {
+        ...state,
+        // JobDetails: action.payload,  // Updated job details after toggling status
+      };
+    case 'APPLICATION_JOB_STATUS_FAILURE':
+      return {
+        ...state,
+        error: action.payload.error,
+      };
+
+    case 'JOB_INVITATION_SUCCESS':
+      return {
+        ...state,
+        JobInvitations: action.payload,
+        error: null,
+      };
+
+    // Job Applications Failure
+    case 'JOB_INVITATION_FAILURE':
+      return {
+        ...state,
+        error: action.payload.error,
+      };
+
+    case 'SENDINVITATION_SUCCESS':
+      return {
+        ...state,
+        error: null,
+      };
+
+    // Job Applications Failure
+    case 'SENDINVITATION_FAILURE':
+      return {
+        ...state,
+        error: action.payload.error,
+      };
+
+    // Job Shortlist Success
+    case 'ADD_TO_SHORTLIST':
+      return {
+        ...state,
+        shortlistedUsers: [...state.shortlistedUsers, action.payload],  // Add the user to shortlist
+      };
+
+    // Job Shortlist Failure
+    case 'REMOVE_FROM_SHORTLIST':
+      return {
+        ...state,
+        shortlistedUsers: state.shortlistedUsers.filter(user => user.id !== action.payload),  // Remove user from shortlist
+      };
+  
+      case 'USER_SHORTLIST_LIST_SUCCESS':
+        return {
+          ...state,
+          UserShortlitedList: action.payload, 
+          loading: false,
+        };
+
+    
+    case 'USER_SHORTLIST_LIST_FAILURE':
+      return {
+        ...state,
+        error: action.payload.error, 
+        loading: false,
+      };
+
+      case 'JOB_SAVED_SUCCESS':
+      return {
+        ...state,
+        SavedJobs: action.payload, // Store job details in the state
+        error: null,
+      };
+
+    case 'JOB_SAVED_FAILURE':
+      return {
+        ...state,
+        error: action.payload.error, // Store the error message for job details
+      };
+
+      
 
     default:
       return state;

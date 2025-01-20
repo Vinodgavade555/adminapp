@@ -1,15 +1,9 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import {PieChart} from 'react-native-chart-kit';
-import {colors} from '../Global_CSS/TheamColors';
+import {colors} from '../../Global_CSS/TheamColors';
 
-
-const ApplicationResponseChart = () => {
+const AnalyticPage = () => {
   const data = [
     {
       name: 'Shortlisted',
@@ -90,10 +84,10 @@ const ApplicationResponseChart = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginVertical: 12,
     padding: 12,
     backgroundColor: colors.background,
     borderRadius: 8,
+    width: '100%',
   },
   headerContainer: {
     paddingHorizontal: 12,
@@ -111,7 +105,6 @@ const styles = StyleSheet.create({
     color: '#f67262',
   },
   labelsContainer: {
-
     alignItems: 'center',
   },
   labelItem: {
@@ -145,4 +138,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ApplicationResponseChart;
+export default AnalyticPage;

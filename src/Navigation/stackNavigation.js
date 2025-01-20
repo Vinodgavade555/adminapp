@@ -13,6 +13,12 @@ import HomeScreen from '../Screens/BottomTabScreens/HomeScreen.js';
 import CustomNotificationScreen from '../Constant/CustomNotification.js';
 import JobDetailScreen from '../Components/JobDetail.js';
 import ViewApplicationsScreen from '../Components/ViewApplication.js';
+import JobInvitationPage from '../Components/JobInvitationPage.js';
+import UserAppliesScreen from '../Screens/BottomTabScreens/UserAppliesScreen.js';
+import UserDetailScreen from '../Components/UserDetailPage.js';
+import AnalyticPage from '../Screens/BottomTabScreens/AnalyticPage.js';
+import ShortlistCandidate from '../Screens/BottomTabScreens/ShortlistedCandidatePage.js';
+import SavedUserList from '../Components/SavedUserList.js';
 
 const StackNavigation = () => {
   const Stack = createNativeStackNavigator();
@@ -78,11 +84,33 @@ const StackNavigation = () => {
       />
 
       <Stack.Screen
-      name='ApplicationPage'
-      component={ViewApplicationsScreen}
-      options={{headerShown: false}}
+        name="ApplicationPage"
+        component={ViewApplicationsScreen}
+        options={{headerShown: false}}
       />
 
+      <Stack.Screen
+        name="InvitationPage"
+        component={JobInvitationPage}
+        options={{headerShown: false}}
+      />
+
+      <Stack.Screen
+        name="UserDetailScreen"
+        component={UserDetailScreen}
+        options={{headerShown: false}}
+      />
+
+      <Stack.Screen
+      name='SaveUserPage'
+      component={SavedUserList}
+      options={{headerShown:false}}
+      />
+
+      <Stack.Screen
+      name='ShortlistUser'
+      component={ShortlistCandidate}
+      />
     </Stack.Navigator>
   );
 };

@@ -9,21 +9,24 @@ import {
 import HeroScroll from '../../Components/HeroScroll';
 import {Text} from 'react-native-paper';
 import {colors} from '../../Global_CSS/TheamColors';
-import CustomDataTable from '../../Constant/CustomDataTable';
 import moment from 'moment';
-import ApplicationResponseChart from '../../Constant/ApplicationResponseChart';
 import {useDispatch, useSelector} from 'react-redux';
 import JobViewController from '../../Redux/Action/JobViewController';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import LinearGradient from 'react-native-linear-gradient';
+import {useNavigation} from '@react-navigation/native';
+import UserCard from '../../Constant/UserCard';
 
 const HomeScreen = () => {
-  const [activeTab, setActiveTab] = useState('Monthly');
   const [id, setId] = useState(null);
   const dispatch = useDispatch();
+  const navigation = useNavigation();
 
   const {GetHomePageData} = JobViewController();
   const {HomeData} = useSelector(state => state.job);
+
+  // console.log('Full Data:', JSON.stringify(HomeData, null, 2));
 
   useEffect(() => {
     const getUserData = async () => {
@@ -39,71 +42,32 @@ const HomeScreen = () => {
     };
 
     getUserData();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleTabChange = tab => {
-    setActiveTab(tab);
-  };
+  const data = [
+    {
+      title: 'Total Openings by Country',
+      value: HomeData?.total_opening_jobs
+        ? HomeData.total_opening_jobs.toLocaleString()
+        : '0',
+      description: 'Jobs available worldwide',
+    },
+    {
+      title: 'Total Hired by Platform',
+      value: HomeData?.total_hired_count
+        ? HomeData.total_hired_count.toLocaleString()
+        : '0',
+      description: 'Candidates hired successfully',
+    },
+    {
+      title: 'Total Applications',
+      value: HomeData?.total_application_count
+        ? HomeData.total_application_count.toLocaleString()
+        : '0',
+      description: 'Applications submitted',
+    },
+  ];
 
-  const filterDataByTab = () => {
-    const today = moment();
-    if (activeTab === 'Monthly') {
-      return jobData.filter(job => moment(job.date).isSame(today, 'month'));
-    } else if (activeTab === 'Weekly') {
-      return jobData.filter(job => moment(job.date).isSame(today, 'week'));
-    } else if (activeTab === 'Today') {
-      return jobData.filter(job => moment(job.date).isSame(today, 'day'));
-    }
-    return jobData;
-  };
-
-  const updateDatesForTab = data => {
-    const today = moment();
-    if (activeTab === 'Monthly') {
-      return data.map(job => ({
-        ...job,
-        date: today
-          .clone()
-          .subtract(Math.floor(Math.random() * 30), 'days')
-          .format('YYYY-MM-DD'),
-      }));
-    } else if (activeTab === 'Weekly') {
-      return data.map(job => ({
-        ...job,
-        date: today
-          .clone()
-          .subtract(Math.floor(Math.random() * 7), 'days')
-          .format('YYYY-MM-DD'),
-      }));
-    } else if (activeTab === 'Today') {
-      return data.map(job => ({
-        ...job,
-        date: today.format('YYYY-MM-DD'),
-      }));
-    }
-    return data;
-  };
-
-  const preprocessData = (data = []) => {
-    // Validate that data is an array
-    if (!Array.isArray(data)) {
-      // console.warn('preprocessData received invalid data:', data);
-      return [];
-    }
-    // Map through each item to extract specific fields
-    return data.map(job => ({
-      createdAt: moment(job.created_at).format('DD MMM YYYY'),
-      jobTitle: job.job_title?.title || null, // Extract title safely
-      applicantCount: job.applicant_count || 0, // Default to 0 if undefined
-      openingsCount: job.openings || 0, // Default to 0 if undefined
-      workmode: job.employment_types?.join(', ') || '',
-      status: job.is_active ? 'Active' : 'Inactive',
-    }));
-  };
-
-  const processedJobs = preprocessData(HomeData.recent_jobs || []);
   return (
     <View style={styles.Maincontainer}>
       <ScrollView style={styles.container}>
@@ -118,16 +82,42 @@ const HomeScreen = () => {
             source={require('../../Assets/Images/Admin.png')}
           />
         </View>
-        
-        <HeroScroll />
-        <View style={styles.TableContainer}>
-          <View style={styles.TableHeadingContainer}>
-            <Text style={styles.tableheading}>Recent Jobs</Text>
-          </View>
 
+        <ScrollView
+          horizontal
+          // pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          style={styles.scrollView}>
+          {data.map((item, index) => (
+            <View key={index} style={[styles.card]}>
+              <LinearGradient
+                start={{x: 1, y: 0}}
+                end={{x: 1, y: 2}}
+                colors={['#0088cc', '#006699', '#004466']}
+                style={styles.linearGradient}>
+                <Text style={styles.title}>{item.title}</Text>
+                <Text style={styles.value}>{item.value}</Text>
+                <Text style={styles.description}>{item.description}</Text>
+              </LinearGradient>
+            </View>
+          ))}
+        </ScrollView>
+
+        <View style={styles.TableHeadingContainer}>
+          <Text style={styles.tableheading}>Recent Jobs</Text>
+        </View>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.horizontalScrollView}>
           {HomeData.recent_jobs && HomeData.recent_jobs.length > 0 ? (
             HomeData.recent_jobs.map((job, index) => (
-              <View key={index} style={styles.jobCard}>
+              <TouchableOpacity
+                key={index}
+                style={styles.jobCard}
+                onPress={() =>
+                  navigation.navigate('JobDetail', {jobId: job.id})
+                }>
                 <View style={styles.jobCardContent}>
                   <View style={styles.titleContainer}>
                     <Text style={styles.jobTitle}>
@@ -135,10 +125,14 @@ const HomeScreen = () => {
                     </Text>
                     <Text style={styles.jobDate}>
                       {job.created_at
-                        ? moment(job.created_at).format('DD MMM YYYY')
+                        ? moment(job.created_at).format('DD MMM')
                         : 'No Date'}
                     </Text>
                   </View>
+                  <Text style={styles.companyName}>
+                    {' '}
+                    {job.company?.company_name || 'No Title'}
+                  </Text>
                   {job.job_location && job.job_location.length > 0 ? (
                     <View style={styles.locationContainer}>
                       <Icon
@@ -152,6 +146,23 @@ const HomeScreen = () => {
                       </Text>
                     </View>
                   ) : null}
+
+                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <Icon
+                      name="briefcase"
+                      size={14}
+                      color={colors.primary}
+                      style={styles.icon}
+                    />
+                    <Text style={styles.experienceLevel}>
+                      {job.experience_level
+                        ? `${job.experience_level.minYear} - ${job.experience_level.maxYear} years`
+                        : 'Experience Level not specified'}
+                    </Text>
+                  </View>
+
+                  <View style={styles.horizontalLine} />
+
                   <View style={{flexDirection: 'row'}}>
                     <Text style={styles.applications}>
                       Applications: {job.applicant_count || 0} |
@@ -162,13 +173,64 @@ const HomeScreen = () => {
                     </Text>
                   </View>
                 </View>
-              </View>
+              </TouchableOpacity>
             ))
           ) : (
             <Text>No recent jobs available</Text>
           )}
+        </ScrollView>
+
+        <View>
+          <Text style={styles.Containertitle}>
+            Top20 related to recent jobs
+          </Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.scrollContainer}
+            style={{paddingVertical: 8}}>
+            {HomeData.top_20_related_to_recent_jobs &&
+            HomeData.top_20_related_to_recent_jobs.length > 0 ? (
+              HomeData.top_20_related_to_recent_jobs.map((item, index) => (
+                <UserCard
+                  key={index}
+                  item={item}
+                  jobId={''}
+                  page_name={'home'}
+                  index={index}
+                  isHorizontal={true}
+                />
+              ))
+            ) : (
+              <Text>No recent jobs available</Text>
+            )}
+          </ScrollView>
         </View>
-        <ApplicationResponseChart />
+
+        <View>
+          <Text style={styles.Containertitle}>recent_job_applications</Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.scrollContainer}
+            style={{paddingVertical: 8}}>
+            {HomeData.recent_job_applications &&
+            HomeData.recent_job_applications.length > 0 ? (
+              HomeData.recent_job_applications.map((item, index) => (
+                <UserCard
+                  key={index}
+                  item={item}
+                  jobId={''}
+                  page_name={'application'}
+                  index={index}
+                  isHorizontal={true} // Pass isHorizontal prop to adjust card width for horizontal scroll
+                />
+              ))
+            ) : (
+              <Text>No recent jobs available</Text>
+            )}
+          </ScrollView>
+        </View>
       </ScrollView>
     </View>
   );
@@ -177,21 +239,73 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   Maincontainer: {
     flex: 1,
-    padding: 12,
-    width:'100%'
+    // padding: 12,
+    marginHorizontal: 12,
+    width: '100%',
   },
+  scrollContainer: {
+    paddingHorizontal: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  Containertitle: {
+    fontSize: 16,
+    color: '#000',
+    fontWeight: 'bold',
+    paddingHorizontal: 12,
+  },
+  horizontalScrollView: {
+    paddingHorizontal: 10,
+  },
+
   container: {
     flex: 1,
     backgroundColor: colors.background,
-     width:'100%'
+    width: '100%',
+  },
+  scrollView: {
+    flexGrow: 0,
+    marginHorizontal: 12,
+  },
+  card: {
+    flex: 1,
+    width: '100%',
+    marginRight: 12,
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  linearGradient: {
+    padding: 20,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 10,
+    color: '#fff',
+  },
+  value: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  description: {
+    fontSize: 14,
+    marginTop: 10,
+    color: '#f0f0f0',
+    textAlign: 'center',
   },
   welcomeBanner: {
-    width: '100%',
+    // width: '100%',
     marginBottom: 12,
     flexDirection: 'row',
     justifyContent: 'space-between',
     backgroundColor: colors.secondary,
     borderRadius: 8,
+    marginHorizontal: 12,
+    marginTop: 12,
   },
   welcomeText: {
     fontSize: 18,
@@ -208,38 +322,8 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
   },
-  TableContainer: {
-    marginTop: 12,
-    borderRadius: 8,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 16,
-  },
-  noDataText: {
-    fontSize: 16,
-    color: '#888',
-    textAlign: 'center',
-    marginTop: 16,
-  },
-  statusBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
-    minWidth: 80, // Ensures badges have enough width
-    marginVertical: 4, // Adds spacing
-  },
-  statusText: {
-    color: '#f60b0b',
-    fontWeight: 'bold',
-    fontSize: 12,
-    textAlign: 'center',
-  },
+
   TableHeadingContainer: {
-    flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 8,
@@ -248,34 +332,19 @@ const styles = StyleSheet.create({
     marginHorizontal: 12,
   },
   tableheading: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
     color: colors.primary,
+    marginTop: 12,
   },
-  tableheadingContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    // paddingHorizontal: 16,
-  },
-  Tab: {
-    fontSize: 12,
-    color: '#888',
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 5,
-    textAlign: 'center',
-    marginRight: 4,
-  },
-  activeTab: {
-    color: '#fff',
-    backgroundColor: colors.primary,
-    fontWeight: 'bold',
-  },
+
   jobCard: {
-    marginVertical: 8,
+    backgroundColor: colors.whiteText,
+    borderRadius: 10,
+    marginRight: 12,
     padding: 12,
-    backgroundColor: '#fff',
-    borderRadius: 8,
+    width: '30%',
+    marginBottom: 20,
   },
   titleContainer: {
     flexDirection: 'row',
@@ -293,7 +362,7 @@ const styles = StyleSheet.create({
     textAlign: 'right', // Align the date to the right side
   },
   companyName: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#555',
   },
   companyDescription: {
@@ -318,6 +387,16 @@ const styles = StyleSheet.create({
   companyLocation: {
     fontSize: 11,
     color: '#555',
+  },
+  experienceLevel: {
+    fontSize: 11,
+    color: 'black',
+    marginLeft: 4,
+  },
+  horizontalLine: {
+    borderBottomWidth: 1,
+    borderBottomColor: colors.lightgaryText,
+    marginTop: 4,
   },
   applications: {
     fontSize: 11,
