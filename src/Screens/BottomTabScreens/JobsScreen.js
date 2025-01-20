@@ -456,7 +456,7 @@ const styles = StyleSheet.create({
     // width: '100%',
   },
   container: {
-    flex: 1,
+    // flex: 1,
     width: '100%',
     flexDirection: 'row',
     backgroundColor: colors.primary,
