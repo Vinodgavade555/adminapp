@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {
+  Dimensions,
   Image,
   ScrollView,
   StyleSheet,
@@ -18,6 +19,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import {useNavigation} from '@react-navigation/native';
 import UserCard from '../../Constant/UserCard';
 
+const {width} = Dimensions.get('window');
 const HomeScreen = () => {
   const [id, setId] = useState(null);
   const dispatch = useDispatch();
@@ -103,134 +105,142 @@ const HomeScreen = () => {
           ))}
         </ScrollView>
 
-        <View style={styles.TableHeadingContainer}>
-          <Text style={styles.tableheading}>Recent Jobs</Text>
-        </View>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.horizontalScrollView}>
-          {HomeData.recent_jobs && HomeData.recent_jobs.length > 0 ? (
-            HomeData.recent_jobs.map((job, index) => (
-              <TouchableOpacity
-                key={index}
-                style={styles.jobCard}
-                onPress={() =>
-                  navigation.navigate('JobDetail', {jobId: job.id})
-                }>
-                <View style={styles.jobCardContent}>
-                  <View style={styles.titleContainer}>
-                    <Text style={styles.jobTitle}>
-                      {job.job_title?.title || 'No Title'}
-                    </Text>
-                    <Text style={styles.jobDate}>
-                      {job.created_at
-                        ? moment(job.created_at).format('DD MMM')
-                        : 'No Date'}
-                    </Text>
-                  </View>
-                  <Text style={styles.companyName}>
-                    {' '}
-                    {job.company?.company_name || 'No Title'}
-                  </Text>
-                  {job.job_location && job.job_location.length > 0 ? (
-                    <View style={styles.locationContainer}>
-                      <Icon
-                        name="map-marker"
-                        size={14}
-                        color={colors.primary}
-                        style={styles.locationIcon}
-                      />
-                      <Text style={styles.companyLocation}>
-                        {job.job_location.join(', ')}
+        {HomeData.recent_jobs && HomeData.recent_jobs.length > 0 && (
+          <View style={styles.TableHeadingContainer}>
+            <Text style={styles.tableheading}>Recent Jobs</Text>
+
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.horizontalScrollView}>
+              {HomeData.recent_jobs && HomeData.recent_jobs.length > 0 ? (
+                HomeData.recent_jobs.map((job, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={styles.jobCard}
+                    onPress={() =>
+                      navigation.navigate('JobDetail', {jobId: job.id})
+                    }>
+                    <View style={styles.jobCardContent}>
+                      <View style={styles.titleContainer}>
+                        <Text style={styles.jobTitle}>
+                          {job.job_title?.title || 'No Title'}
+                        </Text>
+                        <Text style={styles.jobDate}>
+                          {job.created_at
+                            ? moment(job.created_at).format('DD MMM')
+                            : 'No Date'}
+                        </Text>
+                      </View>
+                      <Text style={styles.companyName}>
+                        {' '}
+                        {job.company?.company_name || 'No Title'}
                       </Text>
+                      {job.job_location && job.job_location.length > 0 ? (
+                        <View style={styles.locationContainer}>
+                          <Icon
+                            name="map-marker"
+                            size={14}
+                            color={colors.primary}
+                            style={styles.locationIcon}
+                          />
+                          <Text style={styles.companyLocation}>
+                            {job.job_location.join(', ')}
+                          </Text>
+                        </View>
+                      ) : null}
+
+                      <View
+                        style={{flexDirection: 'row', alignItems: 'center'}}>
+                        <Icon
+                          name="briefcase"
+                          size={14}
+                          color={colors.primary}
+                          style={styles.icon}
+                        />
+                        <Text style={styles.experienceLevel}>
+                          {job.experience_level
+                            ? `${job.experience_level.minYear} - ${job.experience_level.maxYear} years`
+                            : 'Experience Level not specified'}
+                        </Text>
+                      </View>
+
+                      <View style={styles.horizontalLine} />
+
+                      <View style={{flexDirection: 'row'}}>
+                        <Text style={styles.applications}>
+                          Applications: {job.applicant_count || 0} |
+                        </Text>
+
+                        <Text style={styles.openings}>
+                          Openings: {job.openings || 0}
+                        </Text>
+                      </View>
                     </View>
-                  ) : null}
+                  </TouchableOpacity>
+                ))
+              ) : (
+                <Text>No recent jobs available</Text>
+              )}
+            </ScrollView>
+          </View>
+        )}
 
-                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <Icon
-                      name="briefcase"
-                      size={14}
-                      color={colors.primary}
-                      style={styles.icon}
-                    />
-                    <Text style={styles.experienceLevel}>
-                      {job.experience_level
-                        ? `${job.experience_level.minYear} - ${job.experience_level.maxYear} years`
-                        : 'Experience Level not specified'}
-                    </Text>
-                  </View>
+        {HomeData.top_20_related_to_recent_jobs && (
+          <View>
+            <Text style={styles.Containertitle}>
+              Top20 related to recent jobs
+            </Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.scrollContainer}
+              style={{paddingVertical: 8}}>
+              {HomeData.top_20_related_to_recent_jobs &&
+              HomeData.top_20_related_to_recent_jobs.length > 0 ? (
+                HomeData.top_20_related_to_recent_jobs.map((item, index) => (
+                  <UserCard
+                    key={index}
+                    item={item}
+                    jobId={''}
+                    page_name={'home'}
+                    index={index}
+                    isHorizontal={true}
+                  />
+                ))
+              ) : (
+                <Text>No recent jobs available</Text>
+              )}
+            </ScrollView>
+          </View>
+        )}
 
-                  <View style={styles.horizontalLine} />
-
-                  <View style={{flexDirection: 'row'}}>
-                    <Text style={styles.applications}>
-                      Applications: {job.applicant_count || 0} |
-                    </Text>
-
-                    <Text style={styles.openings}>
-                      Openings: {job.openings || 0}
-                    </Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            ))
-          ) : (
-            <Text>No recent jobs available</Text>
-          )}
-        </ScrollView>
-
-        <View>
-          <Text style={styles.Containertitle}>
-            Top20 related to recent jobs
-          </Text>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.scrollContainer}
-            style={{paddingVertical: 8}}>
-            {HomeData.top_20_related_to_recent_jobs &&
-            HomeData.top_20_related_to_recent_jobs.length > 0 ? (
-              HomeData.top_20_related_to_recent_jobs.map((item, index) => (
-                <UserCard
-                  key={index}
-                  item={item}
-                  jobId={''}
-                  page_name={'home'}
-                  index={index}
-                  isHorizontal={true}
-                />
-              ))
-            ) : (
-              <Text>No recent jobs available</Text>
-            )}
-          </ScrollView>
-        </View>
-
-        <View>
-          <Text style={styles.Containertitle}>recent_job_applications</Text>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.scrollContainer}
-            style={{paddingVertical: 8}}>
-            {HomeData.recent_job_applications &&
-            HomeData.recent_job_applications.length > 0 ? (
-              HomeData.recent_job_applications.map((item, index) => (
-                <UserCard
-                  key={index}
-                  item={item}
-                  jobId={''}
-                  page_name={'application'}
-                  index={index}
-                  isHorizontal={true} // Pass isHorizontal prop to adjust card width for horizontal scroll
-                />
-              ))
-            ) : (
-              <Text>No recent jobs available</Text>
-            )}
-          </ScrollView>
-        </View>
+        {HomeData.top_20_related_to_recent_jobs && (
+          <View>
+            <Text style={styles.Containertitle}>recent_job_applications</Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.scrollContainer}
+              style={{paddingVertical: 8}}>
+              {HomeData.recent_job_applications &&
+              HomeData.recent_job_applications.length > 0 ? (
+                HomeData.recent_job_applications.map((item, index) => (
+                  <UserCard
+                    key={index}
+                    item={item}
+                    jobId={''}
+                    page_name={'application'}
+                    index={index}
+                    isHorizontal={true} // Pass isHorizontal prop to adjust card width for horizontal scroll
+                  />
+                ))
+              ) : (
+                <Text>No recent jobs available</Text>
+              )}
+            </ScrollView>
+          </View>
+        )}
       </ScrollView>
     </View>
   );
@@ -324,27 +334,28 @@ const styles = StyleSheet.create({
   },
 
   TableHeadingContainer: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     justifyContent: 'space-between',
     marginTop: 8,
-
     marginBottom: 8,
-    marginHorizontal: 12,
+    // marginHorizontal: 12,
   },
   tableheading: {
     fontSize: 18,
     fontWeight: 'bold',
     color: colors.primary,
     marginTop: 12,
+    marginLeft: 12,
   },
 
   jobCard: {
     backgroundColor: colors.whiteText,
-    borderRadius: 10,
+    marginTop: 18,
+    borderRadius: 8,
     marginRight: 12,
     padding: 12,
-    width: '30%',
-    marginBottom: 20,
+    width: width * 0.7,
+    marginBottom: 18,
   },
   titleContainer: {
     flexDirection: 'row',
@@ -407,11 +418,11 @@ const styles = StyleSheet.create({
     color: colors.primary,
     marginLeft: 4,
   },
-  jobDate: {
-    fontSize: 12,
-    color: '#888',
-    marginTop: 4,
-  },
+  // jobDate: {
+  //   fontSize: 12,
+  //   color: '#888',
+  //   marginTop: 4,
+  // },
 });
 
 export default HomeScreen;

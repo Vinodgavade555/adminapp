@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import instance, {setAuthToken} from '../../Services/baseAPI';
 import axios from 'axios';
 
-export const  BASE_URL = 'http://15.206.149.28/';
+export const BASE_URL = 'http://15.206.149.28/';
 const AuthViewController = () => {
   const navigation = useNavigation();
   const goBackScreen = () => {
@@ -31,74 +31,21 @@ const AuthViewController = () => {
     }
   };
 
-//   const register = requestData => async dispatch => {
-//     dispatch({type: 'LOADING', payload: true});
-//     try {
-//       const response = await instance.post('/register/user/', requestData);
-//       // console.log(
-//       //   '****************************Register response***************************',
-//       // );
-//       console.log(response);
-//       const jsonString = JSON.stringify(response.data);
-//       const data = JSON.parse(jsonString);
-//       console.log(data);
-//       // const {token, user} = data;
-//       // setAuthToken(token); // Set token in axios headers or AsyncStorage
-//       // await AsyncStorage.setItem('user_data', JSON.stringify(user));
-//       // await AsyncStorage.setItem('email', requestData.email);
-
-//       // dispatch({type: 'REGISTER_SUCCESS', payload: {token, user}});
-//       dispatch({type: 'LOADING', payload: false});
-//       Toast.show('You have Successfully Registered', {
-//         type: 'success',
-//         placement: 'top',
-//         duration: 4000,
-//         offset: 100,
-//         animationType: 'slide-in',
-//       });
-//       // navigation.navigate('VerifyOtp');
-//     } catch (error) {
-//       // console.log(error);
-
-//       dispatch({type: 'LOADING', payload: false});
-//       Toast.show(
-//         error.response?.data
-//           ? error.response?.data
-//           : error.response?.data?.non_field_errors[0]
-//           ? error.response.data.non_field_errors[0]
-//           : 'Something went wrong,Please Try again!',
-//         {
-//           type: 'danger',
-//           placement: 'top',
-//           duration: 4000,
-//           offset: 100,
-//           animationType: 'slide-in',
-//         },
-//       );
-//       dispatch({
-//         type: 'REGISTER_FAILURE',
-//         payload: {
-//           error: error.response?.data?.non_field_errors
-//             ? error.response.data.non_field_errors[0]
-//             : error?.response?.data,
-//         },
-//       });
-//     }
-//   };
-
   const login = requestData => async dispatch => {
     dispatch({type: 'LOADING', payload: true});
-     console.log(requestData);
-     
+    console.log(requestData);
+
     try {
-      const response = await axios.post('http://15.206.149.28/api/employer/login/', requestData);
-    
+      const response = await axios.post(
+        'http://15.206.149.28/api/employer/login/',
+        requestData,
+      );
 
       // console.log(
       //   '****************************login response***************************',
       // );
-    // console.log(response);
-    const { message, user_id, access, refresh } = response.data; 
+      // console.log(response);
+      const {message, user_id, access, refresh} = response.data;
       const jsonString = JSON.stringify(response.data);
       const data = JSON.parse(jsonString);
 
@@ -108,7 +55,6 @@ const AuthViewController = () => {
       setAuthToken(access); // Set token in axios headers or AsyncStorage
       await AsyncStorage.setItem('user_data', JSON.stringify(user_id));
 
-  
       dispatch({type: 'LOGIN_SUCCESS', payload: {access, user_id}});
 
       dispatch({type: 'LOADING', payload: false});
@@ -120,7 +66,6 @@ const AuthViewController = () => {
         animationType: 'slide-in',
       });
       navigation.navigate('DefaultScreen');
-
     } catch (error) {
       console.log('error_____', error);
 
