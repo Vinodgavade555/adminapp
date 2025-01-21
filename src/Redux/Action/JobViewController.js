@@ -675,25 +675,27 @@ const JobViewController = () => {
     }
   };
 
-  const GetFilterdJobs = queryParams => async dispatch => {
+  const GetFilteredUsers = (user_id, queryParams) => async dispatch => {
     dispatch({type: 'LOADING', payload: true});
-    // const queryString = new URLSearchParams(queryParams).toString();
+    console.log('-----------------------', user_id, queryParams);
+
+    const queryString = new URLSearchParams(queryParams).toString();
 
     try {
       const response = await axios.get(
-        `http://15.206.149.28/api/filter-users/?${queryParams}`,
+        `http://15.206.149.28/api/filter-users/${user_id}/?${queryString}`,
       );
       console.log(
-        '****************************job-GetFilterdJobs response***************************',
+        '****************************job-GetFilteredUsers response***************************',
       );
       // console.log('queryParams', queryParams);
-      console.log(`http://15.206.149.28/api/filter-users/?${queryParams}`);
+      console.log(`http://15.206.149.28/api/filter-users/${user_id}/?${queryString}`);
 
       const jsonString = JSON.stringify(response.data);
       const data = JSON.parse(jsonString);
       // console.log(data);
 
-      dispatch({type: 'FILTER_JOB_SUCCESS', payload: data});
+      dispatch({type: 'FILTER_USER_SUCCESS', payload: data});
 
       dispatch({type: 'LOADING', payload: false});
     } catch (error) {
@@ -713,7 +715,7 @@ const JobViewController = () => {
         },
       );
       dispatch({
-        type: 'FILTER_JOB_FAILURE',
+        type: 'FILTER_USER_FAILURE',
         payload: {
           error: error.response?.data?.non_field_errors
             ? error.response.data.non_field_errors[0]
@@ -782,7 +784,7 @@ const JobViewController = () => {
     GetSavedJobs,
     GetReviewData,
     AddReview,
-    GetFilterdJobs,
+    GetFilteredUsers,
     GetFiltermasterData,
   };
 };

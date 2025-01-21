@@ -16,6 +16,7 @@ import JobsScreen from '../Screens/BottomTabScreens/JobsScreen';
 import UserAppliesScreen from '../Screens/BottomTabScreens/UserAppliesScreen';
 import ShortlistCandidate from '../Screens/BottomTabScreens/ShortlistedCandidatePage';
 import AnalyticPage from '../Screens/BottomTabScreens/AnalyticPage';
+import UserScreen from '../Screens/BottomTabScreens/UserScreen';
 
 const CustomBottomTab = () => {
   const [selectedTab, setSelectedTab] = useState('Home');
@@ -51,39 +52,7 @@ const CustomBottomTab = () => {
     }, [selectedTab]),
   );
 
-  const renderContent = () => {
-    switch (selectedTab) {
-      case 'Home':
-        return <HomeComponent />;
-
-      case 'Jobs':
-        return <JobsScreen />;
-      case 'AnalyticPage':
-        return <AnalyticPage />;
-      case 'ShortlistCandidate':
-      return <ShortlistCandidate />;
-      
-
-      default:
-        return <HomeComponent />;
-    }
-  };
-
-  return (
-    <PaperProvider>
-      <View style={styles.container}>
-        <View style={styles.content}>{renderContent()}</View>
-        <View style={styles.tabContainer}>
-          {renderTab('Home', 'home', 'Home')}
-          {renderTab('AnalyticPage', 'analytics', 'Analytics')}
-          {renderTab('Jobs', 'mail-sharp', 'Jobs')}
-          {renderTab('ShortlistCandidate', 'checkmark-circle', 'Shortlisted Cadidate')}
-        </View>
-      </View>
-    </PaperProvider>
-  );
-
-  function renderTab(tabName, iconName, label) {
+  function renderTabBtn(tabName, iconName, label) {
     return (
       <TouchableOpacity
         style={[
@@ -107,6 +76,31 @@ const CustomBottomTab = () => {
       </TouchableOpacity>
     );
   }
+
+  return (
+    <PaperProvider>
+      <View style={styles.container}>
+        <View style={styles.content}>
+          {selectedTab === 'Home' && <HomeComponent />}
+          {selectedTab === 'Jobs' && <JobsScreen />}
+          {selectedTab === 'UserScreen' && <UserScreen />}
+          {selectedTab === 'AnalyticPage' && <AnalyticPage />}
+          {selectedTab === 'ShortlistCandidate' && <ShortlistCandidate />}
+        </View>
+        <View style={styles.tabContainer}>
+          {renderTabBtn('Home', 'home', 'Home')}
+          {renderTabBtn('AnalyticPage', 'analytics', 'Analytics')}
+          {renderTabBtn('UserScreen', 'person-outline', 'user')}
+          {renderTabBtn('Jobs', 'mail-sharp', 'Jobs')}
+          {renderTabBtn(
+            'ShortlistCandidate',
+            'checkmark-circle',
+            'Shortlisted Cadidate',
+          )}
+        </View>
+      </View>
+    </PaperProvider>
+  );
 };
 
 const styles = StyleSheet.create({
