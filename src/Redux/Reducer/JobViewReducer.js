@@ -9,6 +9,8 @@ const initialState = {
   shortlistedUsers: [],
   UserShortlitedList:[],
   CandidateReview:null,
+  filteredUsers:[],
+  FilterMasterData: [],
   SavedJobs:null,
   error: null,
   isLoading: false, // Track loading for any API request
@@ -235,7 +237,8 @@ const jobReducer = (state = initialState, action) => {
           results: state.CandidateReview.results.filter(
             review => review.id !== action.payload,
           ),
-        },
+        }
+      }}
     case 'FILTER_USER_SUCCESS':
       return {
         ...state,
@@ -249,7 +252,7 @@ const jobReducer = (state = initialState, action) => {
         ...state,
         error: action.payload.error,
       };
-    }};
+    ;
 
     default:
       return state;
