@@ -295,9 +295,7 @@ const JobViewController = () => {
     dispatch({type: 'LOADING', payload: true});
 
     try {
-      const response = await instance.get(
-        `/filter-users-for-job/${job_id}`,
-      );
+      const response = await instance.get(`/filter-users-for-job/${job_id}`);
       // console.log(
       //   `****************************job-GetJobInvitation response***************************
       //   http://15.206.149.28/api/job/${job_id}/applied-users/`,
@@ -514,10 +512,7 @@ const JobViewController = () => {
     dispatch({type: 'LOADING', payload: true});
 
     try {
-      const response = await instance.post(
-        `/save-candidate/`,
-        requestData,
-      );
+      const response = await instance.post(`/save-candidate/`, requestData);
       // console.log(response);
       const jsonString = JSON.stringify(response.data);
       const data = JSON.parse(jsonString);
@@ -555,13 +550,11 @@ const JobViewController = () => {
     }
   };
 
-  const GetSavedJobs = recruiter_id  => async dispatch => {
+  const GetSavedJobs = recruiter_id => async dispatch => {
     dispatch({type: 'LOADING', payload: true});
 
     try {
-      const response = await instance.get(
-        `/save-candidate/${recruiter_id }/`,
-      );
+      const response = await instance.get(`/save-candidate/${recruiter_id}/`);
       // console.log(
       //   '****************************job-saved response***************************',
       // );
@@ -599,9 +592,9 @@ const JobViewController = () => {
     }
   };
 
-  const GetReviewData = user_id  => async dispatch => {
+  const GetReviewData = user_id => async dispatch => {
     dispatch({type: 'LOADING', payload: true});
-// console.log(user_id);
+    // console.log(user_id);
 
     try {
       const response = await axios.get(
@@ -685,30 +678,32 @@ const JobViewController = () => {
     }
   };
 
-  const GetFilterdJobs = queryParams => async dispatch => {
+  const GetFilteredUsers = (user_id, queryParams) => async dispatch => {
     dispatch({type: 'LOADING', payload: true});
-    // const queryString = new URLSearchParams(queryParams).toString();
- 
+    console.log('-----------------------', user_id, queryParams);
+
+    const queryString = new URLSearchParams(queryParams).toString();
+
     try {
       const response = await axios.get(
-        `http://15.206.149.28/api/filter-users/?${queryParams}`,
+        `http://15.206.149.28/api/filter-users/${user_id}/?${queryString}`,
       );
       console.log(
-        '****************************job-GetFilterdJobs response***************************',
+        '****************************job-GetFilteredUsers response***************************',
       );
       // console.log('queryParams', queryParams);
-      console.log(`http://15.206.149.28/api/filter-users/?${queryParams}`);
- 
+      console.log(`http://15.206.149.28/api/filter-users/${user_id}/?${queryString}`);
+
       const jsonString = JSON.stringify(response.data);
       const data = JSON.parse(jsonString);
       // console.log(data);
- 
-      dispatch({type: 'FILTER_JOB_SUCCESS', payload: data});
- 
+
+      dispatch({type: 'FILTER_USER_SUCCESS', payload: data});
+
       dispatch({type: 'LOADING', payload: false});
     } catch (error) {
       console.log('error', error.response);
- 
+
       dispatch({type: 'LOADING', payload: false});
       Toast.show(
         error.response?.data?.non_field_errors[0]
@@ -723,7 +718,7 @@ const JobViewController = () => {
         },
       );
       dispatch({
-        type: 'FILTER_JOB_FAILURE',
+        type: 'FILTER_USER_FAILURE',
         payload: {
           error: error.response?.data?.non_field_errors
             ? error.response.data.non_field_errors[0]
@@ -732,7 +727,7 @@ const JobViewController = () => {
       });
     }
   };
- 
+
   const GetFiltermasterData = user_id => async dispatch => {
     try {
       const response = await axios.get(
@@ -744,13 +739,13 @@ const JobViewController = () => {
       const jsonString = JSON.stringify(response.data);
       const data = JSON.parse(jsonString);
       // console.log(data);
- 
+
       dispatch({type: 'FILTER_MASTER_DATA_SUCCESS', payload: data});
- 
+
       dispatch({type: 'LOADING', payload: false});
     } catch (error) {
       console.log('error', error.response);
- 
+
       dispatch({type: 'LOADING', payload: false});
       Toast.show(
         error.response?.data?.non_field_errors[0]
@@ -777,26 +772,27 @@ const JobViewController = () => {
 
   const DeleteReview = reviewId => async dispatch => {
     dispatch({type: 'LOADING', payload: true});
-  
+
     try {
       const response = await instance.put(`reviews/${reviewId}/`, {
         is_deleted: true, // Mark the review as deleted
       });
-  
+
       if (response.status === 200) {
         // Dispatch success action to update the state
         dispatch({type: 'DELETE_REVIEW_SUCCESS', payload: reviewId});
         console.log('Review deleted successfully:', reviewId);
       }
-  
+
       dispatch({type: 'LOADING', payload: false});
     } catch (error) {
       console.error('Error deleting review:', error.response);
-  
+
       dispatch({type: 'LOADING', payload: false});
-  
+
       Toast.show(
-        error.response?.data?.detail || 'Something went wrong, please try again!',
+        error.response?.data?.detail ||
+          'Something went wrong, please try again!',
         {
           type: 'danger',
           placement: 'top',
@@ -805,17 +801,13 @@ const JobViewController = () => {
           animationType: 'slide-in',
         },
       );
-  
+
       dispatch({
         type: 'REVIEW_DELETE_UNSUCCESSFUL',
         payload: error.response?.data || 'Error deleting review',
       });
     }
   };
-  
-
-
-  
 
   return {
     goBackScreen,
@@ -834,9 +826,9 @@ const JobViewController = () => {
     GetSavedJobs,
     GetReviewData,
     AddReview,
-    GetFilterdJobs,
+    GetFilteredUsers,
     GetFiltermasterData,
-    DeleteReview
+    DeleteReview,
   };
 };
 
