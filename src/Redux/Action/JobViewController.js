@@ -646,12 +646,8 @@ const JobViewController = () => {
 
   const AddReview = requestData => async dispatch => {
     dispatch({type: 'LOADING', payload: true});
-
     try {
-      const response = await instance.post(
-        `reviews/`,
-        requestData,
-      );
+      const response = await instance.post(`reviews/`, requestData);
       // console.log(response);
       const jsonString = JSON.stringify(response.data);
       const data = JSON.parse(jsonString);

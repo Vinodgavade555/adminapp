@@ -7,9 +7,9 @@ const initialState = {
   JobApplications: null,
   JobInvitations: [],
   shortlistedUsers: [],
-  UserShortlitedList: [],
-  CandidateReview: null,
-  SavedJobs: null,
+  UserShortlitedList:[],
+  CandidateReview:null,
+  SavedJobs:null,
   error: null,
   isLoading: false, // Track loading for any API request
 };
@@ -202,30 +202,30 @@ const jobReducer = (state = initialState, action) => {
         error: action.payload.error, // Store the error message for job details
       };
 
-    case 'CANDIDATE_REVIEW_SAVED_SUCCESS':
-      return {
-        ...state,
-        CandidateReview: action.payload, // Store job details in the state
-        error: null,
-      };
-
-    case 'CANDIDATE_REVIEW_SAVED_UNSUCCESS':
-      return {
-        ...state,
-        error: action.payload.error, // Store the error message for job details
-      };
-    case 'REVIEW_ADDED_SUCCESSFULLY':
-      return {
-        ...state,
-        error: null,
-      };
-
-    // Job Applications Failure
-    case 'REVIEW_ADDED_UNSUCCESSFULLY':
-      return {
-        ...state,
-        error: action.payload.error,
-      };
+      case 'CANDIDATE_REVIEW_SAVED_SUCCESS':
+        return {
+          ...state,
+          CandidateReview: action.payload, // Store job details in the state
+          error: null,
+        };
+  
+      case 'CANDIDATE_REVIEW_SAVED_UNSUCCESS':
+        return {
+          ...state,
+          error: action.payload.error, // Store the error message for job details
+        };
+        case 'REVIEW_ADDED_SUCCESSFULLY':
+          return {
+            ...state,
+            error: null,
+          };
+    
+        // Job Applications Failure
+        case 'REVIEW_ADDED_UNSUCCESSFULLY':
+          return {
+            ...state,
+            error: action.payload.error,
+          };
 
     case 'DELETE_REVIEW_SUCCESS': {
       return {
@@ -236,8 +236,20 @@ const jobReducer = (state = initialState, action) => {
             review => review.id !== action.payload,
           ),
         },
+    case 'FILTER_USER_SUCCESS':
+      return {
+        ...state,
+        filteredUsers: action.payload,
+        error: null,
       };
-    }
+
+    // Job Applications Failure
+    case 'FILTER_USER_FAILURE':
+      return {
+        ...state,
+        error: action.payload.error,
+      };
+    }};
 
     default:
       return state;

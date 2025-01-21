@@ -20,13 +20,13 @@ const UserCard = ({item, jobId, page_name, index, isHorizontal}) => {
   const navigation = useNavigation();
   const [id, setId] = useState('');
   const isFocus = useIsFocused();
-  const transformJobSeekerProfile = (userData) => {
-    const { job_seeker_profile, ...rest } = userData;
-  
+  const transformJobSeekerProfile = userData => {
+    const {job_seeker_profile, ...rest} = userData;
+
     if (!job_seeker_profile) {
-      return rest; 
+      return rest;
     }
-  
+
     return {
       ...rest,
       ...job_seeker_profile,
@@ -86,7 +86,7 @@ const UserCard = ({item, jobId, page_name, index, isHorizontal}) => {
 
     console.log('job', jobId, 'usr', item.id, 'recri', id);
 
-    dispatch(toggleshortlistUser(shortlistData)); 
+    dispatch(toggleshortlistUser(shortlistData));
   };
 
   const handleSaveToggle = async () => {
@@ -129,7 +129,10 @@ const UserCard = ({item, jobId, page_name, index, isHorizontal}) => {
       return value?.toString() || 'N/A';
     }
   };
-  const currentJob = userProfile?.employment_details.find(
+
+  console.log('userProfile', JSON.stringify(userProfile, null, 2));
+
+  const currentJob = userProfile?.employment_details?.find(
     job => job.is_current_company === 'true',
   );
   const experienceText = currentJob
