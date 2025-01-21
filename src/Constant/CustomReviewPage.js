@@ -1,10 +1,9 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
   ScrollView,
   StyleSheet,
-  Image,
   TextInput,
   TouchableOpacity,
 } from 'react-native';
@@ -13,13 +12,35 @@ import moment from 'moment';
 import {colors} from '../Global_CSS/TheamColors';
 import {useDispatch, useSelector} from 'react-redux';
 import JobViewController from '../Redux/Action/JobViewController';
+import {useIsFocused} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const ReviewPage = ({JobDetails}) => {
+const ReviewPage = ({data}) => {
   const dispatch = useDispatch();
   const {GetReviewData, AddReview} = JobViewController();
   const {CandidateReview} = useSelector(state => state.job);
   const [newComment, setNewComment] = useState('');
   const [userRating, setUserRating] = useState(5);
+  const [id, setId] = useState('');
+  const isFocus = useIsFocused();
+  const [reviewTitle, setReviewTitle] = useState('');
+
+  useEffect(() => {
+    const getUserData = async () => {
+      try {
+        const id = await AsyncStorage.getItem('user_data');
+        dispatch(GetReviewData(data?.id));
+
+        setId(id);
+      } catch (error) {
+        console.error('Error reading value from AsyncStorage', error);
+      }
+    };
+
+    getUserData();
+  }, [isFocus]);
+
+  useEffect(() => {}, [CandidateReview]);
 
   const renderStars = rating => {
     const stars = [];
@@ -67,11 +88,11 @@ const ReviewPage = ({JobDetails}) => {
   const handleAddComment = () => {
     if (newComment && userRating) {
       const reviewData = {
-        user: '1',
+        user: data?.id,
         rating: userRating.toString(),
         review_title: 'HIRED',
         review_body: newComment,
-        given_by: '1',
+        given_by: id,
       };
 
       dispatch(AddReview(reviewData));
@@ -81,6 +102,11 @@ const ReviewPage = ({JobDetails}) => {
     }
   };
 
+  const handleDeleteReview = reviewId => {
+    dispatch(DeleteReview(reviewId)); // Dispatch delete action
+    // dispatch(GetReviewData(data?.id)); // Refresh the reviews after deletion
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.contentContainer}>
       <View style={styles.averageRatingContainer}>
@@ -88,6 +114,14 @@ const ReviewPage = ({JobDetails}) => {
       </View>
 
       <View style={styles.commentBoxContainer}>
+        <Text style={styles.labelText}>Enter the Title:</Text>
+        <TextInput
+          style={styles.titleInput}
+          placeholder="Title or Subject for your review"
+          value={reviewTitle}
+          onChangeText={setReviewTitle}
+        />
+
         <TextInput
           style={styles.commentInput}
           placeholder="Add your comment..."
@@ -102,13 +136,44 @@ const ReviewPage = ({JobDetails}) => {
           <Text style={styles.buttonText}>Add Comment</Text>
         </TouchableOpacity>
       </View>
+
+      <View style={styles.reviewsContainer}>
+        <Text style={styles.reviewsTitle}>Reviews:</Text>
+
+        {CandidateReview?.results?.map(review => (
+          <View key={review.id} style={styles.reviewCard}>
+            <View style={styles.reviewCardHeader}>
+              <Text style={styles.reviewTitle}>{review.review_title}</Text>
+              <View style={styles.reviewRating}>
+                {renderStars(review.rating)}
+              </View>
+            </View>
+            {review.review_body && review.review_body.trim() !== '' ? (
+              <Text style={styles.reviewBody}>{review.review_body}</Text>
+            ) : null}
+            <View style={styles.reviewInfoRow}>
+              <Text style={styles.reviewInfo}>
+                Rated by {review.given_by_name} on{' '}
+                {moment(review.review_date).format('MMM Do, YYYY')}
+              </Text>
+              {review.given_by === id && (
+                <TouchableOpacity
+                  onPress={() => handleDeleteReview(review.id)}
+                  style={styles.deleteIconContainer}>
+                  <Ionicons name="trash-outline" size={20} color="#FF0000" />
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+        ))}
+      </View>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   contentContainer: {
-    // padding: 20,
+    flex: 1,
   },
   averageRatingContainer: {
     marginBottom: 8,
@@ -130,6 +195,11 @@ const styles = StyleSheet.create({
     color: '#555',
     marginLeft: 5,
   },
+  labelText: {
+    fontSize: 14,
+    color: '#000',
+    marginBottom: 8,
+  },
 
   commentBoxContainer: {
     backgroundColor: 'white',
@@ -140,8 +210,16 @@ const styles = StyleSheet.create({
     borderColor: '#e6e6e6',
     shadowOffset: {width: 0, height: 2},
   },
-  commentInput: {
+  titleInput: {
     height: 48,
+    borderColor: '#e6e6e6',
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 12,
+  },
+  commentInput: {
+    height: 100,
     borderColor: '#e6e6e6',
     borderWidth: 1,
     padding: 8,
@@ -165,6 +243,54 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 12,
     fontWeight: 'bold',
+  },
+  reviewsContainer: {
+    marginTop: 20,
+  },
+  reviewsTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  reviewCard: {
+    backgroundColor: '#fafafa',
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 0.5,
+    borderColor: '#e6e6e6',
+    marginBottom: 16,
+    shadowRadius: 8,
+  },
+  reviewCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  reviewTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  reviewRating: {
+    flexDirection: 'row',
+    marginTop: 4,
+  },
+  reviewBody: {
+    fontSize: 12,
+    color: '#555',
+    marginBottom: 10,
+  },
+  reviewInfo: {
+    fontSize: 12,
+    color: '#888',
+  },
+  reviewInfoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  deleteIconContainer: {
+    marginLeft: 10,
   },
 });
 

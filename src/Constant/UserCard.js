@@ -288,7 +288,6 @@ const UserCard = ({item, jobId, page_name, index, isHorizontal}) => {
 
       <View style={styles.buttonContainer}>
         {page_name != 'job_invitation' ? (
-          // Render Save Icon only for the home page
           <TouchableOpacity
             style={[styles.saveButton]}
             onPress={handleSaveToggle}>
@@ -299,7 +298,6 @@ const UserCard = ({item, jobId, page_name, index, isHorizontal}) => {
             />
           </TouchableOpacity>
         ) : (
-          // Render Shortlist and Denied Buttons for other pages
           <View style={styles.leftButtons}>
             <TouchableOpacity
               style={[styles.shortlistButton]}
@@ -366,7 +364,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginVertical: 6,
     marginRight: 12,
-    minHeight: 280,
+    // minHeight: 280,
   },
   experienceContainer: {
     // marginTop: 5,

@@ -31,7 +31,7 @@ const UserDetailScreen = ({route, onShortlist}) => {
   const [isShortlisted, setIsShortlisted] = useState(
     data?.is_shortlisted || false,
   );
-  console.log('Full Data:', JSON.stringify(data, null, 2));
+  // console.log('Full Data:', JSON.stringify(data, null, 2));
 
   const handleSendInvitation = () => {
     const invitationData = {
@@ -90,7 +90,7 @@ const UserDetailScreen = ({route, onShortlist}) => {
   };
   const buttonBackgroundColor =
     statusColors[status]?.background || defaultColor;
-  const buttonTextColor = statusColors[status]?.text || '#ffffff'; 
+  const buttonTextColor = statusColors[status]?.text || '#ffffff';
 
   const handleToggle = () => {
     setIsShortlisted(!isShortlisted); // Toggle the state
@@ -123,7 +123,7 @@ const UserDetailScreen = ({route, onShortlist}) => {
   };
 
   const getFormattedNoticePeriod = noticePeriod => {
-    if (!noticePeriod) return 'N/A'; 
+    if (!noticePeriod) return 'N/A';
 
     if (noticePeriod.toLowerCase() === 'immediate') {
       return 'Immediate Available ';
@@ -185,7 +185,7 @@ const UserDetailScreen = ({route, onShortlist}) => {
 
     return {years, months};
   };
-  const currentJob = data?.user?.employment_details.find(
+  const currentJob = data?.user?.employment_details?.find?.(
     job => job.is_current_company === 'true',
   );
   const experienceText = currentJob
@@ -203,10 +203,8 @@ const UserDetailScreen = ({route, onShortlist}) => {
       case 'Profile Details':
         return (
           <ScrollView
-            // style={{flex: 1}}
-            contentContainerStyle={{paddingBottom: 20}} // Ensures space at the bottom
-            showsVerticalScrollIndicator={false} // Optional: hides the vertical scrollbar
-          >
+            contentContainerStyle={{paddingBottom: 20}}
+            showsVerticalScrollIndicator={false}>
             {/* Skills */}
             <View>
               <Text style={styles.boldText}>Skills</Text>
@@ -609,9 +607,9 @@ const UserDetailScreen = ({route, onShortlist}) => {
         return <View></View>;
       case 'Review':
         return (
-          <View>
-            <ReviewPage />
-          </View>
+          <ScrollView contentContainerStyle={{paddingBottom: 20}}>
+            <ReviewPage data={data} />
+          </ScrollView>
         );
       default:
         return null;

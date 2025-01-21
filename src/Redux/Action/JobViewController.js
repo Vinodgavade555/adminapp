@@ -601,10 +601,11 @@ const JobViewController = () => {
 
   const GetReviewData = user_id  => async dispatch => {
     dispatch({type: 'LOADING', payload: true});
+// console.log(user_id);
 
     try {
-      const response = await instance.get(
-        `reviews/${user_id}/`,
+      const response = await axios.get(
+        `http://15.206.149.28/api/reviews/${user_id}`,
       );
       // console.log(
       //   '****************************job-saved response***************************',
@@ -688,6 +689,134 @@ const JobViewController = () => {
     }
   };
 
+  const GetFilterdJobs = queryParams => async dispatch => {
+    dispatch({type: 'LOADING', payload: true});
+    // const queryString = new URLSearchParams(queryParams).toString();
+ 
+    try {
+      const response = await axios.get(
+        `http://15.206.149.28/api/filter-users/?${queryParams}`,
+      );
+      console.log(
+        '****************************job-GetFilterdJobs response***************************',
+      );
+      // console.log('queryParams', queryParams);
+      console.log(`http://15.206.149.28/api/filter-users/?${queryParams}`);
+ 
+      const jsonString = JSON.stringify(response.data);
+      const data = JSON.parse(jsonString);
+      // console.log(data);
+ 
+      dispatch({type: 'FILTER_JOB_SUCCESS', payload: data});
+ 
+      dispatch({type: 'LOADING', payload: false});
+    } catch (error) {
+      console.log('error', error.response);
+ 
+      dispatch({type: 'LOADING', payload: false});
+      Toast.show(
+        error.response?.data?.non_field_errors[0]
+          ? error.response.data.non_field_errors[0]
+          : 'Something went wrong,Please Try again!',
+        {
+          type: 'danger',
+          placement: 'top',
+          duration: 4000,
+          offset: 100,
+          animationType: 'slide-in',
+        },
+      );
+      dispatch({
+        type: 'FILTER_JOB_FAILURE',
+        payload: {
+          error: error.response?.data?.non_field_errors
+            ? error.response.data.non_field_errors[0]
+            : error?.response?.data,
+        },
+      });
+    }
+  };
+ 
+  const GetFiltermasterData = user_id => async dispatch => {
+    try {
+      const response = await axios.get(
+        `http://15.206.149.28/api/filter-master-data/`,
+      );
+      // console.log(
+      //   '****************************job-GetFiltermasterData response***************************',
+      // );
+      const jsonString = JSON.stringify(response.data);
+      const data = JSON.parse(jsonString);
+      // console.log(data);
+ 
+      dispatch({type: 'FILTER_MASTER_DATA_SUCCESS', payload: data});
+ 
+      dispatch({type: 'LOADING', payload: false});
+    } catch (error) {
+      console.log('error', error.response);
+ 
+      dispatch({type: 'LOADING', payload: false});
+      Toast.show(
+        error.response?.data?.non_field_errors[0]
+          ? error.response.data.non_field_errors[0]
+          : 'Something went wrong,Please Try again!',
+        {
+          type: 'danger',
+          placement: 'top',
+          duration: 4000,
+          offset: 100,
+          animationType: 'slide-in',
+        },
+      );
+      dispatch({
+        type: 'FILTER_MASTER_DATA_FAILURE',
+        payload: {
+          error: error.response?.data?.non_field_errors
+            ? error.response.data.non_field_errors[0]
+            : error?.response?.data,
+        },
+      });
+    }
+  };
+
+  const DeleteReview = reviewId => async dispatch => {
+    dispatch({type: 'LOADING', payload: true});
+  
+    try {
+      const response = await instance.put(`reviews/${reviewId}/`, {
+        is_deleted: true, // Mark the review as deleted
+      });
+  
+      if (response.status === 200) {
+        // Dispatch success action to update the state
+        dispatch({type: 'DELETE_REVIEW_SUCCESS', payload: reviewId});
+        console.log('Review deleted successfully:', reviewId);
+      }
+  
+      dispatch({type: 'LOADING', payload: false});
+    } catch (error) {
+      console.error('Error deleting review:', error.response);
+  
+      dispatch({type: 'LOADING', payload: false});
+  
+      Toast.show(
+        error.response?.data?.detail || 'Something went wrong, please try again!',
+        {
+          type: 'danger',
+          placement: 'top',
+          duration: 4000,
+          offset: 100,
+          animationType: 'slide-in',
+        },
+      );
+  
+      dispatch({
+        type: 'REVIEW_DELETE_UNSUCCESSFUL',
+        payload: error.response?.data || 'Error deleting review',
+      });
+    }
+  };
+  
 
 
   
@@ -708,7 +837,10 @@ const JobViewController = () => {
     ToggleSaveJob,
     GetSavedJobs,
     GetReviewData,
-    AddReview
+    AddReview,
+    GetFilterdJobs,
+    GetFiltermasterData,
+    DeleteReview
   };
 };
 

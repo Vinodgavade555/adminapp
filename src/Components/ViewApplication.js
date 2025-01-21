@@ -31,7 +31,6 @@ const ViewApplicationsScreen = ({route}) => {
   };
 
   // console.log(GetJobApplications);
-  
 
   const handleToggleViewMore = index => {
     setExpandedSkills(prevState => ({
@@ -68,7 +67,6 @@ const ViewApplicationsScreen = ({route}) => {
       is_shortlist_by_recruiter: true,
     };
     // console.log('job', jobId, 'usr', item.id, 'recri', id);
-
 
     dispatch(toggleshortlistUser(shortlistData));
   };
