@@ -678,21 +678,23 @@ const JobViewController = () => {
     }
   };
 
-  const GetFilteredUsers = (user_id, queryParams) => async dispatch => {
+  const GetFilteredUsers = (user_id,page, queryParams) => async dispatch => {
     dispatch({type: 'LOADING', payload: true});
-    console.log('-----------------------', user_id, queryParams);
+    console.log('-----------------------', user_id,page, queryParams);
 
     const queryString = new URLSearchParams(queryParams).toString();
 
     try {
       const response = await axios.get(
-        `http://15.206.149.28/api/filter-users/${user_id}/?${queryString}`,
+        `http://15.206.149.28/api/filter-users/${user_id}/?page=${page}&${queryString}`,
       );
       console.log(
         '****************************job-GetFilteredUsers response***************************',
       );
       // console.log('queryParams', queryParams);
-      console.log(`http://15.206.149.28/api/filter-users/${user_id}/?${queryString}`);
+      console.log(
+        `http://15.206.149.28/api/filter-users/${user_id}/?page=${page}&${queryString}`,
+      );
 
       const jsonString = JSON.stringify(response.data);
       const data = JSON.parse(jsonString);

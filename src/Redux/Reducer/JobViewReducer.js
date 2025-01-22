@@ -7,11 +7,12 @@ const initialState = {
   JobApplications: null,
   JobInvitations: [],
   shortlistedUsers: [],
-  UserShortlitedList:[],
-  CandidateReview:null,
-  filteredUsers:[],
+  UserShortlitedList: [],
+  CandidateReview: null,
+  FilteredUsers: [],
+  FilteredUsersPagination: {},
   FilterMasterData: [],
-  SavedJobs:null,
+  SavedJobs: null,
   error: null,
   isLoading: false, // Track loading for any API request
 };
@@ -55,7 +56,6 @@ const jobReducer = (state = initialState, action) => {
         JobDetails: action.payload, // Store job details in the state
         error: null,
       };
-
     // Job Details Failure
     case 'JOB_DETAILS_FAILURE':
       return {
@@ -204,30 +204,30 @@ const jobReducer = (state = initialState, action) => {
         error: action.payload.error, // Store the error message for job details
       };
 
-      case 'CANDIDATE_REVIEW_SAVED_SUCCESS':
-        return {
-          ...state,
-          CandidateReview: action.payload, // Store job details in the state
-          error: null,
-        };
-  
-      case 'CANDIDATE_REVIEW_SAVED_UNSUCCESS':
-        return {
-          ...state,
-          error: action.payload.error, // Store the error message for job details
-        };
-        case 'REVIEW_ADDED_SUCCESSFULLY':
-          return {
-            ...state,
-            error: null,
-          };
-    
-        // Job Applications Failure
-        case 'REVIEW_ADDED_UNSUCCESSFULLY':
-          return {
-            ...state,
-            error: action.payload.error,
-          };
+    case 'CANDIDATE_REVIEW_SAVED_SUCCESS':
+      return {
+        ...state,
+        CandidateReview: action.payload, // Store job details in the state
+        error: null,
+      };
+
+    case 'CANDIDATE_REVIEW_SAVED_UNSUCCESS':
+      return {
+        ...state,
+        error: action.payload.error, // Store the error message for job details
+      };
+    case 'REVIEW_ADDED_SUCCESSFULLY':
+      return {
+        ...state,
+        error: null,
+      };
+
+    // Job Applications Failure
+    case 'REVIEW_ADDED_UNSUCCESSFULLY':
+      return {
+        ...state,
+        error: action.payload.error,
+      };
 
     case 'DELETE_REVIEW_SUCCESS': {
       return {
@@ -237,12 +237,36 @@ const jobReducer = (state = initialState, action) => {
           results: state.CandidateReview.results.filter(
             review => review.id !== action.payload,
           ),
-        }
-      }}
+        },
+      };
+    }
     case 'FILTER_USER_SUCCESS':
       return {
         ...state,
-        filteredUsers: action.payload,
+        FilteredUsersPagination: {
+          count: action.payload.count,
+          total_pages: action.payload.total_pages,
+          current_page: action.payload.current_page,
+          items_per_page: action.payload.items_per_page,
+          previous: action.payload.previous,
+          next_page_number: action.payload.next_page_number,
+          previous_page_number: action.payload.previous_page_number,
+        },
+
+        FilteredUsers:
+          parseInt(action.payload?.current_page) > 1
+            ? [
+                ...state.FilteredUsers,
+                ...action.payload.results.filter(
+                  newUser =>
+                    !state.FilteredUsers.some(
+                      existingUser => existingUser.id === newUser.id,
+                    ),
+                ),
+              ]
+            : action?.payload?.results || [],
+
+        // FilteredUsers: action.payload,
         error: null,
       };
 
@@ -252,7 +276,6 @@ const jobReducer = (state = initialState, action) => {
         ...state,
         error: action.payload.error,
       };
-    ;
 
     default:
       return state;

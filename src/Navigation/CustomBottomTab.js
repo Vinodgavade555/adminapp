@@ -90,7 +90,7 @@ const CustomBottomTab = () => {
         <View style={styles.tabContainer}>
           {renderTabBtn('Home', 'home', 'Home')}
           {renderTabBtn('AnalyticPage', 'analytics', 'Analytics')}
-          {renderTabBtn('UserScreen', 'person-outline', 'user')}
+          {renderTabBtn('UserScreen', 'people-outline', 'users')}
           {renderTabBtn('Jobs', 'mail-sharp', 'Jobs')}
           {renderTabBtn(
             'ShortlistCandidate',

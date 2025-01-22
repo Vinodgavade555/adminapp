@@ -104,15 +104,23 @@ const FilterMasterData = [
         count: 5,
       },
       {
-        name: '15 Days',
+        name: '15 days',
         count: 4,
       },
       {
-        name: '30 Days',
+        name: '1 month',
         count: 6,
       },
       {
-        name: '60 Days',
+        name: '2 months',
+        count: 3,
+      },
+      {
+        name: '3 months',
+        count: 3,
+      },
+      {
+        name: 'more than 3 months',
         count: 3,
       },
     ],
@@ -143,7 +151,7 @@ const FilterMasterData = [
     ],
   },
   {
-    filter: 'current_annual_salary',
+    filter: 'annual_salary',
     data: [
       {
         name: '0-3 Lakhs',
@@ -168,7 +176,14 @@ const FilterMasterData = [
     ],
   },
 ];
-
+const filterMapping = {
+  pref_locations: 'Preferred Location',
+  current_city: 'Current City',
+  key_skills: 'Key Skills',
+  notice_period: 'Notice Period',
+  job_title: 'Job Title',
+  annual_salary: 'Annual Salary',
+};
 const UserScreen = () => {
   const [id, setId] = useState(null);
   const [query, setQuery] = useState('');
@@ -176,28 +191,26 @@ const UserScreen = () => {
   const [searchQueryData, setSearchQueryData] = useState('');
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const [jobListToRender, setJobListToRender] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState('work_modes');
+  const [selectedCategory, setSelectedCategory] = useState('pref_locations');
   const [selectedExperience, setSelectedExperience] = useState('');
   const [searchoptions, setSearchoptions] = useState('');
 
-  const [minSalary, setMinSalary] = useState();
-  const [maxSalary, setMaxSalary] = useState();
+  const [annualSalary, setAnnualSalary] = useState();
   const [filters, setFilters] = useState({});
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const onFocus = useNavigation();
   const {GetJobList, GetFilteredUsers} = JobViewController();
-  const {JobList, JobListPagination, filteredUsers, isLoading} = useSelector(
-    state => state.job,
-  );
+  const {JobList, FilteredUsersPagination, FilteredUsers, isLoading} =
+    useSelector(state => state.job);
 
   useEffect(() => {
     const getUserData = async () => {
       try {
         const userId = await AsyncStorage.getItem('user_data');
         setId(userId);
-        // if (filteredUsers?.length > 0) {
-        dispatch(GetFilteredUsers(userId));
+        // if (FilteredUsers?.length > 0) {
+        dispatch(GetFilteredUsers(userId, 1));
         // Fetch job list on component mount
         // }
       } catch (error) {
@@ -208,11 +221,11 @@ const UserScreen = () => {
   }, [onFocus]);
 
   // Handle fetching more jobs when the user scrolls to the bottom
-  const loadMoreJobs = () => {
-    if (!isLoading && id && JobListPagination.next_page_number) {
-      dispatch(GetJobList(id, JobListPagination.next_page_number)); // Dispatch the action to load more jobs
-    }
-  };
+  // const loadMoreJobs = () => {
+  //   if (!isLoading && id && FilteredUsersPagination.next_page_number) {
+  //     dispatch(GetJobList(id, FilteredUsersPagination.next_page_number)); // Dispatch the action to load more jobs
+  //   }
+  // };
 
   function formatAmount(value) {
     if (value >= 10000000) {
@@ -222,7 +235,7 @@ const UserScreen = () => {
     } else if (value >= 1000) {
       return (value / 1000).toFixed(1) + ' K';
     } else {
-      return value.toString();
+      return value?.toString();
     }
   }
 
@@ -240,11 +253,12 @@ const UserScreen = () => {
         job_title: normalizedQuery, // Use the normalized query
         // page: 1,
       };
-      setSearchQueryData(queryParams);
-
-      dispatch(GetFilteredUsers(id, {...queryParams}));
+      // Save query params and make the API call
+      setSearchQueryData({queryParams});
+      dispatch(GetFilteredUsers(id, 1, queryParams));
     }
   };
+  // console.log('FilteredUsers', JSON.stringify(FilteredUsers, null, 2));
 
   // Filter Jobs code Starts
   const openFiltermodal = () => {
@@ -253,94 +267,44 @@ const UserScreen = () => {
     setFilterModalVisible(true);
   };
 
-
   const buildFilterParams = filters => {
-    const params = new URLSearchParams();
+    const params = {};
 
     // Generic handler for direct filter categories
     const addDirectParams = (key, value) => {
-      params.append(key, value?.join(',') || '');
+      params[key] = value?.join(',') || '';
     };
 
-    // Add 'work_modes', 'department', 'location', and 'skills'
-    addDirectParams('work_modes', filters.work_modes);
+    // Add filters: 'pref_locations', 'current_city', 'key_skills', 'notice_period', 'job_title'
+    const addCustomFilter = (filterKey, filterName) => {
+      const values = filters[filterKey]
+        ?.map(name => {
+          const match = FilterMasterData.find(
+            filter => filter.filter === filterName,
+          )?.data.find(item => item.name === name);
+          return match?.name;
+        })
+        .filter(Boolean)
+        .join(',');
+      params[filterKey] = values || '';
+    };
 
+    addCustomFilter('pref_locations', 'pref_locations');
+    addCustomFilter('current_city', 'current_city');
+    addCustomFilter('key_skills', 'key_skills');
+    addCustomFilter('notice_period', 'notice_period');
+    addCustomFilter('job_title', 'job_title');
+    params['annual_salary'] = annualSalary || '';
+    // Add additional generic filters if needed
+    addDirectParams('work_modes', filters.work_modes);
     addDirectParams('department', filters.department);
     addDirectParams('location', filters.location);
     addDirectParams('skills', filters.skills);
+    // Optional: Add additional parameters for pagination or default settings
+    // params['user_id'] = filters.user_id || '';
 
-    // Handle 'education' filter with custom mapping
-    const educationValues = filters.education
-      ?.map(name => {
-        const match = FilterMasterData?.find(
-          filter => filter.filter === 'education',
-        )?.data.find(item => item.course_name === name);
-        return match?.course_name;
-      })
-      .filter(Boolean)
-      .join(',');
-    params.append('education', educationValues || '');
-
-    // Handle 'posted_on' filter with custom mapping
-    const postedOnValues = filters.posted_on
-      ?.map(name => {
-        const match = FilterMasterData?.find(
-          filter => filter.filter === 'posted_on',
-        )?.data.find(item => item.name === name);
-        return match?.value;
-      })
-      .filter(Boolean)
-      .join(',');
-    params.append('posted_on', postedOnValues || '');
-
-    // Handle 'industry_type' filter with custom mapping
-    const industryTypeValues = filters.industry_type
-      ?.map(name => {
-        const match = FilterMasterData?.find(
-          filter => filter.filter === 'industry_type',
-        )?.data.find(item => item.industry_name === name);
-        return match?.id;
-      })
-      .filter(Boolean)
-      .join(',');
-    params.append('industry_type', industryTypeValues || '');
-
-    // Handle 'company_type' filter with custom mapping
-    const companyTypeValues = filters.company_type
-      ?.map(name => {
-        const match = FilterMasterData?.find(
-          filter => filter.filter === 'company_type',
-        )?.data.find(item => item.name === name);
-        return match?.id;
-      })
-      .filter(Boolean)
-      .join(',');
-    params.append('company_type', companyTypeValues || '');
-
-    // Handle 'companies' filter with custom mapping
-    const companyValues = filters.companies
-      ?.map(name => {
-        const match = FilterMasterData?.find(
-          filter => filter.filter === 'companies',
-        )?.data.find(item => item.company_name === name);
-        return match?.id;
-      })
-      .filter(Boolean)
-      .join(',');
-    params.append('companies', companyValues || '');
-
-    // Handle 'salary' filter for min and max
-    params.append('salary_min', minSalary || '');
-    params.append('salary_max', maxSalary || '');
-
-    // Add 'experience_level_max'
-    params.append('experience_level_max', selectedExperience || '');
-
-    // Optional: Add default parameters (e.g., pagination)
-    params.append('user_id', id);
-
-    // Return the generated query string
-    return params.toString();
+    // Return the generated object
+    return params;
   };
 
   const closeFiltermodal = () => {
@@ -350,8 +314,7 @@ const UserScreen = () => {
   const clearAllFilters = () => {
     // setSelectedFilters({});
     setSelectedExperience();
-    setMinSalary();
-    setMaxSalary();
+    setAnnualSalary();
     setFilters({});
     dispatch({type: 'CLEAR_JOB_LIST', payload: ''});
     setJobListToRender(JobList);
@@ -360,23 +323,60 @@ const UserScreen = () => {
   const handleApplyFilters = () => {
     const filterParams = buildFilterParams({
       ...filters,
-      user_id: id, // Add user_id to the query params
     });
 
-    // console.log('Query Params:', filterParams);
+    console.log('Query Params:', filterParams);
 
-    // Dispatch the API call with filterParams as an object
-    dispatch(GetFilteredUsers(filterParams));
+    dispatch(GetFilteredUsers(id, 1, filterParams));
 
-    // Set the filter query (for UI state or debugging)
     setFilterQuery(filterParams);
 
-    // Close the modal after applying filters
     closeFiltermodal();
   };
 
+  const loadMoreJobs = () => {
+    // searchQueryData.page = FilteredUsersPagination.next_page_number;
+    const filterParams = filterQuery
+      ? `${filterQuery}&page=${FilteredUsersPagination.next_page_number}`
+      : `page=${FilteredUsersPagination.next_page_number}`;
+    console.log(
+      '--------- loadMoreJobs-------------',
+      id,
+      FilteredUsersPagination.next_page_number,
+      filterQuery,
+    );
+
+    if (!isLoading && id && FilteredUsersPagination.next_page_number != null) {
+      if (searchQueryData) {
+        dispatch(
+          GetFilteredUsers(id, FilteredUsersPagination.next_page_number, {
+            searchQueryData,
+          }),
+        );
+        console.log('========searchQueryData========', searchQueryData);
+      } else if (filterQuery) {
+        dispatch(
+          GetFilteredUsers(
+            id,
+            FilteredUsersPagination.next_page_number,
+            filterQuery,
+          ),
+        );
+        console.log('========GetFilteredUsers========', filterParams);
+      } else {
+        dispatch(
+          GetFilteredUsers(id, FilteredUsersPagination.next_page_number),
+          console.log(
+            '================Normal Users================',
+            id,
+            FilteredUsersPagination.next_page_number,
+          ),
+        ); // Dispatch the action to load more jobs
+      }
+    }
+  };
+
   const renderFilterOptions = filterCategory => {
-    // const filters = {}; // Local filters object for storing selected options
     const categoryData = FilterMasterData?.find(
       item => item.filter === filterCategory,
     );
@@ -420,7 +420,7 @@ const UserScreen = () => {
     return (
       <View style={styles.optionsContainer}>
         {/* Experience Filter */}
-        {filterCategory === 'experience' && (
+        {/* {filterCategory === 'experience' && (
           <View style={{marginVertical: 16, alignItems: 'center'}}>
             <Text
               style={{
@@ -446,10 +446,10 @@ const UserScreen = () => {
               onValueChange={value => setSelectedExperience(value)}
             />
           </View>
-        )}
+        )} */}
 
         {/* Salary Filter */}
-        {filterCategory === 'salary' && (
+        {filterCategory === 'annual_salary' && (
           <View style={{marginVertical: 16, alignItems: 'center'}}>
             <Text
               style={{
@@ -458,11 +458,11 @@ const UserScreen = () => {
                 marginBottom: 8,
                 fontWeight: '600',
               }}>
-              Enter Salary Range
+              Enter AnnualSalary
             </Text>
             <Text
               style={{color: colors.secondary, fontSize: 14, marginBottom: 8}}>
-              {formatAmount(minSalary)} - {formatAmount(maxSalary)}
+              {formatAmount(annualSalary)}
             </Text>
             <View
               style={{
@@ -476,33 +476,17 @@ const UserScreen = () => {
                   borderWidth: 1,
                   borderColor: 'gray',
                   borderRadius: 8,
-                  padding: 10,
-                  width: '45%',
+                  padding: 12,
+                  width: '100%',
                   textAlign: 'center',
                   color: colors.primary,
+                  height: 48,
                 }}
-                placeholder="Min Salary..."
+                placeholder="Annual Salary..."
                 placeholderTextColor={colors.primary}
                 keyboardType="numeric"
-                value={minSalary}
-                onChangeText={setMinSalary}
-              />
-              <Text style={{color: 'gray'}}>-</Text>
-              <TextInput
-                style={{
-                  borderWidth: 1,
-                  borderColor: 'gray',
-                  borderRadius: 8,
-                  padding: 10,
-                  width: '45%',
-                  textAlign: 'center',
-                  color: colors.primary,
-                }}
-                placeholder="Max Salary..."
-                placeholderTextColor={colors.primary}
-                keyboardType="numeric"
-                value={maxSalary}
-                onChangeText={setMaxSalary}
+                value={annualSalary}
+                onChangeText={setAnnualSalary}
               />
             </View>
           </View>
@@ -510,16 +494,20 @@ const UserScreen = () => {
 
         {/* Dynamic Filter Options */}
         {categoryData &&
-          filterCategory !== 'experience' &&
-          filterCategory !== 'salary' && (
+          // filterCategory !== 'experience' &&
+          filterCategory !== 'annual_salary' && (
             <>
-              {['location', 'skills', 'companies', 'education'].includes(
-                filterCategory,
-              ) && (
+              {[
+                'pref_locations',
+
+                'current_city',
+                'key_skills',
+                'job_title',
+              ].includes(filterCategory) && (
                 <View style={styles.searchContainer}>
                   <TextInput
                     style={styles.searchInput}
-                    placeholder={`Search ${filterCategory}`}
+                    placeholder={`Search ${filterMapping[filterCategory]}`}
                     placeholderTextColor="#000"
                     value={searchoptions}
                     onChangeText={setSearchoptions}
@@ -569,12 +557,6 @@ const UserScreen = () => {
     );
   };
 
-
-
-
-
-
-
   return (
     <View style={styles.Container}>
       <View style={styles.container}>
@@ -607,23 +589,24 @@ const UserScreen = () => {
           <Ionicons name="filter-outline" size={32} color={colors.primary} />
         </TouchableOpacity>
       </View>
-      <ScrollView
+      <FlatList
         contentContainerStyle={styles.scrollContainer}
-        style={{paddingVertical: 8}}>
-        {filteredUsers.results && filteredUsers.results.length > 0
-          ? filteredUsers.results.map((item, index) => (
-              <UserCard
-                key={index}
-                item={item}
-                jobId={''}
-                page_name={'job_invitation'}
-                index={index}
-                // isHorizontal={true}
-              />
-            ))
-          : null}
-      </ScrollView>
-
+        data={FilteredUsers}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({item, index}) => (
+          <UserCard
+            item={item}
+            jobId={''}
+            page_name={'job_invitation'}
+            index={index}
+          />
+        )}
+        onEndReached={loadMoreJobs} // Trigger loading more jobs
+        onEndReachedThreshold={0.5} // Trigger when half of the list is visible
+        ListFooterComponent={
+          isLoading ? <ActivityIndicator size="large" /> : null
+        }
+      />
       <Modal
         visible={filterModalVisible}
         animationType="slide"
@@ -637,52 +620,48 @@ const UserScreen = () => {
               </TouchableOpacity>
             </View>
             <View style={{flexDirection: 'row', flex: 1}}>
-              <View style={{width: width * 0.35}}>
+              <View style={{width: width * 0.4}}>
                 <ScrollView style={[styles.categoriesContainer]}>
-                  {[...FilterMasterData, {filter: 'experience'}].map(
-                    filterCategory => (
-                      <TouchableOpacity
-                        key={filterCategory.filter}
+                  {[...FilterMasterData].map(filterCategory => (
+                    <TouchableOpacity
+                      key={filterCategory.filter}
+                      style={[
+                        styles.categoryButton,
+                        selectedCategory === filterCategory.filter && [
+                          styles.selectedCategoryButton,
+                          {backgroundColor: '#e6f7ff'},
+                        ],
+                      ]}
+                      onPress={() =>
+                        setSelectedCategory(filterCategory.filter)
+                      }>
+                      <Text
                         style={[
-                          styles.categoryButton,
-                          selectedCategory === filterCategory.filter && [
-                            styles.selectedCategoryButton,
-                            {backgroundColor: '#e6f7ff'},
-                          ],
-                        ]}
-                        onPress={() =>
-                          setSelectedCategory(filterCategory.filter)
-                        }>
-                        <Text
-                          style={[
-                            styles.categoryButtonText,
-                            selectedCategory === filterCategory.filter && {
-                              fontWeight: 'bold',
-                            },
-                          ]}>
-                          {filterCategory.filter
-                            .replace('_', ' ')
-                            .toLowerCase()
-                            .replace(/^\w/, c => c.toUpperCase())}
-                        </Text>
-                        <Text style={{color: 'grey', fontSize: 10}}>
-                          {filterCategory.filter !== 'experience' &&
-                            filterCategory.filter !== 'salary' &&
-                            filters[filterCategory.filter]?.length > 0 &&
-                            ` (${filters[filterCategory.filter].length})`}
+                          styles.categoryButtonText,
+                          selectedCategory === filterCategory.filter && {
+                            fontWeight: 'bold',
+                          },
+                        ]}>
+                        {
+                          // Use the mapping for the transformed label or fallback to default formatting
+                          filterMapping[filterCategory.filter] ||
+                            filterCategory.filter
+                              .replace('_', ' ')
+                              .toLowerCase()
+                              .replace(/\b\w/g, c => c.toUpperCase())
+                        }
+                      </Text>
+                      <Text style={{color: 'grey', fontSize: 10}}>
+                        {filterCategory.filter !== 'annual_salary' &&
+                          filters[filterCategory.filter]?.length > 0 &&
+                          ` (${filters[filterCategory.filter].length})`}
 
-                          {filterCategory.filter === 'experience' &&
-                            selectedExperience > 0 &&
-                            ` (${selectedExperience} Y)`}
-
-                          {filterCategory.filter === 'salary' &&
-                            minSalary &&
-                            maxSalary &&
-                            ` • (${minSalary} - ${maxSalary})`}
-                        </Text>
-                      </TouchableOpacity>
-                    ),
-                  )}
+                        {filterCategory.filter === 'annual_salary' &&
+                          annualSalary &&
+                          ` • `}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
                 </ScrollView>
               </View>
               <View style={styles.optionsContainer}>
@@ -752,7 +731,7 @@ const styles = StyleSheet.create({
   scrollContainer: {
     marginHorizontal: 12,
   },
-  
+
   //Modal Styles
   modalContainer: {
     height: '100%',
@@ -816,7 +795,7 @@ const styles = StyleSheet.create({
   searchContainer: {alignSelf: 'center'},
   searchInput: {
     color: '#000',
-    width: width * 0.6,
+    width: width * 0.55,
     height: 48,
     borderColor: '#ccc',
     borderWidth: 1,
@@ -832,6 +811,7 @@ const styles = StyleSheet.create({
     minHeight: 50,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
   categoryButtonText: {color: colors.primary, fontSize: 13},
   loaderContainer: {
