@@ -42,8 +42,7 @@ const UserCard = ({item, jobId, page_name, index, isHorizontal}) => {
   const userProfile = item?.job_seeker_profile;
   // const userProfile = item?.job_seeker_profile;
 
-      // console.log('******',userProfile);
-      
+  // console.log('******',userProfile);
 
   const [expandedSkills, setExpandedSkills] = useState({});
   const skills = userProfile?.key_skills || [];
@@ -55,32 +54,32 @@ const UserCard = ({item, jobId, page_name, index, isHorizontal}) => {
   const [isSaved, setIsSaved] = useState(false);
 
   const calculateExperience = (joiningDate, leavingDate) => {
-    if (!joiningDate) return { years: 0, months: 0 }; // Handle missing joining date
+    if (!joiningDate) return {years: 0, months: 0}; // Handle missing joining date
     const joinDate = new Date(joiningDate);
     const leaveDate = leavingDate ? new Date(leavingDate) : new Date(); // Use today's date if leavingDate is null
-  
+
     let years = leaveDate.getFullYear() - joinDate.getFullYear();
     let months = leaveDate.getMonth() - joinDate.getMonth();
-  
+
     if (months < 0) {
       years--;
       months += 12;
     }
-  
-    return { years, months };
+
+    return {years, months};
   };
-  
-//   console.log('Current Job:', currentJob);
-// console.log(
-//   'Joining Date:',
-//   currentJob?.joining_date,
-//   'Leaving Date:',
-//   currentJob?.leaving_date
-// );
-// console.log(
-//   'Experience:',
-//   calculateExperience(currentJob?.joining_date, currentJob?.leaving_date)
-// );
+
+  //   console.log('Current Job:', currentJob);
+  // console.log(
+  //   'Joining Date:',
+  //   currentJob?.joining_date,
+  //   'Leaving Date:',
+  //   currentJob?.leaving_date
+  // );
+  // console.log(
+  //   'Experience:',
+  //   calculateExperience(currentJob?.joining_date, currentJob?.leaving_date)
+  // );
 
   useEffect(() => {
     const getUserData = async () => {
@@ -155,16 +154,16 @@ const UserCard = ({item, jobId, page_name, index, isHorizontal}) => {
     job => job.is_current_company === 'true',
   );
   const experienceText = currentJob
-  ? `${currentJob?.role || 'Role unavailable'} at ${
-      currentJob?.company_name || 'Company unavailable'
-    }, ${
-      calculateExperience(currentJob?.joining_date, currentJob?.leaving_date)
-        .years
-    }y ${
-      calculateExperience(currentJob?.joining_date, currentJob?.leaving_date)
-        .months
-    }m`
-  : null;
+    ? `${currentJob?.role || 'Role unavailable'} at ${
+        currentJob?.company_name || 'Company unavailable'
+      }, ${
+        calculateExperience(currentJob?.joining_date, currentJob?.leaving_date)
+          .years
+      }y ${
+        calculateExperience(currentJob?.joining_date, currentJob?.leaving_date)
+          .months
+      }m`
+    : null;
   return (
     <TouchableOpacity
       style={[
@@ -174,10 +173,17 @@ const UserCard = ({item, jobId, page_name, index, isHorizontal}) => {
         },
       ]}
       onPress={() => {
-        navigation.navigate('UserDetailScreen', {
-          data: {user: transformedData, jobId: jobId},
-          page: page_name,
+        navigation.navigate('RecruiterStack', {
+          screen: 'UserDetailScreen',
+          params: {
+            data: {user: transformedData, jobId: jobId}, // Pass data object
+            page: page_name, // Pass page parameter
+          },
         });
+        // navigation.navigate('UserDetailScreen', {
+        //   data: {user: transformedData, jobId: jobId},
+        //   page: page_name,
+        // });
       }}>
       <View
         style={{
@@ -202,7 +208,7 @@ const UserCard = ({item, jobId, page_name, index, isHorizontal}) => {
           <View style={styles.imageContainer}>
             {item?.profile_photo ? (
               <Image
-                source={{uri: user?.profile_photo}}
+                source={{uri: item?.profile_photo}}
                 style={styles.profilePhoto}
               />
             ) : (

@@ -17,6 +17,7 @@ import {useIsFocused} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ReviewPage from '../../Constant/CustomReviewPage';
 import JobViewController from '../RecruiterRedux/Action/JobViewController';
+import { BASE_URL } from '../../Services/baseAPI';
 
 const UserDetailScreen = ({route, onShortlist}) => {
   const {data, page} = route.params;
@@ -79,7 +80,6 @@ const UserDetailScreen = ({route, onShortlist}) => {
 
     getUserData();
   }, [isFocus]);
-
 
   const statusColors = {
     ACCEPTED: {background: '#d6f5d6', text: '#33cc33'},
@@ -205,400 +205,429 @@ const UserDetailScreen = ({route, onShortlist}) => {
             contentContainerStyle={{paddingBottom: 20}}
             showsVerticalScrollIndicator={false}>
             {/* Skills */}
-            <View>
-              <Text style={styles.boldText}>Skills</Text>
-              <View style={styles.chipContainer}>
-                {user?.key_skills?.length > 0 ? (
-                  user?.key_skills?.map((skill, index) => (
-                    <Text key={index} style={styles.chip}>
-                      {skill}
-                    </Text>
-                  ))
-                ) : (
-                  <Text style={styles.OutputText}>No skills available</Text>
-                )}
+            {user?.key_skills && (
+              <View>
+                <Text style={styles.boldText}>Skills</Text>
+                <View style={styles.chipContainer}>
+                  {user?.key_skills?.length > 0 ? (
+                    user?.key_skills?.map((skill, index) => (
+                      <Text key={index} style={styles.chip}>
+                        {skill}
+                      </Text>
+                    ))
+                  ) : (
+                    <Text style={styles.OutputText}>No skills available</Text>
+                  )}
+                </View>
               </View>
-            </View>
+            )}
 
             {/* It Skills ans experience */}
-            <View
-              style={{
-                // paddingHorizontal: 12,
-                paddingVertical: 12,
-                // backgroundColor: '#fff',
-              }}>
-              <Text style={[styles.boldTextSkill]}>IT Skills & Experience</Text>
-              <ScrollView
-                contentContainerStyle={{
-                  flexDirection: 'column',
-                  gap: 8,
-                }}>
-                {user?.it_skills?.length > 0 ? (
-                  user?.it_skills.map((skill, index) => (
-                    <View
-                      key={`it_skill_${index}`}
-                      style={[
-                        styles.skillSection,
-                        {
-                          padding: 12,
-                          borderRadius: 8,
-                          backgroundColor: '#f1f1f1',
-                          color: colors.primary,
-                          height: 'auto',
-                          flex: 1,
-                          // justifyContent: 'flex-start',
-                        },
-                      ]}>
-                      <Text
-                        style={{
-                          fontWeight: '600',
-                          color: colors.primary,
-                          fontSize: 13,
-                        }}>
-                        {skill?.name === 'Other'
-                          ? skill?.othername
-                          : skill?.name || 'N/A'}
-                        {` (${skill?.exp?.years || 0}.${
-                          skill?.exp?.months || 0
-                        } year)`}
-                      </Text>
-                    </View>
-                  ))
-                ) : (
-                  <Text style={styles.OutputText}>No IT skills available.</Text>
-                )}
-              </ScrollView>
-            </View>
-
-            {/* Education */}
-            <View
-              style={
-                {
+            {user?.it_skills && (
+              <View
+                style={{
                   // paddingHorizontal: 12,
-                  // paddingVertical: 12,
-                  // backgroundColor: '#fafafa',
-                }
-              }>
-              <Text style={styles.boldText}>Education</Text>
-              {user?.higher_edu?.length > 0 ? (
+                  paddingVertical: 12,
+                  // backgroundColor: '#fff',
+                }}>
+                <Text style={[styles.boldTextSkill]}>
+                  IT Skills & Experience
+                </Text>
                 <ScrollView
                   contentContainerStyle={{
                     flexDirection: 'column',
-                    gap: 12,
+                    gap: 8,
                   }}>
-                  {user?.higher_edu?.map((edu, index) => (
-                    <View
-                      key={`edu_${index}`}
-                      style={[
-                        styles.section,
-                        {
-                          padding: 12,
-                          backgroundColor: '#fff',
-                          borderRadius: 8,
-                          height: 'auto',
-                          flex: 1,
-                          backgroundColor: '#fafafa',
-                        },
-                      ]}>
-                      <View style={{flexDirection: 'row', gap: 8}}>
-                        <Text style={{color: colors.primary}}>
-                          {edu.course_name || 'N/A'} -
-                        </Text>
-                        <Text style={{color: colors.primary}}>
-                          {edu.specialization || 'N/A'} -
-                        </Text>
-                        <Text style={{color: colors.primary}}>
-                          {edu.duration?.start_year || 'N/A'} -{' '}
-                          {edu.duration?.end_year || 'N/A'}
-                        </Text>
-                      </View>
-                      <Text style={styles.OutputText}>
-                        {edu.university_name || 'N/A'}
-                      </Text>
-                    </View>
-                  ))}
-                </ScrollView>
-              ) : (
-                <Text style={styles.OutputText}>
-                  No higher education records available.
-                </Text>
-              )}
-            </View>
-            <View
-              style={{
-                // paddingHorizontal: 12,
-                paddingVertical: 12,
-                backgroundColor: '#fff',
-              }}>
-              <Text style={[styles.boldText]}>Project details</Text>
-              {user?.project_details?.length > 0 ? (
-                <ScrollView
-                  horizontal
-                  contentContainerStyle={{
-                    flexDirection: 'row', // Ensures project sections are displayed horizontally
-                    gap: 16, // Adds spacing between each project section
-                  }}
-                  showsHorizontalScrollIndicator={false} // Hides the horizontal scrollbar
-                >
-                  {user?.project_details?.map((pro, index) => (
-                    <View
-                      key={`pro_${index}`}
-                      style={[
-                        styles.section,
-                        {
-                          paddingHorizontal: 12,
-                          backgroundColor: '#fafafa',
-                          borderRadius: 8,
-                          width: width * 0.8,
-                        },
-                      ]}>
-                      {pro.role ? (
+                  {user?.it_skills?.length > 0 ? (
+                    user?.it_skills.map((skill, index) => (
+                      <View
+                        key={`it_skill_${index}`}
+                        style={[
+                          styles.skillSection,
+                          {
+                            padding: 12,
+                            borderRadius: 8,
+                            backgroundColor: '#f1f1f1',
+                            color: colors.primary,
+                            height: 'auto',
+                            flex: 1,
+                            // justifyContent: 'flex-start',
+                          },
+                        ]}>
                         <Text
                           style={{
+                            fontWeight: '600',
                             color: colors.primary,
-                            fontWeight: 'bold',
+                            fontSize: 13,
                           }}>
-                          {pro.role}
+                          {skill?.name === 'Other'
+                            ? skill?.othername
+                            : skill?.name || 'N/A'}
+                          {` (${skill?.exp?.years || 0}.${
+                            skill?.exp?.months || 0
+                          } year)`}
                         </Text>
-                      ) : null}
+                      </View>
+                    ))
+                  ) : (
+                    <Text style={styles.OutputText}>
+                      No IT skills available.
+                    </Text>
+                  )}
+                </ScrollView>
+              </View>
+            )}
 
-                      <View style={{marginVertical: 6}}>
-                        {pro.title && (
-                          <Text style={styles.OutputText}>{pro.title}</Text>
-                        )}
-
-                        {pro.description ? (
+            {/* Education */}
+            {user?.higher_edu && (
+              <View
+                style={
+                  {
+                    // paddingHorizontal: 12,
+                    // paddingVertical: 12,
+                    // backgroundColor: '#fafafa',
+                  }
+                }>
+                <Text style={styles.boldText}>Education</Text>
+                {user?.higher_edu?.length > 0 ? (
+                  <ScrollView
+                    contentContainerStyle={{
+                      flexDirection: 'column',
+                      gap: 12,
+                    }}>
+                    {user?.higher_edu?.map((edu, index) => (
+                      <View
+                        key={`edu_${index}`}
+                        style={[
+                          styles.section,
+                          {
+                            padding: 12,
+                            backgroundColor: '#fff',
+                            borderRadius: 8,
+                            height: 'auto',
+                            flex: 1,
+                            backgroundColor: '#fafafa',
+                          },
+                        ]}>
+                        <View style={{flexDirection: 'row', gap: 8}}>
                           <Text style={{color: colors.primary}}>
-                            {pro.description}
+                            {edu.course_name || 'N/A'} -
+                          </Text>
+                          <Text style={{color: colors.primary}}>
+                            {edu.specialization || 'N/A'} -
+                          </Text>
+                          <Text style={{color: colors.primary}}>
+                            {edu.duration?.start_year || 'N/A'} -{' '}
+                            {edu.duration?.end_year || 'N/A'}
+                          </Text>
+                        </View>
+                        <Text style={styles.OutputText}>
+                          {edu.university_name || 'N/A'}
+                        </Text>
+                      </View>
+                    ))}
+                  </ScrollView>
+                ) : (
+                  <Text style={styles.OutputText}>
+                    No higher education records available.
+                  </Text>
+                )}
+              </View>
+            )}
+
+            {user?.project_details && (
+              <View
+                style={{
+                  // paddingHorizontal: 12,
+                  paddingVertical: 12,
+                  backgroundColor: '#fff',
+                }}>
+                <Text style={[styles.boldText]}>Project details</Text>
+                {user?.project_details?.length > 0 ? (
+                  <ScrollView
+                    horizontal
+                    contentContainerStyle={{
+                      flexDirection: 'row', // Ensures project sections are displayed horizontally
+                      gap: 16, // Adds spacing between each project section
+                    }}
+                    showsHorizontalScrollIndicator={false} // Hides the horizontal scrollbar
+                  >
+                    {user?.project_details?.map((pro, index) => (
+                      <View
+                        key={`pro_${index}`}
+                        style={[
+                          styles.section,
+                          {
+                            paddingHorizontal: 12,
+                            backgroundColor: '#fafafa',
+                            borderRadius: 8,
+                            width: width * 0.8,
+                          },
+                        ]}>
+                        {pro.role ? (
+                          <Text
+                            style={{
+                              color: colors.primary,
+                              fontWeight: 'bold',
+                            }}>
+                            {pro.role}
                           </Text>
                         ) : null}
 
-                        {pro.worked_duration?.from &&
-                          pro.worked_duration?.till && (
-                            <Text style={styles.OutputTextWork}>
-                              Worked Duration :
-                              {moment(pro.worked_duration.from).format(
-                                'D MMM YY',
-                              )}{' '}
-                              -{' '}
-                              {moment(pro.worked_duration.till).format(
-                                'D MMM YY',
-                              )}
-                            </Text>
+                        <View style={{marginVertical: 6}}>
+                          {pro.title && (
+                            <Text style={styles.OutputText}>{pro.title}</Text>
                           )}
-                      </View>
 
-                      <View style={{paddingVertical: 4}}>
-                        {Array.isArray(pro?.skills_used) &&
-                        pro.skills_used.length > 0 ? (
-                          <View style={styles.chipContainer}>
-                            {pro.skills_used.map((skill, index) => (
-                              <Text key={index} style={styles.chip}>
-                                {skill}
+                          {pro.description ? (
+                            <Text style={{color: colors.primary}}>
+                              {pro.description}
+                            </Text>
+                          ) : null}
+
+                          {pro.worked_duration?.from &&
+                            pro.worked_duration?.till && (
+                              <Text style={styles.OutputTextWork}>
+                                Worked Duration :
+                                {moment(pro.worked_duration.from).format(
+                                  'D MMM YY',
+                                )}{' '}
+                                -{' '}
+                                {moment(pro.worked_duration.till).format(
+                                  'D MMM YY',
+                                )}
                               </Text>
-                            ))}
-                          </View>
-                        ) : null}
+                            )}
+                        </View>
+
+                        <View style={{paddingVertical: 4}}>
+                          {Array.isArray(pro?.skills_used) &&
+                          pro.skills_used.length > 0 ? (
+                            <View style={styles.chipContainer}>
+                              {pro.skills_used.map((skill, index) => (
+                                <Text key={index} style={styles.chip}>
+                                  {skill}
+                                </Text>
+                              ))}
+                            </View>
+                          ) : null}
+                        </View>
                       </View>
-                    </View>
-                  ))}
-                </ScrollView>
-              ) : (
-                <Text style={styles.OutputText}>
-                  No higher Project records available.
-                </Text>
-              )}
-            </View>
+                    ))}
+                  </ScrollView>
+                ) : (
+                  <Text style={styles.OutputText}>
+                    No higher Project records available.
+                  </Text>
+                )}
+              </View>
+            )}
 
             {/* Languages */}
-            <View style={{}}>
-              <Text style={styles.boldText}>Languages</Text>
-              {user?.languages?.length > 0 ? (
-                <ScrollView
-                  contentContainerStyle={{
-                    flexDirection: 'column', // Stack languages vertically
-                    gap: 12,
-                  }}
-                  showsVerticalScrollIndicator={false} // Hides the vertical scrollbar
-                >
-                  {user?.languages?.map((language, index) => (
-                    <View
-                      key={`language_${index}`}
-                      style={[
-                        styles.section,
-                        {
-                          paddingVertical: 12,
-                          paddingHorizontal: 12,
-                          backgroundColor: '#fff',
-                          borderRadius: 8,
-                          height: 'auto',
-                          flex: 1,
-                          backgroundColor: '#fafafa',
-                        },
-                      ]}>
-                      {/* Language Name with Proficiency Levels in Parentheses */}
-                      <View style={{flexDirection: 'row', gap: 8}}>
+            {user?.languages && (
+              <View style={{}}>
+                <Text style={styles.boldText}>Languages</Text>
+                {user?.languages?.length > 0 ? (
+                  <ScrollView
+                    contentContainerStyle={{
+                      flexDirection: 'column', // Stack languages vertically
+                      gap: 12,
+                    }}
+                    showsVerticalScrollIndicator={false} // Hides the vertical scrollbar
+                  >
+                    {user?.languages?.map((language, index) => (
+                      <View
+                        key={`language_${index}`}
+                        style={[
+                          styles.section,
+                          {
+                            paddingVertical: 12,
+                            paddingHorizontal: 12,
+                            backgroundColor: '#fff',
+                            borderRadius: 8,
+                            height: 'auto',
+                            flex: 1,
+                            backgroundColor: '#fafafa',
+                          },
+                        ]}>
+                        {/* Language Name with Proficiency Levels in Parentheses */}
+                        <View style={{flexDirection: 'row', gap: 8}}>
+                          <Text
+                            style={{
+                              color: colors.primary,
+                              fontWeight: 'bold',
+                            }}>
+                            {language.name || 'N/A'}
+                          </Text>
+                          {/* Proficiency Levels */}
+                          {language.comfortable_in &&
+                          language.comfortable_in.length > 0 ? (
+                            <Text style={styles.OutputText}>
+                              ({language.comfortable_in.join(', ') || 'N/A'})
+                            </Text>
+                          ) : (
+                            <Text style={styles.OutputText}>(N/A)</Text>
+                          )}
+                        </View>
+                      </View>
+                    ))}
+                  </ScrollView>
+                ) : (
+                  <Text style={styles.OutputText}>
+                    No language records available.
+                  </Text>
+                )}
+              </View>
+            )}
+
+            {/* accomplishments */}
+            {user?.accomplishments && (
+              <View
+                style={{
+                  paddingVertical: 12,
+                }}>
+                <Text style={styles.boldText}>Accomplishments</Text>
+                {user?.accomplishments?.length > 0 ? (
+                  <ScrollView
+                    horizontal
+                    contentContainerStyle={{
+                      flexDirection: 'row',
+                      gap: 12, // Space between items
+                    }}
+                    showsHorizontalScrollIndicator={false} // Optional: hides the scroll indicator
+                  >
+                    {user?.accomplishments?.map((accomplishment, index) => (
+                      <View
+                        key={`accomplishment_${index}`}
+                        style={[
+                          styles.section,
+                          {
+                            padding: 12,
+                            backgroundColor: '#fff',
+                            borderRadius: 8,
+                            minWidth: 200, // Minimum width for each accomplishment card
+                            marginRight: 8, // Space between cards horizontally
+                            backgroundColor: '#fafafa',
+                          },
+                        ]}>
                         <Text
                           style={{
                             color: colors.primary,
                             fontWeight: 'bold',
+                            marginBottom: 4, // Space below the title
                           }}>
-                          {language.name || 'N/A'}
-                        </Text>
-                        {/* Proficiency Levels */}
-                        {language.comfortable_in &&
-                        language.comfortable_in.length > 0 ? (
-                          <Text style={styles.OutputText}>
-                            ({language.comfortable_in.join(', ') || 'N/A'})
-                          </Text>
-                        ) : (
-                          <Text style={styles.OutputText}>(N/A)</Text>
-                        )}
-                      </View>
-                    </View>
-                  ))}
-                </ScrollView>
-              ) : (
-                <Text style={styles.OutputText}>
-                  No language records available.
-                </Text>
-              )}
-            </View>
-
-            {/* accomplishments */}
-            <View
-              style={{
-                paddingVertical: 12,
-              }}>
-              <Text style={styles.boldText}>Accomplishments</Text>
-              {user?.accomplishments?.length > 0 ? (
-                <ScrollView
-                  horizontal
-                  contentContainerStyle={{
-                    flexDirection: 'row',
-                    gap: 12, // Space between items
-                  }}
-                  showsHorizontalScrollIndicator={false} // Optional: hides the scroll indicator
-                >
-                  {user?.accomplishments?.map((accomplishment, index) => (
-                    <View
-                      key={`accomplishment_${index}`}
-                      style={[
-                        styles.section,
-                        {
-                          padding: 12,
-                          backgroundColor: '#fff',
-                          borderRadius: 8,
-                          minWidth: 200, // Minimum width for each accomplishment card
-                          marginRight: 8, // Space between cards horizontally
-                          backgroundColor: '#fafafa',
-                        },
-                      ]}>
-                      <Text
-                        style={{
-                          color: colors.primary,
-                          fontWeight: 'bold',
-                          marginBottom: 4, // Space below the title
-                        }}>
-                        {accomplishment.title || 'N/A'}
-                      </Text>
-
-                      {accomplishment.certificationProvider && (
-                        <Text style={styles.OutputText}>
-                          <Text style={{fontWeight: 'bold'}}>
-                            Certification Provider:{' '}
-                          </Text>
-                          {accomplishment.certificationProvider || 'N/A'}
-                        </Text>
-                      )}
-
-                      {accomplishment.description && (
-                        <Text style={styles.OutputText}>
-                          <Text style={{fontWeight: 'bold'}}>
-                            Description:{' '}
-                          </Text>
-                          {accomplishment.description ||
-                            'No description available'}
-                        </Text>
-                      )}
-
-                      {accomplishment.issued_date && (
-                        <Text style={styles.OutputText}>
-                          <Text style={{fontWeight: 'bold'}}>
-                            Issued Date:{' '}
-                          </Text>
-                          {accomplishment.issued_date || 'N/A'}
-                        </Text>
-                      )}
-
-                      {accomplishment.expiry_date && (
-                        <Text style={styles.OutputText}>
-                          <Text style={{fontWeight: 'bold'}}>
-                            Expiry Date:{' '}
-                          </Text>
-                          {accomplishment.expiry_date || 'N/A'}
-                        </Text>
-                      )}
-
-                      {/* Published Date */}
-                      {accomplishment.published_date && (
-                        <Text style={styles.OutputText}>
-                          <Text style={{fontWeight: 'bold'}}>
-                            Published Date:{' '}
-                          </Text>
-                          {accomplishment.published_date || 'N/A'}
-                        </Text>
-                      )}
-
-                      {accomplishment.url && (
-                        <Text
-                          style={styles.OutputText}
-                          onPress={() => Linking.openURL(accomplishment.url)}>
-                          <Text style={{fontWeight: 'bold'}}>Link: </Text>
-                          {accomplishment.url}
-                        </Text>
-                      )}
-
-                      {/* Name */}
-                      {accomplishment.name && (
-                        <Text style={styles.OutputText}>
-                          <Text style={{fontWeight: 'bold'}}>Name: </Text>
-                          {accomplishment.name || 'N/A'}
-                        </Text>
-                      )}
-
-                      {/* Title (again if you want to show it at the bottom as well) */}
-                      {accomplishment.title && (
-                        <Text style={styles.OutputText}>
-                          <Text style={{fontWeight: 'bold'}}>Title: </Text>
                           {accomplishment.title || 'N/A'}
                         </Text>
-                      )}
-                    </View>
-                  ))}
-                </ScrollView>
-              ) : (
-                <Text style={styles.OutputText}>
-                  No accomplishments records available.
-                </Text>
-              )}
-            </View>
+
+                        {accomplishment.certificationProvider && (
+                          <Text style={styles.OutputText}>
+                            <Text style={{fontWeight: 'bold'}}>
+                              Certification Provider:{' '}
+                            </Text>
+                            {accomplishment.certificationProvider || 'N/A'}
+                          </Text>
+                        )}
+
+                        {accomplishment.description && (
+                          <Text style={styles.OutputText}>
+                            <Text style={{fontWeight: 'bold'}}>
+                              Description:{' '}
+                            </Text>
+                            {accomplishment.description ||
+                              'No description available'}
+                          </Text>
+                        )}
+
+                        {accomplishment.issued_date && (
+                          <Text style={styles.OutputText}>
+                            <Text style={{fontWeight: 'bold'}}>
+                              Issued Date:{' '}
+                            </Text>
+                            {accomplishment.issued_date || 'N/A'}
+                          </Text>
+                        )}
+
+                        {accomplishment.expiry_date && (
+                          <Text style={styles.OutputText}>
+                            <Text style={{fontWeight: 'bold'}}>
+                              Expiry Date:{' '}
+                            </Text>
+                            {accomplishment.expiry_date || 'N/A'}
+                          </Text>
+                        )}
+
+                        {/* Published Date */}
+                        {accomplishment.published_date && (
+                          <Text style={styles.OutputText}>
+                            <Text style={{fontWeight: 'bold'}}>
+                              Published Date:{' '}
+                            </Text>
+                            {accomplishment.published_date || 'N/A'}
+                          </Text>
+                        )}
+
+                        {accomplishment.url && (
+                          <Text
+                            style={styles.OutputText}
+                            onPress={() => Linking.openURL(accomplishment.url)}>
+                            <Text style={{fontWeight: 'bold'}}>Link: </Text>
+                            {accomplishment.url}
+                          </Text>
+                        )}
+
+                        {/* Name */}
+                        {accomplishment.name && (
+                          <Text style={styles.OutputText}>
+                            <Text style={{fontWeight: 'bold'}}>Name: </Text>
+                            {accomplishment.name || 'N/A'}
+                          </Text>
+                        )}
+
+                        {/* Title (again if you want to show it at the bottom as well) */}
+                        {accomplishment.title && (
+                          <Text style={styles.OutputText}>
+                            <Text style={{fontWeight: 'bold'}}>Title: </Text>
+                            {accomplishment.title || 'N/A'}
+                          </Text>
+                        )}
+                      </View>
+                    ))}
+                  </ScrollView>
+                ) : (
+                  <Text style={styles.OutputText}>
+                    No accomplishments records available.
+                  </Text>
+                )}
+              </View>
+            )}
 
             <View style={styles.detailText}>
-              <Text style={styles.boldText}>Profile Summary: </Text>
-              <Text style={styles.OutputText}>{user?.profileSummary}</Text>
+              {user?.profileSummary && (
+                <>
+                  <Text style={styles.boldText}>Profile Summary: </Text>
+                  <Text style={styles.OutputText}>{user?.profileSummary}</Text>
+                </>
+              )}
             </View>
             <View style={styles.detailText}>
-              <Text style={styles.boldText}>Certifications: </Text>
-              <Text style={styles.OutputText}>
-                {user?.certifications?.join(', ')}
-              </Text>
+              {user?.certifications && (
+                <>
+                  <Text style={styles.boldText}>Certifications: </Text>
+                  <Text style={styles.OutputText}>
+                    {user?.certifications?.join(', ')}
+                  </Text>
+                </>
+              )}
             </View>
             <View style={styles.detailText}>
-              <Text style={styles.boldText}>Achievements: </Text>
-              <Text style={styles.OutputText}>
-                {user?.selectedCandidate?.achievements?.join(', ')}
-              </Text>
+              {user?.selectedCandidate?.achievements && (
+                <>
+                  <Text style={styles.boldText}>Achievements: </Text>
+                  <Text style={styles.OutputText}>
+                    {user?.selectedCandidate?.achievements?.join(', ')}
+                  </Text>
+                </>
+              )}
             </View>
           </ScrollView>
         );
@@ -690,14 +719,14 @@ const UserDetailScreen = ({route, onShortlist}) => {
               </Text>
             </View>
 
-            <Text style={styles.emailText}>{data?.user?.email || 'N/A'}</Text>
+            <Text style={styles.emailText}>{data?.user?.email}</Text>
             {user?.mobile_number ? (
               <Text style={styles.mobilenumber}>{user?.mobile_number}</Text>
             ) : null}
             <Text style={styles.OutputText}>
               {getFormattedNoticePeriod(
                 user?.career_preferences?.[0]?.notice_period,
-              ) || 'N/A'}
+              )}
             </Text>
           </View>
           <Image

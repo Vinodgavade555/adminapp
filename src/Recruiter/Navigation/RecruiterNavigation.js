@@ -3,12 +3,12 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 import HomeScreen from '../BottomTabScreens/HomeScreen.js';
 import CustomNotificationScreen from '../../Constant/CustomNotification.js';
-import JobDetailScreen from '../Components/JobDetail.js';
 import UserDetailScreen from '../Components/UserDetailPage.js';
 import ShortlistCandidate from '../BottomTabScreens/ShortlistedCandidatePage.js';
 import SavedUserList from '../Components/SavedUserList.js';
 import ApplicationsListScreen from '../Components/ApplicationList.js';
 import InvitationList from '../Components/InvitationList.js';
+import JobDetailScreen from '../Components/JobDetail.js';
 
 const RecruiterNavigation = () => {
   const Stack = createNativeStackNavigator();

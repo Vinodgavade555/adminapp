@@ -118,8 +118,12 @@ const HomeScreen = () => {
                     key={index}
                     style={styles.jobCard}
                     onPress={() =>
-                      navigation.navigate('JobDetail', {jobId: job.id})
+                      navigation.navigate('RecruiterStack', {
+                        screen: 'JobDetail',
+                        params: {jobId: job.id},
+                      })
                     }>
+                    {console.log('Job ID:', job.id)}
                     <View style={styles.jobCardContent}>
                       <View style={styles.titleContainer}>
                         <Text style={styles.jobTitle}>
@@ -217,7 +221,7 @@ const HomeScreen = () => {
         {HomeData.top_20_related_to_recent_jobs && (
           <View>
             <Text style={styles.Containertitle}>Recent job applications</Text>
-            
+
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -226,14 +230,13 @@ const HomeScreen = () => {
               {HomeData.recent_job_applications &&
               HomeData.recent_job_applications.length > 0 ? (
                 HomeData.recent_job_applications.map((item, index) => (
-                
                   <UserCard
                     key={index}
                     item={item}
                     jobId={''}
                     page_name={'home'}
                     index={index}
-                    isHorizontal={true} 
+                    isHorizontal={true}
                   />
                 ))
               ) : (
