@@ -13,7 +13,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useIsFocused, useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useDispatch} from 'react-redux';
-import JobViewController from '../Redux/Action/JobViewController';
+import JobViewController from '../Recruiter/RecruiterRedux/Action/JobViewController';
 const _width = Dimensions.get('window').width;
 
 const UserCard = ({item, jobId, page_name, index, isHorizontal}) => {
@@ -70,17 +70,17 @@ const UserCard = ({item, jobId, page_name, index, isHorizontal}) => {
     return { years, months };
   };
   
-  console.log('Current Job:', currentJob);
-console.log(
-  'Joining Date:',
-  currentJob?.joining_date,
-  'Leaving Date:',
-  currentJob?.leaving_date
-);
-console.log(
-  'Experience:',
-  calculateExperience(currentJob?.joining_date, currentJob?.leaving_date)
-);
+//   console.log('Current Job:', currentJob);
+// console.log(
+//   'Joining Date:',
+//   currentJob?.joining_date,
+//   'Leaving Date:',
+//   currentJob?.leaving_date
+// );
+// console.log(
+//   'Experience:',
+//   calculateExperience(currentJob?.joining_date, currentJob?.leaving_date)
+// );
 
   useEffect(() => {
     const getUserData = async () => {

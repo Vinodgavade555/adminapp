@@ -1,7 +1,7 @@
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
-import CustomDrawer from '../Navigation/CustomDrawer';
-import CustomBottomTab from '../Navigation/CustomBottomTab';
+import CustomDrawer from '../Recruiter/Navigation/CustomDrawer';
+import CustomBottomTab from '../Recruiter/Navigation/CustomBottomTab';
 
 const DefaultScreen = () => {
   return (

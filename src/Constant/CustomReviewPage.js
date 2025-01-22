@@ -11,9 +11,9 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import moment from 'moment';
 import {colors} from '../Global_CSS/TheamColors';
 import {useDispatch, useSelector} from 'react-redux';
-import JobViewController from '../Redux/Action/JobViewController';
 import {useIsFocused} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import JobViewController from '../Recruiter/RecruiterRedux/Action/JobViewController';
 
 const ReviewPage = ({data}) => {
   const dispatch = useDispatch();
