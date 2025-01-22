@@ -31,7 +31,8 @@ const UserDetailScreen = ({route, onShortlist}) => {
   const [isShortlisted, setIsShortlisted] = useState(
     data?.is_shortlisted || false,
   );
-  // console.log('Full Data:', JSON.stringify(data, null, 2));
+  const user = data?.user ? data.user : data.user_id;
+  // console.log(data.user_id);
 
   const handleSendInvitation = () => {
     const invitationData = {
@@ -79,7 +80,6 @@ const UserDetailScreen = ({route, onShortlist}) => {
     getUserData();
   }, [isFocus]);
 
-  const user = data?.user;
 
   const statusColors = {
     ACCEPTED: {background: '#d6f5d6', text: '#33cc33'},
@@ -103,7 +103,6 @@ const UserDetailScreen = ({route, onShortlist}) => {
     //     isShortlisted: !isShortlisted, // Pass the new state
     //   });
     // }
-    console.log(job_id, user_id, recruiter_id);
   };
 
   const showButtons = page === 'application' || page === 'job_invitation';
@@ -668,7 +667,7 @@ const UserDetailScreen = ({route, onShortlist}) => {
               flexDirection: 'column',
               marginHorizontal: 12,
             }}>
-            {console.log('selectedCandidate details ', user?.email)}
+            {/* {console.log('selectedCandidate details ', user?.email)} */}
             <Text style={styles.NameText}>
               {user?.first_name && user?.last_name
                 ? `${user?.first_name} ${user?.last_name}`

@@ -12,13 +12,14 @@ import DefaultScreen from '../Screens/DefaultScreen.js';
 import HomeScreen from '../Screens/BottomTabScreens/HomeScreen.js';
 import CustomNotificationScreen from '../Constant/CustomNotification.js';
 import JobDetailScreen from '../Components/JobDetail.js';
-import ViewApplicationsScreen from '../Components/ViewApplication.js';
+import ViewApplicationsScreen from '../Components/ApplicationList.js';
 import JobInvitationPage from '../Components/JobInvitationPage.js';
 import UserAppliesScreen from '../Screens/BottomTabScreens/UserAppliesScreen.js';
 import UserDetailScreen from '../Components/UserDetailPage.js';
 import AnalyticPage from '../Screens/BottomTabScreens/AnalyticPage.js';
 import ShortlistCandidate from '../Screens/BottomTabScreens/ShortlistedCandidatePage.js';
 import SavedUserList from '../Components/SavedUserList.js';
+import ApplicationsListScreen from '../Components/ApplicationList.js';
 
 const StackNavigation = () => {
   const Stack = createNativeStackNavigator();
@@ -85,7 +86,7 @@ const StackNavigation = () => {
 
       <Stack.Screen
         name="ApplicationPage"
-        component={ViewApplicationsScreen}
+        component={ApplicationsListScreen}
         options={{headerShown: false}}
       />
 

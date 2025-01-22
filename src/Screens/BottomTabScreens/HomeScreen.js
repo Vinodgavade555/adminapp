@@ -218,6 +218,7 @@ const HomeScreen = () => {
         {HomeData.top_20_related_to_recent_jobs && (
           <View>
             <Text style={styles.Containertitle}>recent_job_applications</Text>
+            
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -226,13 +227,14 @@ const HomeScreen = () => {
               {HomeData.recent_job_applications &&
               HomeData.recent_job_applications.length > 0 ? (
                 HomeData.recent_job_applications.map((item, index) => (
+                
                   <UserCard
                     key={index}
                     item={item}
                     jobId={''}
-                    page_name={'application'}
+                    page_name={'home'}
                     index={index}
-                    isHorizontal={true} // Pass isHorizontal prop to adjust card width for horizontal scroll
+                    isHorizontal={true} 
                   />
                 ))
               ) : (

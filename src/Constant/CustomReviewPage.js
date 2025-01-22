@@ -17,10 +17,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ReviewPage = ({data}) => {
   const dispatch = useDispatch();
-  const {GetReviewData, AddReview} = JobViewController();
+  const {GetReviewData, AddReview, DeleteReview} = JobViewController();
   const {CandidateReview} = useSelector(state => state.job);
   const [newComment, setNewComment] = useState('');
-  const [userRating, setUserRating] = useState(5);
+  const [userRating, setUserRating] = useState(3);
   const [id, setId] = useState('');
   const isFocus = useIsFocused();
   const [reviewTitle, setReviewTitle] = useState('');
@@ -29,7 +29,7 @@ const ReviewPage = ({data}) => {
     const getUserData = async () => {
       try {
         const id = await AsyncStorage.getItem('user_data');
-        dispatch(GetReviewData(data?.id));
+        dispatch(GetReviewData(data?.user.id));
 
         setId(id);
       } catch (error) {
@@ -43,31 +43,20 @@ const ReviewPage = ({data}) => {
   useEffect(() => {}, [CandidateReview]);
 
   const renderStars = rating => {
+    const numericRating = parseFloat(rating) || 0;
     const stars = [];
-    const fullStars = Math.floor(rating);
-    const halfStar = rating % 1 >= 0.5 ? 1 : 0;
+    const fullStars = Math.floor(numericRating);
+    const halfStar = numericRating % 1 >= 0.5 ? 1 : 0;
     const emptyStars = 5 - fullStars - halfStar;
 
     for (let i = 0; i < fullStars; i++) {
       stars.push(
-        <Ionicons
-          key={`full-${i}`}
-          name="star"
-          size={18}
-          color="#FFD700"
-          onPress={() => setUserRating(i + 1)}
-        />,
+        <Ionicons key={`full-${i}`} name="star" size={18} color="#FFD700" />,
       );
     }
     if (halfStar) {
       stars.push(
-        <Ionicons
-          key="half"
-          name="star-half"
-          size={18}
-          color="#FFD700"
-          onPress={() => setUserRating(fullStars + 0.5)}
-        />,
+        <Ionicons key="half" name="star-half" size={18} color="#FFD700" />,
       );
     }
     for (let i = 0; i < emptyStars; i++) {
@@ -77,20 +66,20 @@ const ReviewPage = ({data}) => {
           name="star-outline"
           size={18}
           color="#FFD700"
-          onPress={() => setUserRating(fullStars + halfStar + 1)}
         />,
       );
     }
 
-    return stars;
+    return <View style={styles.starDisplay}>{stars}</View>;
   };
 
   const handleAddComment = () => {
-    if (newComment && userRating) {
+    const numericRating = parseFloat(userRating);
+    if (newComment && numericRating >= 0 && numericRating <= 5) {
       const reviewData = {
-        user: data?.id,
-        rating: userRating.toString(),
-        review_title: 'HIRED',
+        user: data?.user?.id,
+        rating: numericRating.toString(),
+        review_title: reviewTitle,
         review_body: newComment,
         given_by: id,
       };
@@ -98,13 +87,21 @@ const ReviewPage = ({data}) => {
       dispatch(AddReview(reviewData));
 
       setNewComment('');
-      setUserRating(5);
+      setUserRating(2);
+      setReviewTitle('');
+    }
+  };
+
+  const handleRatingChange = text => {
+    const sanitizedText = text.replace(/[^0-9.]/g, '');
+    const numericValue = parseFloat(sanitizedText);
+    if (sanitizedText === '' || (numericValue >= 0 && numericValue <= 5)) {
+      setUserRating(sanitizedText);
     }
   };
 
   const handleDeleteReview = reviewId => {
-    dispatch(DeleteReview(reviewId)); // Dispatch delete action
-    // dispatch(GetReviewData(data?.id)); // Refresh the reviews after deletion
+    dispatch(DeleteReview(reviewId));
   };
 
   return (
@@ -122,6 +119,7 @@ const ReviewPage = ({data}) => {
           onChangeText={setReviewTitle}
         />
 
+        <Text style={styles.labelText}>Enter your comment:</Text>
         <TextInput
           style={styles.commentInput}
           placeholder="Add your comment..."
@@ -129,8 +127,17 @@ const ReviewPage = ({data}) => {
           onChangeText={setNewComment}
           multiline
         />
-        <View style={styles.ratingContainer}>
-          <View style={styles.starContainer}>{renderStars(userRating)} </View>
+
+        <Text style={styles.labelText}>Enter your rating:</Text>
+        <View style={styles.ratingRow}>
+          <TextInput
+            style={styles.ratingInput}
+            placeholder="0-5 ratings"
+            keyboardType="numeric"
+            value={userRating}
+            onChangeText={handleRatingChange}
+          />
+          {renderStars(userRating)}
         </View>
         <TouchableOpacity style={styles.button} onPress={handleAddComment}>
           <Text style={styles.buttonText}>Add Comment</Text>
@@ -142,21 +149,27 @@ const ReviewPage = ({data}) => {
 
         {CandidateReview?.results?.map(review => (
           <View key={review.id} style={styles.reviewCard}>
-            <View style={styles.reviewCardHeader}>
-              <Text style={styles.reviewTitle}>{review.review_title}</Text>
+            <View style={styles.reviewInfoRow}>
+              <Text style={styles.reviewInfo}>{review.given_by_name}</Text>
+              <Text style={styles.reviewInfo}>
+                {moment(review.review_date).format('D MMM, YYYY')}
+              </Text>
+            </View>
+
+            <View style={styles.reviewTextContainer}>
+              {review.review_title && (
+                <Text style={styles.reviewTitle}>{review.review_title}</Text>
+              )}
+              {review.review_body && review.review_body.trim() !== '' && (
+                <Text style={styles.reviewBody}>{review.review_body}</Text>
+              )}
+            </View>
+
+            <View style={styles.reviewActionsRow}>
               <View style={styles.reviewRating}>
                 {renderStars(review.rating)}
               </View>
-            </View>
-            {review.review_body && review.review_body.trim() !== '' ? (
-              <Text style={styles.reviewBody}>{review.review_body}</Text>
-            ) : null}
-            <View style={styles.reviewInfoRow}>
-              <Text style={styles.reviewInfo}>
-                Rated by {review.given_by_name} on{' '}
-                {moment(review.review_date).format('MMM Do, YYYY')}
-              </Text>
-              {review.given_by === id && (
+              {review.given_by == id && (
                 <TouchableOpacity
                   onPress={() => handleDeleteReview(review.id)}
                   style={styles.deleteIconContainer}>
@@ -200,6 +213,21 @@ const styles = StyleSheet.create({
     color: '#000',
     marginBottom: 8,
   },
+  ratingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  ratingInput: {
+    width: 100, // Shorter width
+    height: 48,
+    borderColor: '#e6e6e6',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 8,
+    marginRight: 10,
+    textAlign: 'center',
+  },
+  ratingText: {fontSize: 14, color: '#333', marginVertical: 8},
 
   commentBoxContainer: {
     backgroundColor: 'white',
@@ -226,7 +254,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 10,
   },
-  starContainer: {
+  starDisplay: {
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -244,6 +272,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
   },
+  reviewInfoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
   reviewsContainer: {
     marginTop: 20,
   },
@@ -253,7 +286,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   reviewCard: {
-    backgroundColor: '#fafafa',
+    backgroundColor: '#fff',
     padding: 16,
     borderRadius: 12,
     borderWidth: 0.5,
@@ -261,10 +294,22 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     shadowRadius: 8,
   },
+  reviewActionsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   reviewCardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 8,
+  },
+  reviewTextContainer: {
+    marginTop: 12,
+    marginBottom: 8,
+    backgroundColor: '#fafafa',
+    padding: 8,
+    borderRadius: 8,
   },
   reviewTitle: {
     fontSize: 14,
