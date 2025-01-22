@@ -1,13 +1,23 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {StyleSheet, View} from 'react-native';
-import CustomDrawer from '../Recruiter/Navigation/CustomDrawer';
-import CustomBottomTab from '../Recruiter/Navigation/CustomBottomTab';
+
+import {UserContext} from '../Services/UserContext';
+import RecruiterDrawer from '../Recruiter/Navigation/RecruiterDrawer';
+import RecruiterBottomTab from '../Recruiter/Navigation/RecruiterBottomTab';
+import TLDrawer from '../Team_Lead/Navigation/TLDrawer';
+import TLBottomTab from '../Team_Lead/Navigation/TLBottomTab';
 
 const DefaultScreen = () => {
+  const {userType} = useContext(UserContext);
+  console.log('User Type:', userType);
   return (
     <View style={styles.container}>
-      <CustomDrawer />
-      <CustomBottomTab />
+      {/* <CustomDrawer />
+      <CustomBottomTab /> */}
+      {userType === 'Recruiter' && <RecruiterDrawer />}
+      {userType === 'Recruiter' && <RecruiterBottomTab />}
+      {userType === 'TA Manager' && <TLDrawer />}
+      {userType === 'TA Manager' && <TLBottomTab />}
     </View>
   );
 };

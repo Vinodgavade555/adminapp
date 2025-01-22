@@ -24,158 +24,158 @@ import UserCard from '../../Constant/UserCard';
 import Slider from '@react-native-community/slider';
 import JobViewController from '../RecruiterRedux/Action/JobViewController';
 
-const FilterMasterData = [
-  {
-    filter: 'pref_locations',
-    data: [
-      {
-        name: 'Mumbai',
-        count: 5,
-      },
-      {
-        name: 'Bangalore',
-        count: 4,
-      },
-      {
-        name: 'Hyderabad',
-        count: 3,
-      },
-      {
-        name: 'Delhi',
-        count: 2,
-      },
-      {
-        name: 'Pune',
-        count: 6,
-      },
-    ],
-  },
-  {
-    filter: 'current_city',
-    data: [
-      {
-        name: 'Mumbai',
-        count: 7,
-      },
-      {
-        name: 'Bangalore',
-        count: 5,
-      },
-      {
-        name: 'Pune',
-        count: 4,
-      },
-      {
-        name: 'Chennai',
-        count: 3,
-      },
-    ],
-  },
-  {
-    filter: 'key_skills',
-    data: [
-      {
-        name: 'Python',
-        count: 10,
-      },
-      {
-        name: 'Java',
-        count: 8,
-      },
-      {
-        name: 'SQL',
-        count: 5,
-      },
-      {
-        name: 'Data Analysis',
-        count: 6,
-      },
-      {
-        name: 'UI/UX Design',
-        count: 4,
-      },
-    ],
-  },
-  {
-    filter: 'notice_period',
-    data: [
-      {
-        name: 'Immediate',
-        count: 5,
-      },
-      {
-        name: '15 days',
-        count: 4,
-      },
-      {
-        name: '1 month',
-        count: 6,
-      },
-      {
-        name: '2 months',
-        count: 3,
-      },
-      {
-        name: '3 months',
-        count: 3,
-      },
-      {
-        name: 'more than 3 months',
-        count: 3,
-      },
-    ],
-  },
-  {
-    filter: 'job_title',
-    data: [
-      {
-        name: 'Software Developer',
-        count: 7,
-      },
-      {
-        name: 'Data Analyst',
-        count: 5,
-      },
-      {
-        name: 'UI/UX Designer',
-        count: 3,
-      },
-      {
-        name: 'Project Manager',
-        count: 4,
-      },
-      {
-        name: 'System Architect',
-        count: 2,
-      },
-    ],
-  },
-  {
-    filter: 'annual_salary',
-    data: [
-      {
-        name: '0-3 Lakhs',
-        count: 4,
-      },
-      {
-        name: '3-5 Lakhs',
-        count: 5,
-      },
-      {
-        name: '5-10 Lakhs',
-        count: 7,
-      },
-      {
-        name: '10-15 Lakhs',
-        count: 3,
-      },
-      {
-        name: '15+ Lakhs',
-        count: 2,
-      },
-    ],
-  },
-];
+// const FilterUserMaster = [
+//   {
+//     filter: 'pref_locations',
+//     data: [
+//       {
+//         name: 'Mumbai',
+//         count: 5,
+//       },
+//       {
+//         name: 'Bangalore',
+//         count: 4,
+//       },
+//       {
+//         name: 'Hyderabad',
+//         count: 3,
+//       },
+//       {
+//         name: 'Delhi',
+//         count: 2,
+//       },
+//       {
+//         name: 'Pune',
+//         count: 6,
+//       },
+//     ],
+//   },
+//   {
+//     filter: 'current_city',
+//     data: [
+//       {
+//         name: 'Mumbai',
+//         count: 7,
+//       },
+//       {
+//         name: 'Bangalore',
+//         count: 5,
+//       },
+//       {
+//         name: 'Pune',
+//         count: 4,
+//       },
+//       {
+//         name: 'Chennai',
+//         count: 3,
+//       },
+//     ],
+//   },
+//   {
+//     filter: 'key_skills',
+//     data: [
+//       {
+//         name: 'Python',
+//         count: 10,
+//       },
+//       {
+//         name: 'Java',
+//         count: 8,
+//       },
+//       {
+//         name: 'SQL',
+//         count: 5,
+//       },
+//       {
+//         name: 'Data Analysis',
+//         count: 6,
+//       },
+//       {
+//         name: 'UI/UX Design',
+//         count: 4,
+//       },
+//     ],
+//   },
+//   {
+//     filter: 'notice_period',
+//     data: [
+//       {
+//         name: 'Immediate',
+//         count: 5,
+//       },
+//       {
+//         name: '15 days',
+//         count: 4,
+//       },
+//       {
+//         name: '1 month',
+//         count: 6,
+//       },
+//       {
+//         name: '2 months',
+//         count: 3,
+//       },
+//       {
+//         name: '3 months',
+//         count: 3,
+//       },
+//       {
+//         name: 'more than 3 months',
+//         count: 3,
+//       },
+//     ],
+//   },
+//   {
+//     filter: 'job_title',
+//     data: [
+//       {
+//         name: 'Software Developer',
+//         count: 7,
+//       },
+//       {
+//         name: 'Data Analyst',
+//         count: 5,
+//       },
+//       {
+//         name: 'UI/UX Designer',
+//         count: 3,
+//       },
+//       {
+//         name: 'Project Manager',
+//         count: 4,
+//       },
+//       {
+//         name: 'System Architect',
+//         count: 2,
+//       },
+//     ],
+//   },
+//   {
+//     filter: 'annual_salary',
+//     data: [
+//       {
+//         name: '0-3 Lakhs',
+//         count: 4,
+//       },
+//       {
+//         name: '3-5 Lakhs',
+//         count: 5,
+//       },
+//       {
+//         name: '5-10 Lakhs',
+//         count: 7,
+//       },
+//       {
+//         name: '10-15 Lakhs',
+//         count: 3,
+//       },
+//       {
+//         name: '15+ Lakhs',
+//         count: 2,
+//       },
+//     ],
+//   },
+// ];
 const filterMapping = {
   pref_locations: 'Preferred Location',
   current_city: 'Current City',
@@ -200,9 +200,14 @@ const UsersList = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const onFocus = useNavigation();
-  const {GetJobList, GetFilteredUsers} = JobViewController();
-  const {JobList, FilteredUsersPagination, FilteredUsers, isLoading} =
-    useSelector(state => state.job);
+  const {GetFiltermasterData, GetFilteredUsers} = JobViewController();
+  const {
+    JobList,
+    FilteredUsersPagination,
+    FilteredUsers,
+    isLoading,
+    FilterUserMaster,
+  } = useSelector(state => state.job);
 
   useEffect(() => {
     const getUserData = async () => {
@@ -213,6 +218,7 @@ const UsersList = () => {
         dispatch(GetFilteredUsers(userId, 1));
         // Fetch job list on component mount
         // }
+        dispatch(GetFiltermasterData());
       } catch (error) {
         console.error('Error reading value from AsyncStorage', error);
       }
@@ -279,7 +285,7 @@ const UsersList = () => {
     const addCustomFilter = (filterKey, filterName) => {
       const values = filters[filterKey]
         ?.map(name => {
-          const match = FilterMasterData.find(
+          const match = FilterUserMaster.find(
             filter => filter.filter === filterName,
           )?.data.find(item => item.name === name);
           return match?.name;
@@ -295,13 +301,6 @@ const UsersList = () => {
     addCustomFilter('notice_period', 'notice_period');
     addCustomFilter('job_title', 'job_title');
     params['annual_salary'] = annualSalary || '';
-    // Add additional generic filters if needed
-    addDirectParams('work_modes', filters.work_modes);
-    addDirectParams('department', filters.department);
-    addDirectParams('location', filters.location);
-    addDirectParams('skills', filters.skills);
-    // Optional: Add additional parameters for pagination or default settings
-    // params['user_id'] = filters.user_id || '';
 
     // Return the generated object
     return params;
@@ -377,7 +376,7 @@ const UsersList = () => {
   };
 
   const renderFilterOptions = filterCategory => {
-    const categoryData = FilterMasterData?.find(
+    const categoryData = FilterUserMaster?.find(
       item => item.filter === filterCategory,
     );
 
@@ -622,7 +621,7 @@ const UsersList = () => {
             <View style={{flexDirection: 'row', flex: 1}}>
               <View style={{width: width * 0.4}}>
                 <ScrollView style={[styles.categoriesContainer]}>
-                  {[...FilterMasterData].map(filterCategory => (
+                  {[...FilterUserMaster].map(filterCategory => (
                     <TouchableOpacity
                       key={filterCategory.filter}
                       style={[

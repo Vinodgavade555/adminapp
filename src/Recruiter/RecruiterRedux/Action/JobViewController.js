@@ -597,9 +597,7 @@ const JobViewController = () => {
     // console.log(user_id);
 
     try {
-      const response = await instance.get(
-        `/reviews/${user_id}`,
-      );
+      const response = await instance.get(`/reviews/${user_id}`);
       // console.log(
       //   '****************************job-saved response***************************',
       // );
@@ -678,9 +676,9 @@ const JobViewController = () => {
     }
   };
 
-  const GetFilteredUsers = (user_id,page, queryParams) => async dispatch => {
+  const GetFilteredUsers = (user_id, page, queryParams) => async dispatch => {
     dispatch({type: 'LOADING', payload: true});
-    console.log('-----------------------', user_id,page, queryParams);
+    console.log('-----------------------', user_id, page, queryParams);
 
     const queryString = new URLSearchParams(queryParams).toString();
 
@@ -733,7 +731,7 @@ const JobViewController = () => {
   const GetFiltermasterData = user_id => async dispatch => {
     try {
       const response = await axios.get(
-        `http://15.206.149.28/api/filter-master-data/`,
+        `http://15.206.149.28/api/filter-user-master/`,
       );
       // console.log(
       //   '****************************job-GetFiltermasterData response***************************',
@@ -742,7 +740,7 @@ const JobViewController = () => {
       const data = JSON.parse(jsonString);
       // console.log(data);
 
-      dispatch({type: 'FILTER_MASTER_DATA_SUCCESS', payload: data});
+      dispatch({type: 'FILTER_USER_MASTER_SUCCESS', payload: data});
 
       dispatch({type: 'LOADING', payload: false});
     } catch (error) {
@@ -762,7 +760,7 @@ const JobViewController = () => {
         },
       );
       dispatch({
-        type: 'FILTER_MASTER_DATA_FAILURE',
+        type: 'FILTER_USER_MASTER_FAILURE',
         payload: {
           error: error.response?.data?.non_field_errors
             ? error.response.data.non_field_errors[0]

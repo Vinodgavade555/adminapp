@@ -13,7 +13,7 @@ import {IconButton} from 'react-native-paper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {colors} from '../../Global_CSS/TheamColors';
 
-const CustomDrawer = ({children}) => {
+const TLDrawer = ({children}) => {
   const [drawerVisible, setDrawerVisible] = useState(false);
   const translateX = useState(new Animated.Value(-300))[0];
   const navigation = useNavigation();
@@ -305,4 +305,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CustomDrawer;
+export default TLDrawer;

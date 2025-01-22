@@ -1,22 +1,28 @@
-import React, {useEffect} from 'react';
+import React, {useContext, useEffect} from 'react';
 import {Image, StyleSheet, Text, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AuthViewController from '../Redux/Action/AuthViewController';
-import { colors } from '../Global_CSS/TheamColors';
+import {colors} from '../Global_CSS/TheamColors';
+import {UserContext} from '../Services/UserContext';
+import {jwtDecode} from 'jwt-decode';
 // import AuthViewController from '../Redux/Action/AuthViewController';
 
 const SplashScreen = () => {
   const navigation = useNavigation();
   const {checkLoginStatus} = AuthViewController();
+  const {userType, setUserType} = useContext(UserContext);
 
   useEffect(() => {
     const initializeApp = async () => {
       try {
         const token = await AsyncStorage.getItem('token'); // Get token from AsyncStorage
+        // console.log('token: ', token);
+
         if (token) {
           // Validate the token or proceed to the main screen
-          
+          const decodedToken = jwtDecode(token);
+          setUserType(decodedToken?.user_type || '');
           navigation.replace('DefaultScreen');
         } else {
           navigation.replace('LoginScreen');
@@ -59,10 +65,10 @@ const styles = StyleSheet.create({
     color: '#808080',
     textAlign: 'center',
   },
-  textFlexhire:{
-    fontsize:500,
-    color:colors.secondary,
-    fontWeight:'bold'
+  textFlexhire: {
+    fontsize: 500,
+    color: colors.secondary,
+    fontWeight: 'bold',
   },
   textContainer: {
     marginBottom: 36,

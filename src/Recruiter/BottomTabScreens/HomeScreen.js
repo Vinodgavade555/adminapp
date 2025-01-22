@@ -27,7 +27,7 @@ const HomeScreen = () => {
   const {GetHomePageData} = JobViewController();
   const {HomeData} = useSelector(state => state.job);
 
-  // console.log('Full Data:', JSON.stringify(HomeData, null, 2));
+  // console.log('Full Data:',HomeData?.recent_job_applications);
 
   useEffect(() => {
     const getUserData = async () => {
@@ -216,7 +216,7 @@ const HomeScreen = () => {
 
         {HomeData.top_20_related_to_recent_jobs && (
           <View>
-            <Text style={styles.Containertitle}>recent_job_applications</Text>
+            <Text style={styles.Containertitle}>Recent job applications</Text>
             
             <ScrollView
               horizontal

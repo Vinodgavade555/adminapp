@@ -10,15 +10,11 @@ import {
 import {Provider as PaperProvider} from 'react-native-paper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useFocusEffect} from '@react-navigation/native';
-import HomeComponent from '../BottomTabScreens/HomeScreen';
 import {colors} from '../../Global_CSS/TheamColors';
-import JobsScreen from '../BottomTabScreens/JobsScreen';
-import ShortlistCandidate from '../BottomTabScreens/ShortlistedCandidatePage';
-import AnalyticPage from '../BottomTabScreens/AnalyticPage';
-import UserScreen from '../BottomTabScreens/UsersList';
-import UsersList from '../BottomTabScreens/UsersList';
 
-const CustomBottomTab = () => {
+import Trial from '../trial';
+
+const TLBottomTab = () => {
   const [selectedTab, setSelectedTab] = useState('Home');
 
   useFocusEffect(
@@ -81,11 +77,11 @@ const CustomBottomTab = () => {
     <PaperProvider>
       <View style={styles.container}>
         <View style={styles.content}>
-          {selectedTab === 'Home' && <HomeComponent />}
-          {selectedTab === 'Jobs' && <JobsScreen />}
-          {selectedTab === 'UserScreen' && <UsersList />}
-          {selectedTab === 'AnalyticPage' && <AnalyticPage />}
-          {selectedTab === 'ShortlistCandidate' && <ShortlistCandidate />}
+          {selectedTab === 'Home' && <Trial />}
+          {selectedTab === 'Jobs' && <Trial />}
+          {selectedTab === 'UserScreen' && <Trial />}
+          {selectedTab === 'AnalyticPage' && <Trial />}
+          {selectedTab === 'ShortlistCandidate' && <Trial />}
         </View>
         <View style={styles.tabContainer}>
           {renderTabBtn('Home', 'home', 'Home')}
@@ -148,4 +144,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CustomBottomTab;
+export default TLBottomTab;
