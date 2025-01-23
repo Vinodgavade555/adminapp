@@ -1,5 +1,6 @@
 // services/api.js
 export const BASE_URL = 'http://15.206.149.28/api';
+export const IMAGE_BASE_URL="http://15.206.149.28"
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 

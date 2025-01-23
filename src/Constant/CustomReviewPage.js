@@ -29,7 +29,7 @@ const ReviewPage = ({data}) => {
     const getUserData = async () => {
       try {
         const id = await AsyncStorage.getItem('user_data');
-        dispatch(GetReviewData(data?.user.id));
+        dispatch(GetReviewData(data?.user?.user_id));
 
         setId(id);
       } catch (error) {
@@ -77,12 +77,13 @@ const ReviewPage = ({data}) => {
     const numericRating = parseFloat(userRating);
     if (newComment && numericRating >= 0 && numericRating <= 5) {
       const reviewData = {
-        user: data?.user?.id,
+        user: data?.user?.user_id,
         rating: numericRating.toString(),
         review_title: reviewTitle,
         review_body: newComment,
         given_by: id,
       };
+
 
       dispatch(AddReview(reviewData));
 
@@ -91,6 +92,7 @@ const ReviewPage = ({data}) => {
       setReviewTitle('');
     }
   };
+  console.log(data?.user.user_id);
 
   const handleRatingChange = text => {
     const sanitizedText = text.replace(/[^0-9.]/g, '');

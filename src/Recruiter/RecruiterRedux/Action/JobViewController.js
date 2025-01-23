@@ -648,7 +648,7 @@ const JobViewController = () => {
       dispatch({type: 'REVIEW_ADDED_SUCCESSFULLY', payload: requestData.job});
       console.log('requestData.job', requestData.job);
 
-      dispatch(GetSavedJobs(requestData.recruiter_id));
+      dispatch(GetReviewData(requestData.user_id));
 
       dispatch({type: 'LOADING', payload: false});
     } catch (error) {

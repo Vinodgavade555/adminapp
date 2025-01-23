@@ -15,8 +15,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useDispatch, useSelector} from 'react-redux';
 import {useIsFocused} from '@react-navigation/native';
-import { BASE_URL } from '../../Redux/Action/AuthViewController';
 import JobViewController from '../RecruiterRedux/Action/JobViewController';
+import { IMAGE_BASE_URL } from '../../Services/baseAPI';
 
 
 const JobDetailScreen = ({route, navigation}) => {
@@ -94,12 +94,12 @@ const JobDetailScreen = ({route, navigation}) => {
         <View style={styles.companyInfoContainer}>
           <View style={styles.companyInfo}>
             <View style={styles.logoContainer}>
-              {console.log( JobDetails?.company?.logo)
-              }
+              {/* {console.log( JobDetails?.company?.logo)
+              } */}
               <Image
                 source={
                   JobDetails?.company?.logo
-                    ? {uri: BASE_URL + JobDetails?.company?.logo}
+                    ? {uri: IMAGE_BASE_URL + JobDetails?.company?.logo}
                     : require('../../Assets/CompanyLogo/Swatsan1.jpeg')
                 }
                 style={styles.logo}
