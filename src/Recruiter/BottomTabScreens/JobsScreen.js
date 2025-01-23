@@ -15,7 +15,7 @@ import {colors} from '../../Global_CSS/TheamColors';
 import moment from 'moment';
 import Icon from 'react-native-vector-icons/Ionicons';
 import JobViewController from '../RecruiterRedux/Action/JobViewController';
-import { useDispatch, useSelector } from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
 const JobsScreen = () => {
   const [id, setId] = useState(null);
@@ -64,7 +64,10 @@ const JobsScreen = () => {
   }
 
   const handleCardPress = jobId => {
-    navigation.navigate('JobDetail', {jobId: jobId});
+    navigation.navigate('RecruiterStack', {
+      screen: 'JobDetail',
+      params: {jobId: jobId},
+    });
     // console.log(jobId);
   };
 

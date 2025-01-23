@@ -3,9 +3,13 @@ import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import instance, {setAuthToken} from '../../Services/baseAPI';
 import axios from 'axios';
-
+import {jwtDecode} from 'jwt-decode'; 
+import { useContext } from 'react';
+import { UserContext } from '../../Services/UserContext';
 export const BASE_URL = 'http://15.206.149.28/';
 const AuthViewController = () => {
+  const {userType, setUserType } = useContext(UserContext);
+
   const navigation = useNavigation();
   const goBackScreen = () => {
     navigation.goBack();
@@ -41,17 +45,17 @@ const AuthViewController = () => {
         requestData,
       );
 
-      // console.log(
-      //   '****************************login response***************************',
-      // );
+      console.log(
+        '****************************login response***************************',
+      );
       // console.log(response);
       const {message, user_id, access, refresh} = response.data;
       const jsonString = JSON.stringify(response.data);
       const data = JSON.parse(jsonString);
 
       // const {access, user_id} = data;
-      // console.log('login data ', token, user);
-
+      const decodedToken = jwtDecode(access);
+      setUserType(decodedToken?.user_type || '');
       setAuthToken(access); // Set token in axios headers or AsyncStorage
       await AsyncStorage.setItem('user_data', JSON.stringify(user_id));
 

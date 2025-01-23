@@ -11,7 +11,7 @@ const initialState = {
   CandidateReview: null,
   FilteredUsers: [],
   FilteredUsersPagination: {},
-  FilterMasterData: [],
+  FilterUserMaster: [],
   SavedJobs: null,
   error: null,
   isLoading: false, // Track loading for any API request
@@ -275,6 +275,19 @@ const jobReducer = (state = initialState, action) => {
       return {
         ...state,
         error: action.payload.error,
+      };
+
+    case 'FILTER_USER_MASTER_SUCCESS':
+      return {
+        ...state,
+        FilterUserMaster: action.payload, // Store job details in the state
+        error: null,
+      };
+
+    case 'FILTER_USER_MASTER_FAILURE':
+      return {
+        ...state,
+        error: action.payload.error, // Store the error message for job details
       };
 
     default:
