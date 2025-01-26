@@ -123,7 +123,7 @@ const HomeScreen = () => {
                         params: {jobId: job.id},
                       })
                     }>
-                    {console.log('Job ID:', job.id)}
+                    {/* {console.log('Job ID:', job.id)} */}
                     <View style={styles.jobCardContent}>
                       <View style={styles.titleContainer}>
                         <Text style={styles.jobTitle}>

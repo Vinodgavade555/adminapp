@@ -69,7 +69,8 @@ const styles = StyleSheet.create({
   },
   modalButtons: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'center',
+    gap:12
   },
   button: {
     paddingVertical: 10,

@@ -14,6 +14,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {useIsFocused} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import JobViewController from '../Recruiter/RecruiterRedux/Action/JobViewController';
+import ConfirmationModal from './CustomModal';
 
 const ReviewPage = ({data}) => {
   const dispatch = useDispatch();
@@ -24,6 +25,8 @@ const ReviewPage = ({data}) => {
   const [id, setId] = useState('');
   const isFocus = useIsFocused();
   const [reviewTitle, setReviewTitle] = useState('');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [reviewToDelete, setReviewToDelete] = useState(null);
 
   useEffect(() => {
     const getUserData = async () => {
@@ -83,8 +86,6 @@ const ReviewPage = ({data}) => {
         review_body: newComment,
         given_by: id,
       };
-
-
       dispatch(AddReview(reviewData));
 
       setNewComment('');
@@ -92,7 +93,7 @@ const ReviewPage = ({data}) => {
       setReviewTitle('');
     }
   };
-  console.log(data?.user.user_id);
+  // console.log(data?.user.user_id);
 
   const handleRatingChange = text => {
     const sanitizedText = text.replace(/[^0-9.]/g, '');
@@ -103,7 +104,19 @@ const ReviewPage = ({data}) => {
   };
 
   const handleDeleteReview = reviewId => {
-    dispatch(DeleteReview(reviewId));
+    setReviewToDelete(reviewId);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteReview = () => {
+    dispatch(DeleteReview(reviewToDelete));
+    // console.log('reviewToDelete',reviewToDelete);
+
+    setShowDeleteModal(false); // Close modal after confirmation
+  };
+  const cancelDeleteReview = () => {
+    // If user cancels, just close the modal without deleting
+    setShowDeleteModal(false);
   };
 
   return (
@@ -149,39 +162,51 @@ const ReviewPage = ({data}) => {
       <View style={styles.reviewsContainer}>
         <Text style={styles.reviewsTitle}>Reviews:</Text>
 
-        {CandidateReview?.results?.map(review => (
-          <View key={review.id} style={styles.reviewCard}>
-            <View style={styles.reviewInfoRow}>
-              <Text style={styles.reviewInfo}>{review.given_by_name}</Text>
-              <Text style={styles.reviewInfo}>
-                {moment(review.review_date).format('D MMM, YYYY')}
-              </Text>
-            </View>
-
-            <View style={styles.reviewTextContainer}>
-              {review.review_title && (
-                <Text style={styles.reviewTitle}>{review.review_title}</Text>
-              )}
-              {review.review_body && review.review_body.trim() !== '' && (
-                <Text style={styles.reviewBody}>{review.review_body}</Text>
-              )}
-            </View>
-
-            <View style={styles.reviewActionsRow}>
-              <View style={styles.reviewRating}>
-                {renderStars(review.rating)}
+        {CandidateReview?.results?.map(review => {
+          return (
+            <View key={review.id} style={styles.reviewCard}>
+              <View style={styles.reviewInfoRow}>
+                <Text style={styles.reviewInfo}>{review.given_by_name}</Text>
+                <Text style={styles.reviewInfo}>
+                  {moment(review.review_date).format('D MMM, YYYY')}
+                </Text>
               </View>
-              {review.given_by == id && (
-                <TouchableOpacity
-                  onPress={() => handleDeleteReview(review.id)}
-                  style={styles.deleteIconContainer}>
-                  <Ionicons name="trash-outline" size={20} color="#FF0000" />
-                </TouchableOpacity>
-              )}
+
+              <View style={styles.reviewTextContainer}>
+                {review.review_title && (
+                  <Text style={styles.reviewTitle}>{review.review_title}</Text>
+                )}
+                {review.review_body && review.review_body.trim() !== '' && (
+                  <Text style={styles.reviewBody}>{review.review_body}</Text>
+                )}
+              </View>
+
+              <View style={styles.reviewActionsRow}>
+                <View style={styles.reviewRating}>
+                  {renderStars(review.rating)}
+                </View>
+
+                {review.given_by == id && (
+                  <TouchableOpacity
+                    onPress={() => handleDeleteReview(review.id)}
+                    style={styles.deleteIconContainer}>
+                    <Ionicons name="trash-outline" size={20} color="#FF0000" />
+                  </TouchableOpacity>
+                )}
+              </View>
             </View>
-          </View>
-        ))}
+          );
+        })}
       </View>
+
+      <ConfirmationModal
+        visible={showDeleteModal}
+        // onClose={() => setShowDeleteModal(false)}
+        onClose={cancelDeleteReview}
+        onConfirm={confirmDeleteReview}
+        message="Are you sure you want to delete this review?"
+        title="Delete Review"
+      />
     </ScrollView>
   );
 };
