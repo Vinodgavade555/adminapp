@@ -292,13 +292,9 @@ const UserDetailScreen = ({route, onShortlist}) => {
     job => job.is_current_company === 'true',
   );
 
- const experienceText = currentJob
-  ? `${currentJob?.job_title} at ${currentJob?.company_name}, ${
-      calculateExperience(currentJob?.joining_date, currentJob?.leaving_date).years
-    }y ${
-      calculateExperience(currentJob?.joining_date, currentJob?.leaving_date).months
-    }m`
-  : null;
+  const experienceText = currentJob
+    ? `${currentJob?.job_title} at ${currentJob?.company_name}`
+    : null;
 
   const renderTabs = () => {
     switch (activeTab) {
@@ -479,7 +475,9 @@ const UserDetailScreen = ({route, onShortlist}) => {
 
             {/* accomplishments */}
             <View>
-              <Text style={styles.boldTextAccomplishment}>Accomplishments:</Text>
+              <Text style={styles.boldTextAccomplishment}>
+                Accomplishments:
+              </Text>
 
               {user?.accomplishments?.length > 0 ? (
                 <ScrollView
@@ -505,7 +503,7 @@ const UserDetailScreen = ({route, onShortlist}) => {
                                   styles.section,
                                   {
                                     paddingHorizontal: 8,
-                                    paddingVertical:12,
+                                    paddingVertical: 12,
                                     backgroundColor: '#fafafa',
                                     borderRadius: 8,
                                     width: width * 0.7,
@@ -558,7 +556,7 @@ const UserDetailScreen = ({route, onShortlist}) => {
                                       Link:{' '}
                                     </Text>
                                     <Text style={{color: colors.secondary}}>
-                                    {accomplishment.url}
+                                      {accomplishment.url}
                                     </Text>
                                   </Text>
                                 )}
@@ -569,18 +567,15 @@ const UserDetailScreen = ({route, onShortlist}) => {
                                     openAccomplishmentModal(accomplishment)
                                   }
                                   style={{
-                                    backgroundColor: '#ccf5ff',
-                                    paddingVertical: 8, // Adjust padding to make the button smaller
-                                    paddingHorizontal: 12, // Adjust horizontal padding to control the button's width
+                                    paddingVertical: 8,
                                     borderRadius: 4,
-                                    marginTop: 10, // Space between the button and other content
-                                    alignSelf: 'flex-end', // Adds space between the button and the content above
+                                    marginTop: 10,
+                                    alignSelf: 'flex-start',
                                   }}>
                                   <Text
                                     style={{
-                                      color: '#006680', // Makes the text white to contrast with the skyblue background
+                                      color: colors.secondary,
                                       fontWeight: 'bold',
-                                      // Centers the text within the button
                                     }}>
                                     View More
                                   </Text>
@@ -1271,11 +1266,19 @@ const UserDetailScreen = ({route, onShortlist}) => {
               <View style={styles.iconTextSalaryContainer}>
                 <Ionicons name="cash" size={14} color="gray" />
                 <Text style={styles.salaryText}>
-                  {formatAmount(
-                    data?.user?.career_preferences?.[0]?.annual_salary?.amount,
-                  )}{' '}
                   {data?.user?.career_preferences?.[0]?.annual_salary
-                    ?.currency || ''}
+                    ?.currency === 'INR'
+                    ? `₹ ${formatAmount(
+                        data?.user?.career_preferences?.[0]?.annual_salary
+                          ?.amount,
+                      )}`
+                    : `${
+                        data?.user?.career_preferences?.[0]?.annual_salary
+                          ?.currency
+                      } ${formatAmount(
+                        data?.user?.career_preferences?.[0]?.annual_salary
+                          ?.amount,
+                      )}`}
                 </Text>
               </View>
             ) : null}
@@ -1444,7 +1447,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     marginTop: 8,
   },
-  boldTextAccomplishment:{
+  boldTextAccomplishment: {
     fontWeight: 'bold',
     color: 'black',
     fontSize: 16,
