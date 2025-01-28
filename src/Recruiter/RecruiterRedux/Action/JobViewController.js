@@ -472,7 +472,7 @@ const JobViewController = () => {
 
   const toggleshortlistUser = requestData => async dispatch => {
     dispatch({type: 'LOADING', payload: true});
-console.log("requestData",requestData);
+// console.log("requestData",requestData);
 
     try {
       const response = await instance.post(
@@ -484,7 +484,7 @@ console.log("requestData",requestData);
       const data = JSON.parse(jsonString);
 
       dispatch({type: 'TOGGLE_TO_SHORTLIST_SUCCESS', payload: requestData});
-      console.log('requestData.job', requestData);
+      // console.log('requestData.job', requestData);
 
       dispatch(
         GetUserShortlistedList(requestData.job_id, requestData.recruiter_id),
@@ -528,7 +528,7 @@ console.log("requestData",requestData);
       const data = JSON.parse(jsonString);
 
       dispatch({type: 'USER_SAVED_SUCCESSFULLY', payload: requestData.user_id});
-      console.log('requestData', requestData.user_id);
+      // console.log('requestData', requestData.user_id);
 
       // dispatch(GetSavedUser(requestData.recruiter_id));
 

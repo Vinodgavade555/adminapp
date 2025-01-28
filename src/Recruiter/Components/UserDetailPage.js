@@ -25,7 +25,8 @@ import CustomHeader from '../../Constant/CustomBackIcon';
 
 const UserDetailScreen = ({route, navigation}) => {
   const {data, page} = route.params;
-  const {SendInvitation, ApplicationJobStatus} = JobViewController();
+  const {SendInvitation, ApplicationJobStatus, toggleshortlistUser} =
+    JobViewController();
   const isFocus = useIsFocused();
   const dispatch = useDispatch();
   const [id, setId] = useState('');
@@ -33,12 +34,11 @@ const UserDetailScreen = ({route, navigation}) => {
   const [buttonPressed, setButtonPressed] = useState(false);
   const [activeTab, setActiveTab] = useState('Profile Details');
 
-  const [isShortlisted, setIsShortlisted] = useState(
-    data?.is_shortlisted || false,
-  );
   const user = data?.user ? data.user : data.user_id;
+  const [isShortlisted, setIsShortlisted] = useState(user.is_shortlisted);
 
-  console.log('.................', JSON.stringify(data, null, 2));
+  // console.log('.................', JSON.stringify(user, null, 2));
+  console.log('.................', user.is_shortlisted);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
@@ -177,9 +177,22 @@ const UserDetailScreen = ({route, navigation}) => {
         console.error('Error reading value from AsyncStorage', error);
       }
     };
-
+    // setIsShortlisted(user?.is_shortlisted);
     getUserData();
   }, [isFocus]);
+
+  const ToggleShortlist = () => {
+    const shortlistData = {
+      job_id: data?.jobId,
+      user_id: data?.user?.user_id,
+      recruiter_id: id,
+      is_shortlist_by_recruiter: !isShortlisted,
+    };
+    console.log('^^^^^^^^^^^', shortlistData);
+
+    dispatch(toggleshortlistUser(shortlistData));
+    setIsShortlisted(prevState => !prevState); // Toggling the state
+  };
 
   const statusColors = {
     ACCEPTED: {background: '#d6f5d6', text: '#33cc33'},
@@ -1080,66 +1093,74 @@ const UserDetailScreen = ({route, navigation}) => {
 
   return (
     <View style={styles.container}>
-      <View style={{flexDirection: 'row', alignItems: 'center',justifyContent:'space-between'}}>
-        <View style={{flexDirection:'row',alignItems: 'center'}}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <CustomHeader />
-        </TouchableOpacity>
-        <Text style={styles.title}>User Details</Text>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}>
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <CustomHeader />
+          </TouchableOpacity>
+          <Text style={styles.title}>User Details</Text>
         </View>
-        <View style={{flexDirection:'row',margin:4,gap:12}}>
-        <TouchableOpacity style={styles.iconButton}>
-          <Ionicons name="heart-outline" size={26} color="red" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.iconButton}>
-          <Ionicons name="bookmark-outline" size={26} color="#004466" />
-        </TouchableOpacity>
-       
-      </View>
+        <View style={{flexDirection: 'row', margin: 4, gap: 12}}>
+          {page === 'home' && (
+            <TouchableOpacity style={styles.iconButton}>
+              <Ionicons name="bookmark-outline" size={26} color="#004466" />
+            </TouchableOpacity>
+          )}
+
+          {page !== 'home' && (
+            <>
+              <TouchableOpacity
+                // style={[styles.shortlistButton]}
+                onPress={() => {
+                  ToggleShortlist(user);
+                }}>
+                <Ionicons
+                  name={isShortlisted ? 'heart' : 'heart-outline'}
+                  size={24}
+                  color="red"
+                />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.iconButton}>
+                <Ionicons name="bookmark-outline" size={26} color="#004466" />
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
       </View>
       <View
         style={{
           flexDirection: 'row',
           justifyContent: 'space-aound',
-          marginTop: 12,
+          // marginTop: 12,
         }}>
         {showButtons && (
           <>
-            {/* Check if the page is 'application' to show both buttons */}
-            {(page === 'application' || page === 'job_invitation') && (
+            {page === 'application' && (
               <>
                 <TouchableOpacity
-                  style={[
-                    styles.shortlistButton,
-                    {backgroundColor: isShortlisted ? '#f8d7da' : '#d4edda'},
-                  ]}
-                  onPress={handleToggle}>
+                  // style={[styles.shortlistButton, {backgroundColor: '#ffe0cc'}]}
+                  onPress={handleCoverLetterClick}>
                   <Text
                     style={{
-                      color: isShortlisted ? '#155724' : '#28a745',
+                      color: colors.secondary,
+                      textAlign: 'right',
+                      fontSize: 14,
+                      textDecorationLine: 'underline',
                     }}>
-                    {isShortlisted ? 'Unshortlist' : 'Shortlist'}
+                    View Cover Letter
                   </Text>
                 </TouchableOpacity>
 
-                {page === 'application' && (
-                  <TouchableOpacity
-                    style={[
-                      styles.shortlistButton,
-                      {backgroundColor: '#ffe0cc'},
-                    ]}
-                    onPress={handleCoverLetterClick}>
-                    <Text style={{color: '#ff6600'}}>Cover Letter</Text>
-                  </TouchableOpacity>
-                )}
-
-                {/* Modal for Cover Letter */}
                 <Modal
                   visible={isModalVisible}
                   transparent={true}
                   animationType="slide"
-                  onRequestClose={handleCloseModal} // Handle back button on Android
-                >
+                  onRequestClose={handleCloseModal}>
                   <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>
                       <View
@@ -1166,6 +1187,7 @@ const UserDetailScreen = ({route, navigation}) => {
           </>
         )}
       </View>
+
       <ScrollView
         showsVerticalScrollIndicator={false}
         style={{

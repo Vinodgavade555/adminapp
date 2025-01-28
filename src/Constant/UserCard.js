@@ -22,7 +22,7 @@ const UserCard = ({item, jobId, page_name, index, isHorizontal,coverLetter}) => 
   const [id, setId] = useState('');
   const isFocus = useIsFocused();
   useEffect(() => {
-    console.log('Job Applications Updated_____________________', item);
+    // console.log('Job Applications Updated_____________________', item);
   }, [item]);
   const transformJobSeekerProfile = userData => {
   const {job_seeker_profile, ...rest} = userData;
@@ -41,16 +41,13 @@ const UserCard = ({item, jobId, page_name, index, isHorizontal,coverLetter}) => 
     item && item.user_id
       ? transformJobSeekerProfile(item.user_id)
       : transformJobSeekerProfile(item);
-  // const userProfile =
-  //   page_name === 'job_invitation' || page_name === 'home'
-  //     ? item?.job_seeker_profile
-  //     : item?.user;
+  
 
   const userProfile =
     item?.job_seeker_profile || item?.user_id?.job_seeker_profile;
   // const userProfile = item?.job_seeker_profile;
 
-  console.log('******', item?.is_shortlisted);
+  // console.log('******', item?.is_shortlisted);
 
   const [expandedSkills, setExpandedSkills] = useState({});
   const skills = userProfile?.key_skills || [];
@@ -79,7 +76,7 @@ const UserCard = ({item, jobId, page_name, index, isHorizontal,coverLetter}) => 
   const ToggleShortlist = item => {
     const shortlistData = {
       job_id: jobId,
-      user_id: item.id,
+      user_id: item.user_id,
       recruiter_id: id,
       is_shortlist_by_recruiter: !isShortlisted,
     };
@@ -95,7 +92,7 @@ const UserCard = ({item, jobId, page_name, index, isHorizontal,coverLetter}) => 
       recruiter_id: id,
       // is_saved: !isSaved,
     };
-    console.log('Toggling save action:', saveData);
+    // console.log('Toggling save action:', saveData);
     dispatch(ToggleSaveUser(saveData));
   };
 

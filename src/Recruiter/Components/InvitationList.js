@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {
   StyleSheet,
   Text,
@@ -16,6 +16,7 @@ import UserCard from '../../Constant/UserCard';
 import JobViewController from '../RecruiterRedux/Action/JobViewController';
 
 const InvitationList = ({route}) => {
+  
   const {jobId} = route.params;
   const dispatch = useDispatch();
   const {GetJobInvitation} = JobViewController();
@@ -31,7 +32,7 @@ const InvitationList = ({route}) => {
       [index]: !prevState[index],
     }));
   };
-  console.log(JobInvitations?.results);
+  // console.log(JobInvitations?.results);
 
   useEffect(() => {
     const getUserData = async () => {

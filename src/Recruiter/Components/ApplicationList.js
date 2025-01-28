@@ -45,7 +45,7 @@ const ApplicationsListScreen = ({route}) => {
   }, [dispatch, jobId, isFocus]);
 
   useEffect(() => {
-    console.log('JobApplications state updated:', JobApplications);
+    // console.log('JobApplications state updated:', JobApplications);
   }, [JobApplications]);
 
   return (
@@ -70,7 +70,6 @@ const ApplicationsListScreen = ({route}) => {
       {(selectedTab === 'matching' ? JobApplications?.matching_applies : JobApplications?.unmatching_applies)?.map((jobApplication) => {
         const user = jobApplication?.user_id;
         const coverLetter = jobApplication?.cover_letter;
-        // console.log('get',jobApplication?.cover_letter);
 
         return (
           <UserCard
