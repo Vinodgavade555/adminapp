@@ -391,10 +391,7 @@ const JobViewController = () => {
     dispatch({type: 'LOADING', payload: true});
 
     try {
-      const response = await instance.post(
-        `/job-invitations/`,
-        data,
-      );
+      const response = await instance.post(`/job-invitations/`, data);
 
       // console.log("API Response:", response);
 
@@ -472,7 +469,7 @@ const JobViewController = () => {
 
   const toggleshortlistUser = requestData => async dispatch => {
     dispatch({type: 'LOADING', payload: true});
-// console.log("requestData",requestData);
+    // console.log("requestData",requestData);
 
     try {
       const response = await instance.post(
@@ -520,6 +517,7 @@ const JobViewController = () => {
 
   const ToggleSaveUser = requestData => async dispatch => {
     dispatch({type: 'LOADING', payload: true});
+    console.log('requestData', requestData);
 
     try {
       const response = await instance.post(`/save-candidate/`, requestData);
@@ -530,7 +528,7 @@ const JobViewController = () => {
       dispatch({type: 'USER_SAVED_SUCCESSFULLY', payload: requestData.user_id});
       // console.log('requestData', requestData.user_id);
 
-      // dispatch(GetSavedUser(requestData.recruiter_id));
+      dispatch(GetSavedUser(requestData.recruiter_id, requestData.job_id));
 
       dispatch({type: 'LOADING', payload: false});
     } catch (error) {
@@ -656,8 +654,6 @@ const JobViewController = () => {
       // console.log(response);
       const jsonString = JSON.stringify(response.data);
       const data = JSON.parse(jsonString);
-      
-      
 
       dispatch({type: 'REVIEW_ADDED_SUCCESSFULLY', payload: requestData.job});
 

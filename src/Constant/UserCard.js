@@ -48,7 +48,6 @@ const UserCard = ({
     item && item.user_id
       ? transformJobSeekerProfile(item.user_id)
       : transformJobSeekerProfile(item);
-  
 
   const userProfile =
     item?.job_seeker_profile || item?.user_id?.job_seeker_profile;
@@ -87,20 +86,21 @@ const UserCard = ({
       recruiter_id: id,
       is_shortlist_by_recruiter: !isShortlisted,
     };
-    console.log('shortlistData',shortlistData);
+    console.log('shortlistData', shortlistData);
 
     dispatch(toggleshortlistUser(shortlistData));
   };
 
-  const handleSaveToggle = async () => {
-    setIsSaved(!isSaved); // Toggle the save state
+  const handleSaveToggle = (item) => {
+    // setIsSaved(!isSaved); // Toggle the save state
 
     const saveData = {
-      user_id: item.id,
+      user_id: item.user_id,
       recruiter_id: id,
+      job_id: jobId,
       // is_saved: !isSaved,
     };
-    // console.log('Toggling save action:', saveData);
+    console.log('Toggling save action:', saveData);
     dispatch(ToggleSaveUser(saveData));
   };
 
@@ -321,7 +321,7 @@ const UserCard = ({
         {page_name === 'home' ? (
           <TouchableOpacity
             style={[styles.saveButton]}
-            onPress={handleSaveToggle}>
+            onPress={() => handleSaveToggle(userProfile)}>
             <Ionicons
               name={
                 item.isSaved || item?.user_id?.is_saved

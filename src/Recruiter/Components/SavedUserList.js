@@ -1,20 +1,9 @@
 import React, {useState, useEffect} from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  Dimensions,
-} from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import moment from 'moment';
-import {useIsFocused, useNavigation} from '@react-navigation/native';
+import {View, ScrollView, StyleSheet, Dimensions} from 'react-native';
+import {useIsFocused} from '@react-navigation/native';
 import {useDispatch, useSelector} from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {colors} from '../../Global_CSS/TheamColors';
-import {BASE_URL} from '../../Services/baseAPI';
 import JobViewController from '../RecruiterRedux/Action/JobViewController';
 import UserCard from '../../Constant/UserCard';
 const {width} = Dimensions.get('window'); // Get the screen width
@@ -23,12 +12,9 @@ const SavedJobScreen = ({route}) => {
   const {jobId} = route.params;
   const [id, setId] = useState();
   const dispatch = useDispatch();
-  const {GetSavedUser, ToggleSaveUser} = JobViewController();
+  const {GetSavedUser} = JobViewController();
   const {SavedUsers} = useSelector(state => state.job);
   const isFocus = useIsFocused();
-  const navigation = useNavigation();
-
-  console.log('********************', GetSavedUser);
 
   useEffect(() => {
     const getUserData = async () => {
@@ -42,20 +28,23 @@ const SavedJobScreen = ({route}) => {
     };
 
     getUserData();
-  }, [isFocus]);
-  console.log('SavedUsers', SavedUsers);
+  }, [isFocus, dispatch]);
 
   return (
     <View style={styles.container}>
       <ScrollView>
-        {SavedUsers?.results?.map((item, index) => (
-          <UserCard
-            key={item.id || index} // Use unique `id` if available
-            item={item}
-            jobId={jobId}
-            page_name={'home'}
-          />
-        ))}
+        {SavedUsers?.results && SavedUsers?.results?.length > 0
+          ? SavedUsers?.results.map((item, index) => {
+              return (
+                <UserCard
+                  key={item.id || index} // Use unique `id` if available
+                  item={item}
+                  jobId={jobId}
+                  page_name={'home'}
+                />
+              );
+            })
+          : null}
       </ScrollView>
     </View>
   );

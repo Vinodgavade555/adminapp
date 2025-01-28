@@ -25,8 +25,12 @@ import CustomHeader from '../../Constant/CustomBackIcon';
 
 const UserDetailScreen = ({route, navigation}) => {
   const {data, page} = route.params;
-  const {SendInvitation, ApplicationJobStatus, toggleshortlistUser} =
-    JobViewController();
+  const {
+    SendInvitation,
+    ApplicationJobStatus,
+    toggleshortlistUser,
+    ToggleSaveUser,
+  } = JobViewController();
   const isFocus = useIsFocused();
   const dispatch = useDispatch();
   const [id, setId] = useState('');
@@ -36,9 +40,10 @@ const UserDetailScreen = ({route, navigation}) => {
 
   const user = data?.user ? data.user : data.user_id;
   const [isShortlisted, setIsShortlisted] = useState(user.is_shortlisted);
+  const [isSavedUser, setIsSavedUser] = useState(user.is_saved);
 
   // console.log('.................', JSON.stringify(user, null, 2));
-  console.log('.................', user.is_shortlisted);
+  console.log('.................', user.is_saved);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
@@ -193,6 +198,16 @@ const UserDetailScreen = ({route, navigation}) => {
     dispatch(toggleshortlistUser(shortlistData));
     setIsShortlisted(prevState => !prevState); // Toggling the state
   };
+  const handleSaveUser = () => {
+    const saveData = {
+      user_id: data.user?.user_id,
+      recruiter_id: id,
+      // is_saved: !isSaved,
+    };
+    // console.log('Toggling save action:', saveData);
+    dispatch(ToggleSaveUser(saveData));
+    setIsSavedUser(prevState => !prevState); // Toggling the state
+  };
 
   const statusColors = {
     ACCEPTED: {background: '#d6f5d6', text: '#33cc33'},
@@ -205,9 +220,6 @@ const UserDetailScreen = ({route, navigation}) => {
     statusColors[status]?.background || defaultColor;
   const buttonTextColor = statusColors[status]?.text || '#ffffff';
 
-  const handleToggle = () => {
-    setIsShortlisted(!isShortlisted); // Toggle the state
-  };
   const openEmploymentModal = employment => {
     setSelectedEmployment(employment);
     setEmploymentModalVisible(true);
@@ -462,7 +474,6 @@ const UserDetailScreen = ({route, navigation}) => {
                             borderRadius: 8,
                             height: 'auto',
                             flex: 1,
-                            backgroundColor: '#fafafa',
                           },
                         ]}>
                         <View style={{flexDirection: 'row', gap: 8}}>
@@ -1107,7 +1118,9 @@ const UserDetailScreen = ({route, navigation}) => {
         </View>
         <View style={{flexDirection: 'row', margin: 4, gap: 12}}>
           {page === 'home' && (
-            <TouchableOpacity style={styles.iconButton}>
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={() => handleSaveUser()}>
               <Ionicons name="bookmark-outline" size={26} color="#004466" />
             </TouchableOpacity>
           )}
@@ -1125,8 +1138,14 @@ const UserDetailScreen = ({route, navigation}) => {
                   color="red"
                 />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.iconButton}>
-                <Ionicons name="bookmark-outline" size={26} color="#004466" />
+              <TouchableOpacity
+                style={styles.iconButton}
+                onPress={() => handleSaveUser()}>
+                <Ionicons
+                  name={isSavedUser ? 'bookmark' : 'bookmark-outline'}
+                  size={26}
+                  color="#004466"
+                />
               </TouchableOpacity>
             </>
           )}
