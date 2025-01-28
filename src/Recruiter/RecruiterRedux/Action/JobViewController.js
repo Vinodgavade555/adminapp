@@ -246,11 +246,13 @@ const JobViewController = () => {
     }
   };
 
-  const GetJobApplications = job_id => async dispatch => {
+  const GetJobApplications = (job_id, recruiter_id) => async dispatch => {
     dispatch({type: 'LOADING', payload: true});
 
     try {
-      const response = await instance.get(`/job/applications/${job_id}`);
+      const response = await instance.get(
+        `/job/applications/${job_id}/?recruiter_id=${recruiter_id}`,
+      );
       // console.log(
       //   `****************************job-GetAppliedJobSeekerList response***************************
       //   http://15.206.149.28/api/job/${job_id}/applied-users/`,
@@ -291,11 +293,13 @@ const JobViewController = () => {
     }
   };
 
-  const GetJobInvitation = job_id => async dispatch => {
+  const GetJobInvitation = (job_id, recruiter_id) => async dispatch => {
     dispatch({type: 'LOADING', payload: true});
 
     try {
-      const response = await instance.get(`/filter-users-for-job/${job_id}`);
+      const response = await instance.get(
+        `/filter-users-for-job/${job_id}/?recruiter_id=${recruiter_id}`,
+      );
       // console.log(
       //   `****************************job-GetJobInvitation response***************************
       //   http://15.206.149.28/api/job/${job_id}/applied-users/`,
@@ -425,15 +429,16 @@ const JobViewController = () => {
     }
   };
 
-  const GetUserShortlistedList = job_id => async dispatch => {
+  const GetUserShortlistedList = (job_id, recruiter_id) => async dispatch => {
     dispatch({type: 'LOADING', payload: true});
 
     try {
-      const response = await instance.get(`/shortlist-user/job/${job_id}`);
-
+      const response = await instance.get(
+        `/shortlist-user/job/${job_id}/?recruiter_id=${recruiter_id}`,
+      );
       const jsonString = JSON.stringify(response.data);
       const data = JSON.parse(jsonString);
-      console.log(data);
+      // console.log(data);
 
       dispatch({type: 'USER_SHORTLIST_LIST_SUCCESS', payload: data});
 
@@ -467,6 +472,7 @@ const JobViewController = () => {
 
   const toggleshortlistUser = requestData => async dispatch => {
     dispatch({type: 'LOADING', payload: true});
+console.log("requestData",requestData);
 
     try {
       const response = await instance.post(
@@ -477,8 +483,12 @@ const JobViewController = () => {
       const jsonString = JSON.stringify(response.data);
       const data = JSON.parse(jsonString);
 
-      dispatch({type: 'ADD_TO_SHORTLIST', payload: data});
-      dispatch(GetUserShortlistedList(requestData.user_id));
+      dispatch({type: 'TOGGLE_TO_SHORTLIST_SUCCESS', payload: requestData});
+      console.log('requestData.job', requestData);
+
+      dispatch(
+        GetUserShortlistedList(requestData.job_id, requestData.recruiter_id),
+      );
 
       dispatch({type: 'LOADING', payload: false});
     } catch (error) {
@@ -498,7 +508,7 @@ const JobViewController = () => {
         },
       );
       dispatch({
-        type: 'REMOVE_FROM_SHORTLIST',
+        type: 'TOGGLE_TO_SHORTLIST_FAILURE',
         payload: {
           error: error.response?.data?.non_field_errors
             ? error.response.data.non_field_errors[0]
@@ -508,7 +518,7 @@ const JobViewController = () => {
     }
   };
 
-  const ToggleSaveJob = requestData => async dispatch => {
+  const ToggleSaveUser = requestData => async dispatch => {
     dispatch({type: 'LOADING', payload: true});
 
     try {
@@ -517,10 +527,10 @@ const JobViewController = () => {
       const jsonString = JSON.stringify(response.data);
       const data = JSON.parse(jsonString);
 
-      dispatch({type: 'JOB_SAVED_SUCCESSFULLY', payload: requestData.job});
-      console.log('requestData.job', requestData.job);
+      dispatch({type: 'USER_SAVED_SUCCESSFULLY', payload: requestData.user_id});
+      console.log('requestData', requestData.user_id);
 
-      dispatch(GetSavedJobs(requestData.recruiter_id));
+      // dispatch(GetSavedUser(requestData.recruiter_id));
 
       dispatch({type: 'LOADING', payload: false});
     } catch (error) {
@@ -540,7 +550,7 @@ const JobViewController = () => {
         },
       );
       dispatch({
-        type: 'JOB_SAVED_UNSUCCESSFULLY',
+        type: 'USER_SAVED_UNSUCCESSFULLY',
         payload: {
           error: error.response?.data?.non_field_errors
             ? error.response.data.non_field_errors[0]
@@ -550,11 +560,14 @@ const JobViewController = () => {
     }
   };
 
-  const GetSavedJobs = recruiter_id => async dispatch => {
+  const GetSavedUser = (recruiter_id, jobId) => async dispatch => {
     dispatch({type: 'LOADING', payload: true});
+    console.log('-----------------====================7777777', recruiter_id, jobId);
 
     try {
-      const response = await instance.get(`/save-candidate/${recruiter_id}/`);
+      const response = await instance.get(
+        `/save-candidate/${recruiter_id}/?job_id=${jobId}`,
+      );
       // console.log(
       //   '****************************job-saved response***************************',
       // );
@@ -563,7 +576,7 @@ const JobViewController = () => {
       const data = JSON.parse(jsonString);
       // console.log(data);
 
-      dispatch({type: 'JOB_SAVED_SUCCESS', payload: data});
+      dispatch({type: 'GET_USER_SAVED_SUCCESS', payload: data});
       dispatch({type: 'LOADING', payload: false});
     } catch (error) {
       console.log('error', error.response);
@@ -582,7 +595,7 @@ const JobViewController = () => {
         },
       );
       dispatch({
-        type: 'JOB_SAVED_FAILURE',
+        type: 'GET_USER_SAVED_FAILURE',
         payload: {
           error: error.response?.data?.non_field_errors
             ? error.response.data.non_field_errors[0]
@@ -822,8 +835,8 @@ const JobViewController = () => {
     SendInvitation,
     toggleshortlistUser,
     GetUserShortlistedList,
-    ToggleSaveJob,
-    GetSavedJobs,
+    ToggleSaveUser,
+    GetSavedUser,
     GetReviewData,
     AddReview,
     GetFilteredUsers,

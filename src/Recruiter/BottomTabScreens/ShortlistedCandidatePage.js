@@ -12,21 +12,21 @@ import {useIsFocused} from '@react-navigation/native';
 import UserCard from '../../Constant/UserCard';
 import JobViewController from '../RecruiterRedux/Action/JobViewController';
 
-const ShortlistCandidate = () => {
+const ShortlistCandidate = ({route}) => {
   const [id, setId] = useState();
+  const {jobId} = route.params; // Get company data from params
   const dispatch = useDispatch();
-  const {GetUserShortlistedList, toggleshortlistUser} = JobViewController();
+  const {GetUserShortlistedList} = JobViewController();
   const {UserShortlitedList, loading, error} = useSelector(state => state.job);
   const isFocus = useIsFocused();
-
-  // console.log('UserShortlitedList:', UserShortlitedList);
+  console.log('jobId:', jobId);
 
   useEffect(() => {
     const getUserData = async () => {
       try {
-        const id = await AsyncStorage.getItem('user_data');
-        setId(id);
-        dispatch(GetUserShortlistedList(id));
+        const recruiter_id = await AsyncStorage.getItem('user_data');
+        setId(recruiter_id);
+        dispatch(GetUserShortlistedList(jobId, recruiter_id));
       } catch (error) {
         console.error('Error reading value from AsyncStorage', error);
       }
@@ -51,15 +51,17 @@ const ShortlistCandidate = () => {
   return (
     <ScrollView style={{paddingHorizontal: 12, paddingVertical: 18}}>
       <Text>Shortlisted Candidates</Text>
-      {UserShortlitedList?.results &&
-      UserShortlitedList?.results?.length > 0 ? (
-        UserShortlitedList?.results?.map((item, index) => {
-          const user = item.user_id;
+      {UserShortlitedList?.results && UserShortlitedList.results.length > 0 ? (
+        UserShortlitedList.results.map((item, index) => {
+          const user = item.recruiter_id; // Or item.user_id depending on your requirements
+          const job_Id = item.job_id; // Or item.user_id depending on your requirements
+
           return (
             <UserCard
               key={index}
-              item={user}
+              item={item}
               userId={user}
+              jobId={job_Id}
               page_name={'job_invitation'}
             />
           );

@@ -174,7 +174,7 @@ const JobDetailScreen = ({route, navigation}) => {
                   style={[styles.cardButton, {backgroundColor: '#00BCD4'}]} // Unique background color for this button
                   onPress={() => {
                     navigation.navigate('ApplicationPage', { jobId: JobDetails?.id });
-                    console.log(JobDetails?.id );
+                    // console.log(JobDetails?.id );
                     
                   }}>
                   <Text style={styles.cardbuttonInviteText}>
@@ -197,6 +197,7 @@ const JobDetailScreen = ({route, navigation}) => {
                   style={[styles.cardButton, {backgroundColor: '#FFC107'}]}
                   onPress={() => {
                     navigation.navigate('ShortlistUser', { jobId: JobDetails?.id });
+                    
                   }}>
                   <Text style={styles.cardbuttonText}>
                     Shortlisted Candidate

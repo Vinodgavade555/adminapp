@@ -5,14 +5,15 @@ const initialState = {
   JobDetails: [],
   HomeData: [],
   JobApplications: null,
-  JobInvitations: [],
-  shortlistedUsers: [],
+  JobInvitations: null,
+  shortlistUser: null,
   UserShortlitedList: [],
   CandidateReview: null,
   FilteredUsers: [],
   FilteredUsersPagination: {},
   FilterUserMaster: [],
-  SavedJobs: null,
+  SaveUser: [],
+  SavedUsers: [],
   error: null,
   isLoading: false, // Track loading for any API request
 };
@@ -162,19 +163,53 @@ const jobReducer = (state = initialState, action) => {
       };
 
     // Job Shortlist Success
-    case 'ADD_TO_SHORTLIST':
+    case 'TOGGLE_TO_SHORTLIST_SUCCESS': {
       return {
         ...state,
-        shortlistedUsers: [...state.shortlistedUsers, action.payload], // Add the user to shortlist
+        JobApplications: {
+          ...state.JobApplications,
+          matching_applies: state.JobApplications.matching_applies.map(
+            application => {
+              // Match based on job_id and user_id
+              if (
+                application.job === action.payload.job_id &&
+                application.user_id?.id === action.payload.user_id
+              ) {
+                return {
+                  ...application,
+                  user_id: {
+                    ...application.user_id, // Copy the existing user_id object
+                    is_shortlisted: !application.user_id.is_shortlisted, // Toggle the is_shortlisted field
+                  },
+                };
+              }
+              return application; // Leave unchanged if no match
+            },
+          ),
+        },
+
+        JobInvitations: {
+          ...state.JobInvitations,
+          results: state.JobInvitations.results.map(application =>
+            application.id === action.payload.user_id // Assuming user_id has an `id` field to compare
+              ? {
+                  ...application,
+                  // Spread the existing user_id object to preserve other properties
+                  is_shortlisted: !application.is_shortlisted, // Toggle the is_shortlisted value
+                }
+              : application,
+          ),
+        },
+
+        error: null,
       };
+    }
 
     // Job Shortlist Failure
-    case 'REMOVE_FROM_SHORTLIST':
+    case 'TOGGLE_TO_SHORTLIST_FAILURE':
       return {
         ...state,
-        shortlistedUsers: state.shortlistedUsers.filter(
-          user => user.id !== action.payload,
-        ), // Remove user from shortlist
+        error: action.payload.error,
       };
 
     case 'USER_SHORTLIST_LIST_SUCCESS':
@@ -191,14 +226,27 @@ const jobReducer = (state = initialState, action) => {
         loading: false,
       };
 
-    case 'JOB_SAVED_SUCCESS':
+    //Save users
+    case 'USER_SAVED_SUCCESSFULLY':
       return {
         ...state,
-        SavedJobs: action.payload, // Store job details in the state
+        SaveUser: action.payload, // Store job details in the state
         error: null,
       };
+    case 'USER_SAVED_UNSUCCESSFULLY':
+      return {
+        ...state,
+        error: action.payload.error, // Store the error message for job details
+      };
 
-    case 'JOB_SAVED_FAILURE':
+    //get saves users
+    case 'GET_USER_SAVED_SUCCESS':
+      return {
+        ...state,
+        SavedUsers: action.payload, // Store job details in the state
+        error: null,
+      };
+    case 'GET_USER_SAVED_FAILURE':
       return {
         ...state,
         error: action.payload.error, // Store the error message for job details
