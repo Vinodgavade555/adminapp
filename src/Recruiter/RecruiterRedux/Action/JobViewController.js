@@ -484,7 +484,7 @@ console.log("requestData",requestData);
       const data = JSON.parse(jsonString);
 
       dispatch({type: 'TOGGLE_TO_SHORTLIST_SUCCESS', payload: requestData});
-      console.log('requestData.job', requestData);
+      // console.log('requestData.job', requestData);
 
       dispatch(
         GetUserShortlistedList(requestData.job_id, requestData.recruiter_id),
@@ -562,7 +562,7 @@ console.log("requestData",requestData);
 
   const GetSavedUser = (recruiter_id, jobId) => async dispatch => {
     dispatch({type: 'LOADING', payload: true});
-    console.log('-----------------====================7777777', recruiter_id, jobId);
+    console.log('-----------------====================', recruiter_id, jobId);
 
     try {
       const response = await instance.get(

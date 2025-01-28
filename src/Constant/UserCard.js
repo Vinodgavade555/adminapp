@@ -17,15 +17,22 @@ import {useDispatch} from 'react-redux';
 import JobViewController from '../Recruiter/RecruiterRedux/Action/JobViewController';
 const _width = Dimensions.get('window').width;
 
-const UserCard = ({item, jobId, page_name, index, isHorizontal,coverLetter}) => {
+const UserCard = ({
+  item,
+  jobId,
+  page_name,
+  index,
+  isHorizontal,
+  coverLetter,
+}) => {
   const navigation = useNavigation();
   const [id, setId] = useState('');
   const isFocus = useIsFocused();
   useEffect(() => {
-    console.log('Job Applications Updated_____________________', item);
+    // console.log('Job Applications Updated_____________________', item);
   }, [item]);
   const transformJobSeekerProfile = userData => {
-  const {job_seeker_profile, ...rest} = userData;
+    const {job_seeker_profile, ...rest} = userData;
 
     if (!job_seeker_profile) {
       return rest;
@@ -50,7 +57,7 @@ const UserCard = ({item, jobId, page_name, index, isHorizontal,coverLetter}) => 
     item?.job_seeker_profile || item?.user_id?.job_seeker_profile;
   // const userProfile = item?.job_seeker_profile;
 
-  console.log('******', item?.is_shortlisted);
+  console.log('******', item?.user_id?.is_shortlisted);
 
   const [expandedSkills, setExpandedSkills] = useState({});
   const skills = userProfile?.key_skills || [];
@@ -60,8 +67,8 @@ const UserCard = ({item, jobId, page_name, index, isHorizontal,coverLetter}) => 
   const dispatch = useDispatch();
   const {toggleshortlistUser, ToggleSaveUser} = JobViewController();
   const [isSaved, setIsSaved] = useState(false);
-  const [isShortlisted, setIsShortlisted] = useState(item.is_shortlisted);
-  
+  const [isShortlisted, setIsShortlisted] = useState();
+
   useEffect(() => {
     const getUserData = async () => {
       try {
@@ -71,7 +78,7 @@ const UserCard = ({item, jobId, page_name, index, isHorizontal,coverLetter}) => 
         console.error('Error reading value from AsyncStorage', error);
       }
     };
-    setIsShortlisted(item?.is_shortlisted);
+    setIsShortlisted(item?.is_shortlisted || item?.user_id?.is_shortlisted);
 
     getUserData();
   }, [isFocus]);
@@ -79,10 +86,11 @@ const UserCard = ({item, jobId, page_name, index, isHorizontal,coverLetter}) => 
   const ToggleShortlist = item => {
     const shortlistData = {
       job_id: jobId,
-      user_id: item.id,
+      user_id: item.user_id,
       recruiter_id: id,
       is_shortlist_by_recruiter: !isShortlisted,
     };
+    console.log('shortlistData',shortlistData);
 
     dispatch(toggleshortlistUser(shortlistData));
   };
@@ -102,12 +110,12 @@ const UserCard = ({item, jobId, page_name, index, isHorizontal,coverLetter}) => 
   const HandleDeny = item => {
     const shortlistData = {
       job_id: jobId,
-      user_id: item.id,
+      user_id: item.user_id,
       recruiter_id: id,
       is_shortlist_by_recruiter: false,
     };
 
-    dispatch(toggleshortlistUser(shortlistData));
+    // dispatch(toggleshortlistUser(shortlistData));
   };
 
   const handleToggleViewMore = index => {
@@ -135,176 +143,182 @@ const UserCard = ({item, jobId, page_name, index, isHorizontal,coverLetter}) => 
     ? `${currentJob?.job_title} at ${currentJob?.company_name}`
     : null;
   return (
-    <TouchableOpacity
+    <View
       style={[
         styles.applicationItem,
         {
           width: isHorizontal ? _width * 0.85 : _width - 24,
         },
-      ]}
-      onPress={() => {
-        // console.log("Stringified Transformed Data:", JSON.stringify(jobId));
-        navigation.navigate('RecruiterStack', {
-          screen: 'UserDetailScreen',
-          params: {
-            data: {user: transformedData, jobId: jobId, cover_letter: coverLetter},
-            page: page_name,
-          },
-        });
+      ]}>
+      <TouchableOpacity
+        onPress={() => {
+          // console.log("Stringified Transformed Data:", JSON.stringify(jobId));
+          navigation.navigate('RecruiterStack', {
+            screen: 'UserDetailScreen',
+            params: {
+              data: {
+                user: transformedData,
+                jobId: jobId,
+                cover_letter: coverLetter,
+              },
+              page: page_name,
+            },
+          });
 
-        // navigation.navigate('UserDetailScreen', {
-        //   data: {user: transformedData, jobId: jobId},
-        //   page: page_name,
-        // });
-      }}>
-      <View
-        style={{
-          backgroundColor: '#fafafa',
-          padding: 8,
-          borderRadius: 8,
+          // navigation.navigate('UserDetailScreen', {
+          //   data: {user: transformedData, jobId: jobId},
+          //   page: page_name,
+          // });
         }}>
-        <View style={styles.profileContainer}>
-          <View style={styles.textContainer}>
-            <Text style={styles.applicationNameText}>
-              {item?.first_name || item?.user_id?.first_name}{' '}
-              {item?.last_name || item?.user_id?.last_name}
-            </Text>
-
-            {experienceText && (
-              <View style={styles.experienceContainer}>
-                <Text style={styles.applicationExperienceText}>
-                  {experienceText}
-                </Text>
-              </View>
-            )}
-          </View>
-          <View style={styles.imageContainer}>
-            {item?.profile_photo ? (
-              <Image
-                source={{uri: item?.profile_photo}}
-                style={styles.profilePhoto}
-              />
-            ) : (
-              <Image
-                source={require('../Assets/Images/Userimage.png')}
-                style={styles.profilePhoto}
-              />
-            )}
-          </View>
-        </View>
-
-        <View style={styles.salaryAndDateContainer}>
-          {userProfile?.career_preferences?.[0]?.total_exp ? (
-            <View style={styles.totalExp}>
-              <Ionicons name="briefcase" size={14} color="gray" />
-              <Text style={styles.applicationExpText}>
-                {userProfile?.career_preferences?.[0]?.total_exp} years
-              </Text>
-            </View>
-          ) : null}
-
-          {userProfile?.career_preferences?.[0]?.annual_salary?.amount ? (
-            <View style={styles.iconTextSalaryContainer}>
-              <Ionicons name="cash" size={14} color="gray" />
-              <Text style={styles.salaryText}>
-                {userProfile?.career_preferences?.[0]?.annual_salary
-                  ?.currency || ''}{' '}
-                {formatAmount(
-                  userProfile?.career_preferences?.[0]?.annual_salary?.amount,
-                )}
-              </Text>
-            </View>
-          ) : null}
-
-          {userProfile?.career_preferences?.[0]?.notice_period ? (
-            <View style={styles.iconTextContainer}>
-              <Ionicons name="time" size={14} color="gray" />
-              <Text style={styles.applicationNoticeText}>
-                {userProfile?.career_preferences?.[0]?.notice_period}
-              </Text>
-            </View>
-          ) : null}
-        </View>
-
-        <View style={styles.locationContainer}>
-          {userProfile?.career_preferences?.[0]?.city && (
-            <View style={styles.locationItem}>
-              <Ionicons name="location" size={14} color="#004466" />
-              <Text style={styles.applicationLocationText}>
-                {userProfile?.career_preferences?.[0]?.city}
+        <View
+          style={{
+            backgroundColor: '#fafafa',
+            padding: 8,
+            borderRadius: 8,
+          }}>
+          <View style={styles.profileContainer}>
+            <View style={styles.textContainer}>
+              <Text style={styles.applicationNameText}>
+                {item?.first_name || item?.user_id?.first_name}{' '}
+                {item?.last_name || item?.user_id?.last_name}
               </Text>
 
-              {Array.isArray(
-                userProfile?.career_preferences?.[0]?.pref_locations,
-              ) &&
-                userProfile?.career_preferences?.[0]?.pref_locations.length >
-                  0 && (
-                  <Text style={styles.applicationPrefLocationText}>
-                    {' ('}
-                    {page_name === 'home'
-                      ? userProfile?.career_preferences?.[0]?.pref_locations
-                          .slice(0, 2)
-                          .join(', ') +
-                        (userProfile?.career_preferences?.[0]?.pref_locations
-                          .length > 2
-                          ? ' ...'
-                          : '')
-                      : userProfile?.career_preferences?.[0]?.pref_locations.join(
-                          ', ',
-                        )}{' '}
-                    {')'}
+              {experienceText && (
+                <View style={styles.experienceContainer}>
+                  <Text style={styles.applicationExperienceText}>
+                    {experienceText}
                   </Text>
-                )}
+                </View>
+              )}
             </View>
-          )}
-        </View>
-
-        {userProfile?.career_preferences?.[0]?.expected_salary?.amount ? (
-          <View style={styles.iconTextContainer}>
-            <Text style={styles.applicationExpectedText}>
-              Expected Salary :{item?.is_shortlist_by_recruiter}
-            </Text>
-            <Text style={styles.salaryText}>
-              {userProfile?.career_preferences?.[0]?.expected_salary
-                ?.currency === 'INR'
-                ? `₹ ${formatAmount(
-                    userProfile?.career_preferences?.[0]?.expected_salary
-                      ?.amount,
-                  )}`
-                : `${
-                    userProfile?.career_preferences?.[0]?.expected_salary
-                      ?.currency
-                  } ${formatAmount(
-                    userProfile?.career_preferences?.[0]?.expected_salary
-                      ?.amount,
-                  )}`}
-            </Text>
+            <View style={styles.imageContainer}>
+              {item?.profile_photo ? (
+                <Image
+                  source={{uri: item?.profile_photo}}
+                  style={styles.profilePhoto}
+                />
+              ) : (
+                <Image
+                  source={require('../Assets/Images/Userimage.png')}
+                  style={styles.profilePhoto}
+                />
+              )}
+            </View>
           </View>
-        ) : null}
 
-        <ScrollView contentContainerStyle={styles.chipContainer}>
-          {(page_name === 'home'
-            ? allSkills.slice(0, 3)
-            : showAllSkills
-            ? allSkills
-            : initialSkills
-          ).map((skill, skillIndex) => (
-            <View key={skillIndex} style={styles.chip}>
-              <Text style={styles.chipText}>{skill}</Text>
-            </View>
-          ))}
-
-          {page_name != 'home' && userProfile?.key_skills?.length > 3 && (
-            <TouchableOpacity onPress={() => handleToggleViewMore(index)}>
-              <View style={styles.chip}>
-                <Text style={styles.chipViewText}>
-                  {showAllSkills ? 'View Less' : 'View More'}
+          <View style={styles.salaryAndDateContainer}>
+            {userProfile?.career_preferences?.[0]?.total_exp ? (
+              <View style={styles.totalExp}>
+                <Ionicons name="briefcase" size={14} color="gray" />
+                <Text style={styles.applicationExpText}>
+                  {userProfile?.career_preferences?.[0]?.total_exp} years
                 </Text>
               </View>
-            </TouchableOpacity>
-          )}
-        </ScrollView>
-      </View>
+            ) : null}
+
+            {userProfile?.career_preferences?.[0]?.annual_salary?.amount ? (
+              <View style={styles.iconTextSalaryContainer}>
+                <Ionicons name="cash" size={14} color="gray" />
+                <Text style={styles.salaryText}>
+                  {userProfile?.career_preferences?.[0]?.annual_salary
+                    ?.currency || ''}{' '}
+                  {formatAmount(
+                    userProfile?.career_preferences?.[0]?.annual_salary?.amount,
+                  )}
+                </Text>
+              </View>
+            ) : null}
+
+            {userProfile?.career_preferences?.[0]?.notice_period ? (
+              <View style={styles.iconTextContainer}>
+                <Ionicons name="time" size={14} color="gray" />
+                <Text style={styles.applicationNoticeText}>
+                  {userProfile?.career_preferences?.[0]?.notice_period}
+                </Text>
+              </View>
+            ) : null}
+          </View>
+
+          <View style={styles.locationContainer}>
+            {userProfile?.career_preferences?.[0]?.city && (
+              <View style={styles.locationItem}>
+                <Ionicons name="location" size={14} color="#004466" />
+                <Text style={styles.applicationLocationText}>
+                  {userProfile?.career_preferences?.[0]?.city}
+                </Text>
+
+                {Array.isArray(
+                  userProfile?.career_preferences?.[0]?.pref_locations,
+                ) &&
+                  userProfile?.career_preferences?.[0]?.pref_locations.length >
+                    0 && (
+                    <Text style={styles.applicationPrefLocationText}>
+                      {' ('}
+                      {page_name === 'home'
+                        ? userProfile?.career_preferences?.[0]?.pref_locations
+                            .slice(0, 2)
+                            .join(', ') +
+                          (userProfile?.career_preferences?.[0]?.pref_locations
+                            .length > 2
+                            ? ' ...'
+                            : '')
+                        : userProfile?.career_preferences?.[0]?.pref_locations.join(
+                            ', ',
+                          )}{' '}
+                      {')'}
+                    </Text>
+                  )}
+              </View>
+            )}
+          </View>
+
+          {userProfile?.career_preferences?.[0]?.expected_salary?.amount ? (
+            <View style={styles.iconTextContainer}>
+              <Text style={styles.applicationExpectedText}>
+                Expected Salary :{item?.is_shortlist_by_recruiter}
+              </Text>
+              <Text style={styles.salaryText}>
+                {userProfile?.career_preferences?.[0]?.expected_salary
+                  ?.currency === 'INR'
+                  ? `₹ ${formatAmount(
+                      userProfile?.career_preferences?.[0]?.expected_salary
+                        ?.amount,
+                    )}`
+                  : `${
+                      userProfile?.career_preferences?.[0]?.expected_salary
+                        ?.currency
+                    } ${formatAmount(
+                      userProfile?.career_preferences?.[0]?.expected_salary
+                        ?.amount,
+                    )}`}
+              </Text>
+            </View>
+          ) : null}
+
+          <ScrollView contentContainerStyle={styles.chipContainer}>
+            {(page_name === 'home'
+              ? allSkills.slice(0, 3)
+              : showAllSkills
+              ? allSkills
+              : initialSkills
+            ).map((skill, skillIndex) => (
+              <View key={skillIndex} style={styles.chip}>
+                <Text style={styles.chipText}>{skill}</Text>
+              </View>
+            ))}
+
+            {page_name != 'home' && userProfile?.key_skills?.length > 3 && (
+              <TouchableOpacity onPress={() => handleToggleViewMore(index)}>
+                <View style={styles.chip}>
+                  <Text style={styles.chipViewText}>
+                    {showAllSkills ? 'View Less' : 'View More'}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            )}
+          </ScrollView>
+        </View>
+      </TouchableOpacity>
       {/* {console.log('item.isSaved', item?.user_id?.is_saved)} */}
       <View style={styles.buttonContainer}>
         {page_name === 'home' ? (
@@ -355,7 +369,7 @@ const UserCard = ({item, jobId, page_name, index, isHorizontal,coverLetter}) => 
           <Ionicons name="call" size={24} color="#1aa3ff" />
         </TouchableOpacity>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 };
 
