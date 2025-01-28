@@ -54,7 +54,7 @@ const UserCard = ({
     item?.job_seeker_profile || item?.user_id?.job_seeker_profile;
   // const userProfile = item?.job_seeker_profile;
 
-  console.log('******', item?.is_shortlisted);
+  // console.log('******', item?.is_shortlisted);
 
   const [expandedSkills, setExpandedSkills] = useState({});
   const skills = userProfile?.key_skills || [];
@@ -87,7 +87,7 @@ const UserCard = ({
       recruiter_id: id,
       is_shortlist_by_recruiter: !isShortlisted,
     };
-    console.log('shortlistData',shortlistData);
+    // console.log('shortlistData',shortlistData);
 
     dispatch(toggleshortlistUser(shortlistData));
   };

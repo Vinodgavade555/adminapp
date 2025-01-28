@@ -25,20 +25,19 @@ import CustomHeader from '../../Constant/CustomBackIcon';
 
 const UserDetailScreen = ({route, navigation}) => {
   const {data, page} = route.params;
-  const {SendInvitation, ApplicationJobStatus, toggleshortlistUser} =
-    JobViewController();
+  const {SendInvitation, ApplicationJobStatus, toggleshortlistUser} = JobViewController();
   const isFocus = useIsFocused();
   const dispatch = useDispatch();
   const [id, setId] = useState('');
   const [status, setStatus] = useState(data?.status || 'APPLIED');
   const [buttonPressed, setButtonPressed] = useState(false);
   const [activeTab, setActiveTab] = useState('Profile Details');
-
+  const [isInvitationSent, setIsInvitationSent] = useState(false);
   const user = data?.user ? data.user : data.user_id;
   const [isShortlisted, setIsShortlisted] = useState(user.is_shortlisted);
 
   // console.log('.................', JSON.stringify(user, null, 2));
-  console.log('.................', user.is_shortlisted);
+  
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
@@ -138,11 +137,12 @@ const UserDetailScreen = ({route, navigation}) => {
   const handleSendInvitation = () => {
     const invitationData = {
       job: data?.jobId,
-      user_id: data?.user?.id,
+      user_id: data?.user?.user_id,
       created_by: id,
     };
-    // console.log(invitationData);
+    // console.log('**************************',invitationData);
     dispatch(SendInvitation(invitationData));
+    setIsInvitationSent(true);
   };
 
   const handleApplicationStatus = () => {
@@ -188,7 +188,7 @@ const UserDetailScreen = ({route, navigation}) => {
       recruiter_id: id,
       is_shortlist_by_recruiter: !isShortlisted,
     };
-    console.log('^^^^^^^^^^^', shortlistData);
+    // console.log('^^^^^^^^^^^', shortlistData);
 
     dispatch(toggleshortlistUser(shortlistData));
     setIsShortlisted(prevState => !prevState); // Toggling the state
