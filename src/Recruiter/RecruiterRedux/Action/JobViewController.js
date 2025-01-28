@@ -562,7 +562,7 @@ const JobViewController = () => {
 
   const GetSavedUser = (recruiter_id, jobId) => async dispatch => {
     dispatch({type: 'LOADING', payload: true});
-    console.log('-----------------====================7777777', recruiter_id, jobId);
+    console.log('-----------------====================', recruiter_id, jobId);
 
     try {
       const response = await instance.get(
