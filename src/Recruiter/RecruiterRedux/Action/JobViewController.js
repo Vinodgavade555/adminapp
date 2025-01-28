@@ -517,7 +517,6 @@ const JobViewController = () => {
 
   const ToggleSaveUser = requestData => async dispatch => {
     dispatch({type: 'LOADING', payload: true});
-    console.log('requestData', requestData);
 
     try {
       const response = await instance.post(`/save-candidate/`, requestData);
