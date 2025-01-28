@@ -86,7 +86,7 @@ const UserCard = ({
       recruiter_id: id,
       is_shortlist_by_recruiter: !isShortlisted,
     };
-    // console.log('shortlistData', shortlistData);
+    console.log('shortlistData', shortlistData);
 
     dispatch(toggleshortlistUser(shortlistData));
   };
