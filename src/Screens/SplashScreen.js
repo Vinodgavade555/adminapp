@@ -17,7 +17,6 @@ const SplashScreen = () => {
     const initializeApp = async () => {
       try {
         const token = await AsyncStorage.getItem('token'); // Get token from AsyncStorage
-        // console.log('token: ', token);
 
         if (token) {
           // Validate the token or proceed to the main screen

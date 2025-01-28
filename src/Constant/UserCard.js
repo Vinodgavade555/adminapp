@@ -21,6 +21,9 @@ const UserCard = ({item, jobId, page_name, index, isHorizontal,coverLetter}) => 
   const navigation = useNavigation();
   const [id, setId] = useState('');
   const isFocus = useIsFocused();
+  useEffect(() => {
+    console.log('Job Applications Updated_____________________', item);
+  }, [item]);
   const transformJobSeekerProfile = userData => {
   const {job_seeker_profile, ...rest} = userData;
 
@@ -33,19 +36,21 @@ const UserCard = ({item, jobId, page_name, index, isHorizontal,coverLetter}) => 
       ...job_seeker_profile,
     };
   };
-  const transformedData = transformJobSeekerProfile(item);
-
-  // console.log('.....................',JSON.stringify(coverLetter,null,2));
-
+  // const transformedData = transformJobSeekerProfile(item?.user_id || item);
+  const transformedData =
+    item && item.user_id
+      ? transformJobSeekerProfile(item.user_id)
+      : transformJobSeekerProfile(item);
   // const userProfile =
   //   page_name === 'job_invitation' || page_name === 'home'
   //     ? item?.job_seeker_profile
   //     : item?.user;
 
-  const userProfile = item?.job_seeker_profile;
+  const userProfile =
+    item?.job_seeker_profile || item?.user_id?.job_seeker_profile;
   // const userProfile = item?.job_seeker_profile;
 
-  // console.log('******',userProfile);
+  console.log('******', item?.is_shortlisted);
 
   const [expandedSkills, setExpandedSkills] = useState({});
   const skills = userProfile?.key_skills || [];
@@ -53,9 +58,10 @@ const UserCard = ({item, jobId, page_name, index, isHorizontal,coverLetter}) => 
   const allSkills = skills;
   const showAllSkills = expandedSkills[index];
   const dispatch = useDispatch();
-  const {toggleshortlistUser} = JobViewController();
+  const {toggleshortlistUser, ToggleSaveUser} = JobViewController();
   const [isSaved, setIsSaved] = useState(false);
-
+  const [isShortlisted, setIsShortlisted] = useState(item.is_shortlisted);
+  
   useEffect(() => {
     const getUserData = async () => {
       try {
@@ -65,16 +71,17 @@ const UserCard = ({item, jobId, page_name, index, isHorizontal,coverLetter}) => 
         console.error('Error reading value from AsyncStorage', error);
       }
     };
+    setIsShortlisted(item?.is_shortlisted);
 
     getUserData();
   }, [isFocus]);
 
-  const HandleShortlist = item => {
+  const ToggleShortlist = item => {
     const shortlistData = {
       job_id: jobId,
       user_id: item.id,
       recruiter_id: id,
-      is_shortlist_by_recruiter: true,
+      is_shortlist_by_recruiter: !isShortlisted,
     };
 
     dispatch(toggleshortlistUser(shortlistData));
@@ -86,10 +93,10 @@ const UserCard = ({item, jobId, page_name, index, isHorizontal,coverLetter}) => 
     const saveData = {
       user_id: item.id,
       recruiter_id: id,
-      is_saved: !isSaved,
+      // is_saved: !isSaved,
     };
     console.log('Toggling save action:', saveData);
-    dispatch(ToggleSaveJob(saveData));
+    dispatch(ToggleSaveUser(saveData));
   };
 
   const HandleDeny = item => {
@@ -159,7 +166,8 @@ const UserCard = ({item, jobId, page_name, index, isHorizontal,coverLetter}) => 
         <View style={styles.profileContainer}>
           <View style={styles.textContainer}>
             <Text style={styles.applicationNameText}>
-              {item?.first_name} {item?.last_name}
+              {item?.first_name || item?.user_id?.first_name}{' '}
+              {item?.last_name || item?.user_id?.last_name}
             </Text>
 
             {experienceText && (
@@ -254,7 +262,7 @@ const UserCard = ({item, jobId, page_name, index, isHorizontal,coverLetter}) => 
         {userProfile?.career_preferences?.[0]?.expected_salary?.amount ? (
           <View style={styles.iconTextContainer}>
             <Text style={styles.applicationExpectedText}>
-              Expected Salary :
+              Expected Salary :{item?.is_shortlist_by_recruiter}
             </Text>
             <Text style={styles.salaryText}>
               {userProfile?.career_preferences?.[0]?.expected_salary
@@ -297,26 +305,40 @@ const UserCard = ({item, jobId, page_name, index, isHorizontal,coverLetter}) => 
           )}
         </ScrollView>
       </View>
-
+      {/* {console.log('item.isSaved', item?.user_id?.is_saved)} */}
       <View style={styles.buttonContainer}>
         {page_name === 'home' ? (
           <TouchableOpacity
             style={[styles.saveButton]}
             onPress={handleSaveToggle}>
             <Ionicons
-              name={isSaved ? 'bookmark' : 'bookmark-outline'}
+              name={
+                item.isSaved || item?.user_id?.is_saved
+                  ? 'bookmark'
+                  : 'bookmark-outline'
+              }
               size={24}
-              color={isSaved ? '#1aa3ff' : '#808080'}
+              color={
+                item.isSaved || item?.user_id?.is_saved ? '#1aa3ff' : '#808080'
+              }
             />
           </TouchableOpacity>
         ) : (
           <View style={styles.leftButtons}>
             <TouchableOpacity
-              style={[styles.shortlistButton]}
+              // style={[styles.shortlistButton]}
               onPress={() => {
-                HandleShortlist(userProfile);
+                ToggleShortlist(userProfile);
               }}>
-              <Text style={styles.circleButtonText}>Shortlist</Text>
+              <Ionicons
+                name={
+                  item?.user_id?.is_shortlisted || item?.is_shortlisted
+                    ? 'heart'
+                    : 'heart-outline'
+                }
+                size={24}
+                color="red"
+              />
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -499,7 +521,7 @@ const styles = StyleSheet.create({
   leftButtons: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8, // Space between "Shortlist" and "Denied" buttons
+    gap: 12, // Space between "Shortlist" and "Denied" buttons
   },
 
   shortlistButton: {

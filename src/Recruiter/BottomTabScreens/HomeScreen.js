@@ -32,10 +32,10 @@ const HomeScreen = () => {
   useEffect(() => {
     const getUserData = async () => {
       try {
-        const userId = await AsyncStorage.getItem('user_data');
-        setId(userId);
-        if (userId) {
-          dispatch(GetHomePageData(userId));
+        const recruiter_id = await AsyncStorage.getItem('user_data');
+        setId(recruiter_id);
+        if (recruiter_id) {
+          dispatch(GetHomePageData(recruiter_id));
         }
       } catch (error) {
         console.error('Error reading value from AsyncStorage', error);

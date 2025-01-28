@@ -588,17 +588,13 @@ const UsersList = () => {
           <Ionicons name="filter-outline" size={32} color={colors.primary} />
         </TouchableOpacity>
       </View>
+
       <FlatList
         contentContainerStyle={styles.scrollContainer}
         data={FilteredUsers}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({item, index}) => (
-          <UserCard
-            item={item}
-            jobId={''}
-            page_name={'job_invitation'}
-            index={index}
-          />
+          <UserCard item={item} jobId={''} page_name={'home'} index={index} />
         )}
         onEndReached={loadMoreJobs} // Trigger loading more jobs
         onEndReachedThreshold={0.5} // Trigger when half of the list is visible

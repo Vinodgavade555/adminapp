@@ -1,5 +1,3 @@
-
-
 import React, {useState, useEffect} from 'react';
 import {
   View,
@@ -15,28 +13,29 @@ import moment from 'moment';
 import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {useDispatch, useSelector} from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { colors } from '../../Global_CSS/TheamColors';
-import { BASE_URL } from '../../Services/baseAPI';
+import {colors} from '../../Global_CSS/TheamColors';
+import {BASE_URL} from '../../Services/baseAPI';
 import JobViewController from '../RecruiterRedux/Action/JobViewController';
+import UserCard from '../../Constant/UserCard';
 const {width} = Dimensions.get('window'); // Get the screen width
 
-const SavedJobScreen = () => {
+const SavedJobScreen = ({route}) => {
+  const {jobId} = route.params;
   const [id, setId] = useState();
   const dispatch = useDispatch();
-  const {GetSavedJobs, ToggleSaveJob} = JobViewController();
-  const {SavedJobs} = useSelector(state => state.job);
+  const {GetSavedUser, ToggleSaveUser} = JobViewController();
+  const {SavedUsers} = useSelector(state => state.job);
   const isFocus = useIsFocused();
   const navigation = useNavigation();
 
-  console.log('********************',GetSavedJobs);
-  
+  console.log('********************', GetSavedUser);
 
   useEffect(() => {
     const getUserData = async () => {
       try {
-        const id = await AsyncStorage.getItem('user_data'); // Wait for the value to be retrieved
-        setId(id);
-        dispatch(GetSavedJobs(id));
+        const recruiter_id = await AsyncStorage.getItem('user_data'); // Wait for the value to be retrieved
+        setId(recruiter_id);
+        dispatch(GetSavedUser(recruiter_id, jobId));
       } catch (error) {
         console.error('Error reading value from AsyncStorage', error);
       }
@@ -44,164 +43,20 @@ const SavedJobScreen = () => {
 
     getUserData();
   }, [isFocus]);
+  console.log('SavedUsers', SavedUsers);
 
- 
   return (
     <View style={styles.container}>
-      {/* <ScrollView style={styles.cardContainer}>
-        {Array.isArray(SavedJobs?.saved_jobs) &&
-        SavedJobs.saved_jobs.length > 0 ? (
-          SavedJobs.saved_jobs.map(savedJob => (
-            <TouchableOpacity key={savedJob.job.id} style={styles.card}>
-              <View style={styles.cardContent}>
-                <View style={styles.innerContainer}>
-                  <TouchableOpacity
-                    onPress={() =>
-                      navigation.navigate('JobDetailScreen', {
-                        job_id: savedJob.job.id,
-                      })
-                    }>
-                    <View style={styles.jobTitleContainer}>
-                      {savedJob?.job?.job_title?.title && (
-                        <Text style={styles.cardTitle}>
-                          {savedJob.job.job_title.title}
-                        </Text>
-                      )}
-                      <View style={styles.detailsRow}>
-                        <Ionicons
-                          name="location"
-                          size={14}
-                          color={colors.primary}
-                        />
-                        {savedJob?.job?.job_location &&
-                          savedJob.job.job_location.length > 0 && (
-                            <Text style={styles.detailsText}>
-                              {savedJob.job.job_location.join(', ')}
-                            </Text>
-                          )}
-                      </View>
-                      <View style={styles.containerData}>
-                        <View style={styles.detailsRow}>
-                          <Ionicons
-                            name="briefcase"
-                            size={14}
-                            color={colors.primary}
-                          />
-                          {savedJob?.job?.experience_level && (
-                            <Text style={styles.detailsText}>
-                              {`${
-                                savedJob.job.experience_level.minYear || 0
-                              } - ${
-                                savedJob.job.experience_level.maxYear || 0
-                              } years`}
-                            </Text>
-                          )}
-                        </View>
-                        <View style={styles.detailsalary}>
-                          <Ionicons
-                            name="cash"
-                            size={14}
-                            color={colors.primary}
-                          />
-                          <View
-                            style={{
-                              flexDirection: 'row',
-                              alignItems: 'center',
-                            }}>
-                            <CustomFormatAmount
-                              amount={savedJob?.job?.salary?.yearly?.min || 0}
-                            />
-                            <Text style={{color: colors.primary}}> - </Text>
-                            <CustomFormatAmount
-                              amount={savedJob?.job?.salary?.yearly?.max || 0}
-                            />
-                            <Text
-                              style={{
-                                fontSize: 10,
-                                fontWeight: 'bold',
-                                color: 'gray',
-                              }}>
-                              {savedJob?.job?.salary?.yearly?.currency || 'N/A'}
-                            </Text>
-                          </View>
-                        </View>
-                      </View>
-                    </View>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => toggleBookmark(savedJob.job.id)}
-                    style={styles.bookmarkIconContainer}>
-                    <Ionicons
-                      name={
-                        isBookmarked(savedJob?.job?.id)
-                          ? 'bookmark'
-                          : 'bookmark-outline'
-                      }
-                      size={22}
-                      color={colors.primary}
-                    />
-                  </TouchableOpacity>
-                </View>
-
-                <View style={styles.innerCard}>
-                  <View style={styles.iconMain}>
-                    {savedJob?.job?.company.logo ? (
-                      <Image
-                        source={{uri: BASE_URL + savedJob?.job?.company.logo}}
-                        style={styles.logo}
-                      />
-                    ) : (
-                      <Ionicons
-                        name="business"
-                        size={36}
-                        color="gray"
-                        style={styles.logo}
-                      />
-                    )}
-                    <View style={styles.companyMaincontainer}>
-                      <View style={styles.companyDetail}>
-                        {savedJob?.job?.company?.company_name && (
-                          <Text style={styles.companyText}>
-                            {savedJob?.job?.company?.company_name}
-                          </Text>
-                        )}
-                        {savedJob?.rating && (
-                          <View style={styles.icon}>
-                            <Ionicons
-                              name="star"
-                              size={14}
-                              color="#ffd700"
-                              style={styles.ratingIcon}
-                            />
-                            <Text style={styles.companyReview}>
-                              {savedJob?.rating}
-                            </Text>
-                          </View>
-                        )}
-                      </View>
-                    </View>
-                  </View>
-                  {savedJob?.job?.created_at && (
-                    <Text style={styles.companyDate}>
-                      {moment(savedJob?.job?.created_at).format('MMM D')}
-                    </Text>
-                  )}
-                </View>
-              </View>
-            </TouchableOpacity>
-          ))
-        ) : (
-          <View>
-            <Image
-            //   style={JobCardStyle.jobimage}
-            //   source={require('../../Assets/invitesImages/Jobsearch.png')}
-            />
-            <Text>No Saved jobs.....</Text>
-          </View>
-        )}
-      </ScrollView> */}
-
-      
+      <ScrollView>
+        {SavedUsers?.results?.map((item, index) => (
+          <UserCard
+            key={item.id || index} // Use unique `id` if available
+            item={item}
+            jobId={jobId}
+            page_name={'home'}
+          />
+        ))}
+      </ScrollView>
     </View>
   );
 };

@@ -171,10 +171,9 @@ const JobDetailScreen = ({route, navigation}) => {
                 <TouchableOpacity
                   style={[styles.cardButton, {backgroundColor: '#00BCD4'}]} // Unique background color for this button
                   onPress={() => {
-                    navigation.navigate('ApplicationPage', {
-                      jobId: JobDetails?.id,
-                    });
-                    console.log(JobDetails?.id);
+                    navigation.navigate('ApplicationPage', { jobId: JobDetails?.id });
+                    console.log(JobDetails?.id );
+                    
                   }}>
                   <Text style={styles.cardbuttonInviteText}>
                     View Applications ({JobDetails?.applicant_count || 0})
@@ -197,9 +196,7 @@ const JobDetailScreen = ({route, navigation}) => {
                 <TouchableOpacity
                   style={[styles.cardButton, {backgroundColor: '#FFC107'}]}
                   onPress={() => {
-                    navigation.navigate('ShortlistUser', {
-                      jobId: JobDetails?.id,
-                    });
+                    navigation.navigate('ShortlistUser', { jobId: JobDetails?.id });
                   }}>
                   <Text style={styles.cardbuttonText}>
                     Shortlisted Candidate

@@ -31,21 +31,19 @@ const InvitationList = ({route}) => {
       [index]: !prevState[index],
     }));
   };
-  // console.log(GetJobInvitation);
-  
+  console.log(JobInvitations?.results);
 
   useEffect(() => {
     const getUserData = async () => {
       try {
-        const id = await AsyncStorage.getItem('user_data');
-        dispatch(GetJobInvitation(jobId, id));
+        const recruiter_id = await AsyncStorage.getItem('user_data');
+        dispatch(GetJobInvitation(jobId, recruiter_id));
       } catch (error) {
         console.error('Error reading value from AsyncStorage', error);
       }
     };
     getUserData();
   }, [isFocus]);
-
   function formatAmount(value) {
     if (value >= 10000000) {
       return (value / 10000000).toFixed(1) + ' Cr';
@@ -57,7 +55,6 @@ const InvitationList = ({route}) => {
       return value?.toString() || 'N/A';
     }
   }
-
   if (!JobInvitations?.results?.length) {
     return (
       <View style={styles.container}>
@@ -77,8 +74,20 @@ const InvitationList = ({route}) => {
         const showAllSkills = expandedSkills[index]; // Check if the skills are expanded
 
         return (
-          <UserCard key={index} item={jobInvitation} jobId={jobId} page_name={'job_invitation'} index={index}/>
-          
+          // <UserCard
+          //   key={index}
+          //   item={jobInvitation}
+          //   jobId={jobId}
+          //   page_name={'job_invitation'}
+          //   index={index}
+          // />
+          <UserCard
+          key={jobInvitation?.id}  // Use a unique identifier for the key
+          item={jobInvitation}
+          jobId={jobId}
+          page_name={'job_invitation'}
+          index={index}  // or user?.id if it’s more appropriate
+        />
         );
       })}
     </ScrollView>
