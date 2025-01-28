@@ -19,7 +19,6 @@ const ShortlistCandidate = ({route}) => {
   const {GetUserShortlistedList} = JobViewController();
   const {UserShortlitedList, loading, error} = useSelector(state => state.job);
   const isFocus = useIsFocused();
-  console.log('UserShortlitedList:', UserShortlitedList);
 
   useEffect(() => {
     const getUserData = async () => {
