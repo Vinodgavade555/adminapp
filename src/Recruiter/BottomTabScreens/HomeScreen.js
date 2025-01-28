@@ -104,6 +104,65 @@ const HomeScreen = () => {
           ))}
         </ScrollView>
 
+        {HomeData.top_20_related_to_recent_jobs && (
+          <View>
+            <Text style={styles.Containertitle}>
+              Top20 Users related to recent jobs
+            </Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.scrollContainer}
+              style={{paddingVertical: 12}}>
+              {HomeData.top_20_related_to_recent_jobs &&
+              HomeData.top_20_related_to_recent_jobs.length > 0 ? (
+                HomeData.top_20_related_to_recent_jobs.map((item, index) => (
+                  <UserCard
+                    key={index}
+                    item={item}
+                    jobId={''}
+                    page_name={'home'}
+                    index={index}
+                    isHorizontal={true}
+                  />
+                ))
+              ) : (
+                <Text>No recent jobs available</Text>
+              )}
+            </ScrollView>
+          </View>
+        )}
+
+        {HomeData.recent_job_applications && (
+          <View>
+            <Text style={styles.Containertitle}>
+              Recent User job applications
+            </Text>
+
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.scrollContainer}
+              style={{paddingVertical: 8}}>
+              {HomeData.recent_job_applications &&
+              HomeData.recent_job_applications.length > 0 ? (
+                HomeData.recent_job_applications.map((item, index) => (
+                  <UserCard
+                    key={index}
+                    item={item.user_id}
+                    jobId={''}
+                    page_name={'home'}
+                    index={index}
+                    isHorizontal={true}
+                  />
+                ))
+              ) : (
+                <Text>No recent jobs available</Text>
+              )}
+            </ScrollView>
+          </View>
+        )}
+
         {HomeData.recent_jobs && HomeData.recent_jobs.length > 0 && (
           <View style={styles.TableHeadingContainer}>
             <Text style={styles.tableheading}>Recent Jobs</Text>
@@ -123,22 +182,26 @@ const HomeScreen = () => {
                         params: {jobId: job.id},
                       })
                     }>
-                    {/* {console.log('Job ID:', job.id)} */}
                     <View style={styles.jobCardContent}>
-                      <View style={styles.titleContainer}>
-                        <Text style={styles.jobTitle}>
-                          {job.job_title?.title || 'No Title'}
+                      {job?.job_title?.title || job?.created_at ? (
+                        <View style={styles.titleContainer}>
+                          {job?.job_title?.title && (
+                            <Text style={styles.jobTitle}>
+                              {job.job_title.title}
+                            </Text>
+                          )}
+                          {job?.created_at && (
+                            <Text style={styles.jobDate}>
+                              {moment(job.created_at).format('DD MMM')}
+                            </Text>
+                          )}
+                        </View>
+                      ) : null}
+                      {job?.company?.company_name ? (
+                        <Text style={styles.companyName}>
+                          {job.company.company_name}
                         </Text>
-                        <Text style={styles.jobDate}>
-                          {job.created_at
-                            ? moment(job.created_at).format('DD MMM')
-                            : 'No Date'}
-                        </Text>
-                      </View>
-                      <Text style={styles.companyName}>
-                        {' '}
-                        {job.company?.company_name || 'No Title'}
-                      </Text>
+                      ) : null}
                       {job.job_location && job.job_location.length > 0 ? (
                         <View style={styles.locationContainer}>
                           <Icon
@@ -153,20 +216,20 @@ const HomeScreen = () => {
                         </View>
                       ) : null}
 
-                      <View
-                        style={{flexDirection: 'row', alignItems: 'center'}}>
-                        <Icon
-                          name="briefcase"
-                          size={14}
-                          color={colors.primary}
-                          style={styles.icon}
-                        />
-                        <Text style={styles.experienceLevel}>
-                          {job.experience_level
-                            ? `${job.experience_level.minYear} - ${job.experience_level.maxYear} years`
-                            : 'Experience Level not specified'}
-                        </Text>
-                      </View>
+                      {job?.experience_level ? (
+                        <View
+                          style={{flexDirection: 'row', alignItems: 'center',marginTop:4}}>
+                          <Icon
+                            name="briefcase"
+                            size={14}
+                            color={colors.primary}
+                            style={styles.icon}
+                          />
+                          <Text style={styles.experienceLevel}>
+                            {`${job.experience_level.minYear} - ${job.experience_level.maxYear} years`}
+                          </Text>
+                        </View>
+                      ) : null}
 
                       <View style={styles.horizontalLine} />
 
@@ -188,63 +251,6 @@ const HomeScreen = () => {
             </ScrollView>
           </View>
         )}
-
-        {HomeData.top_20_related_to_recent_jobs && (
-          <View>
-            <Text style={styles.Containertitle}>
-              Top20 related to recent jobs
-            </Text>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.scrollContainer}
-              style={{paddingVertical: 8}}>
-              {HomeData.top_20_related_to_recent_jobs &&
-              HomeData.top_20_related_to_recent_jobs.length > 0 ? (
-                HomeData.top_20_related_to_recent_jobs.map((item, index) => (
-                  <UserCard
-                    key={index}
-                    item={item}
-                    jobId={''}
-                    page_name={'home'}
-                    index={index}
-                    isHorizontal={true}
-                  />
-                ))
-              ) : (
-                <Text>No recent jobs available</Text>
-              )}
-            </ScrollView>
-          </View>
-        )}
-
-        {HomeData.top_20_related_to_recent_jobs && (
-          <View>
-            <Text style={styles.Containertitle}>Recent job applications</Text>
-
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.scrollContainer}
-              style={{paddingVertical: 8}}>
-              {HomeData.recent_job_applications &&
-              HomeData.recent_job_applications.length > 0 ? (
-                HomeData.recent_job_applications.map((item, index) => (
-                  <UserCard
-                    key={index}
-                    item={item}
-                    jobId={''}
-                    page_name={'home'}
-                    index={index}
-                    isHorizontal={true}
-                  />
-                ))
-              ) : (
-                <Text>No recent jobs available</Text>
-              )}
-            </ScrollView>
-          </View>
-        )}
       </ScrollView>
     </View>
   );
@@ -253,7 +259,6 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   Maincontainer: {
     flex: 1,
-    // padding: 12,
     marginHorizontal: 12,
     width: '100%',
   },
@@ -287,6 +292,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
     borderRadius: 8,
     overflow: 'hidden',
+    marginBottom: 18,
   },
   linearGradient: {
     padding: 20,
@@ -312,7 +318,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   welcomeBanner: {
-    // width: '100%',
     marginBottom: 12,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -340,9 +345,7 @@ const styles = StyleSheet.create({
   TableHeadingContainer: {
     flexDirection: 'column',
     justifyContent: 'space-between',
-    marginTop: 8,
     marginBottom: 8,
-    // marginHorizontal: 12,
   },
   tableheading: {
     fontSize: 18,
@@ -395,6 +398,7 @@ const styles = StyleSheet.create({
   locationContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop:4
   },
   locationIcon: {
     marginRight: 4, // Space between the icon and text

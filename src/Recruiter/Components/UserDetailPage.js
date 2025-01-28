@@ -21,8 +21,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import ReviewPage from '../../Constant/CustomReviewPage';
 import JobViewController from '../RecruiterRedux/Action/JobViewController';
 import WebView from 'react-native-webview';
+import CustomHeader from '../../Constant/CustomBackIcon';
 
-const UserDetailScreen = ({route, onShortlist}) => {
+const UserDetailScreen = ({route, navigation}) => {
   const {data, page} = route.params;
   const {SendInvitation, ApplicationJobStatus} = JobViewController();
   const isFocus = useIsFocused();
@@ -36,7 +37,9 @@ const UserDetailScreen = ({route, onShortlist}) => {
     data?.is_shortlisted || false,
   );
   const user = data?.user ? data.user : data.user_id;
-  // console.log(data);
+
+  console.log('.................', JSON.stringify(data, null, 2));
+
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [isEmploymentModalVisible, setEmploymentModalVisible] = useState(false);
@@ -47,7 +50,7 @@ const UserDetailScreen = ({route, onShortlist}) => {
   const [isWebViewVisible, setWebViewVisible] = useState(false);
   const [selectedMode, setSelectedMode] = useState(null);
 
-  const webViewRef = useRef(null); // WebView reference// Handle back button press
+  const webViewRef = useRef(null);
   const handleBackPress = () => {
     if (webViewRef.current && webViewRef.current.canGoBack()) {
       webViewRef.current.goBack();
@@ -65,33 +68,33 @@ const UserDetailScreen = ({route, onShortlist}) => {
     setIsModalVisible(!isModalVisible);
   };
 
-  const handleLinkPress = url => {
-    setUrl(url);
-    setWebViewVisible(true); // Show WebView modal when link is clicked
-  };
-  // Function to close WebView modal
-  const closeWebView = () => {
-    setWebViewVisible(false); // Close the WebView
-  };
+  // const handleLinkPress = url => {
+  //   setUrl(url);
+  //   setWebViewVisible(true); // Show WebView modal when link is clicked
+  // };
+  // // Function to close WebView modal
+  // const closeWebView = () => {
+  //   setWebViewVisible(false); // Close the WebView
+  // };
 
-  // Handle the hardware back button on Android to close the WebView
-  useEffect(() => {
-    const backAction = () => {
-      if (isWebViewVisible) {
-        closeWebView(); // Close WebView on back button press
-        return true; // Prevent default back behavior (navigation)
-      }
-      return false; // Allow default back action if WebView is not visible
-    };
+  // // Handle the hardware back button on Android to close the WebView
+  // useEffect(() => {
+  //   const backAction = () => {
+  //     if (isWebViewVisible) {
+  //       closeWebView(); // Close WebView on back button press
+  //       return true; // Prevent default back behavior (navigation)
+  //     }
+  //     return false; // Allow default back action if WebView is not visible
+  //   };
 
-    // Add event listener for the hardware back button
-    BackHandler.addEventListener('hardwareBackPress', backAction);
+  //   // Add event listener for the hardware back button
+  //   BackHandler.addEventListener('hardwareBackPress', backAction);
 
-    // Cleanup the event listener on component unmount
-    return () => {
-      BackHandler.removeEventListener('hardwareBackPress', backAction);
-    };
-  }, [isWebViewVisible]);
+  //   // Cleanup the event listener on component unmount
+  //   return () => {
+  //     BackHandler.removeEventListener('hardwareBackPress', backAction);
+  //   };
+  // }, [isWebViewVisible]);
   // Open modal with the selected project details
   const openModal = project => {
     setSelectedProject(project);
@@ -108,9 +111,17 @@ const UserDetailScreen = ({route, onShortlist}) => {
     setSelectedAccomplishment(null);
   };
 
+  const handleCoverLetterClick = () => {
+    setIsModalVisible(true); // Show the modal
+  };
+
+  const handleCloseModal = () => {
+    setIsModalVisible(false); // Close the modal
+  };
+
   const groupAccomplishmentsByName = accomplishments => {
     return accomplishments.reduce((groups, accomplishment) => {
-      const name = accomplishment.name || 'Unnamed';
+      const name = accomplishment.name || null; // If name is not available, set it to null
       if (!groups[name]) {
         groups[name] = [];
       }
@@ -130,7 +141,7 @@ const UserDetailScreen = ({route, onShortlist}) => {
       user_id: data?.user?.id,
       created_by: id,
     };
-
+    // console.log(invitationData);
     dispatch(SendInvitation(invitationData));
   };
 
@@ -273,21 +284,6 @@ const UserDetailScreen = ({route, onShortlist}) => {
     return selected ? selected.slots : [];
   };
 
-  const calculateExperience = (joiningDate, leavingDate) => {
-    const joinDate = new Date(joiningDate);
-    const leaveDate = new Date(leavingDate || new Date());
-
-    let years = leaveDate.getFullYear() - joinDate.getFullYear();
-    let months = leaveDate.getMonth() - joinDate.getMonth();
-
-    if (months < 0) {
-      years--;
-      months += 12;
-    }
-
-    return {years, months};
-  };
-
   const currentJob = data?.user?.employment_details?.find?.(
     job => job.is_current_company === 'true',
   );
@@ -295,6 +291,13 @@ const UserDetailScreen = ({route, onShortlist}) => {
   const experienceText = currentJob
     ? `${currentJob?.job_title} at ${currentJob?.company_name}`
     : null;
+
+  const formatDate = date => {
+    if (date) {
+      return moment(date).isValid() ? moment(date).format('D MMM YY') : '';
+    }
+    return '';
+  };
 
   const renderTabs = () => {
     switch (activeTab) {
@@ -475,119 +478,118 @@ const UserDetailScreen = ({route, onShortlist}) => {
 
             {/* accomplishments */}
             <View>
-              <Text style={styles.boldTextAccomplishment}>
-                Accomplishments:
-              </Text>
+              {user?.accomplishments && user?.accomplishments.length > 0 ? (
+                <>
+                  <Text style={styles.boldTextAccomplishment}>
+                    Accomplishments:
+                  </Text>
+                  <ScrollView
+                    contentContainerStyle={{flexDirection: 'column', gap: 2}}
+                    showsVerticalScrollIndicator={false}>
+                    {Object.keys(groupedAccomplishments).map((name, index) => (
+                      <View
+                        key={`accomplishment_group_${index}`}
+                        style={{marginBottom: 8}}>
+                        {name && <Text style={styles.boldText}>{name}</Text>}
 
-              {user?.accomplishments?.length > 0 ? (
-                <ScrollView
-                  contentContainerStyle={{flexDirection: 'column', gap: 2}}
-                  showsVerticalScrollIndicator={false}>
-                  {Object.keys(groupedAccomplishments).map((name, index) => (
-                    <View
-                      key={`accomplishment_group_${index}`}
-                      style={{marginBottom: 8}}>
-                      <Text style={styles.boldText}>{name}</Text>
-
-                      {/* ScrollView for Horizontal Scrolling */}
-                      <ScrollView
-                        horizontal={true}
-                        showsHorizontalScrollIndicator={false}>
-                        <View
-                          style={{flexDirection: 'row', flexWrap: 'nowrap'}}>
-                          {groupedAccomplishments[name].map(
-                            (accomplishment, idx) => (
-                              <View
-                                key={`accomplishment_${idx}`}
-                                style={[
-                                  styles.section,
-                                  {
-                                    paddingHorizontal: 8,
-                                    paddingVertical: 12,
-                                    backgroundColor: '#fafafa',
-                                    borderRadius: 8,
-                                    width: width * 0.7,
-                                    marginRight: 8, // Space between items
-                                  },
-                                ]}>
-                                {/* Show Name First */}
-                                {accomplishment.name ? (
-                                  <Text
-                                    style={{
-                                      color: colors.primary,
-                                      fontWeight: 'bold',
-                                      marginBottom: 4,
-                                    }}>
-                                    {accomplishment.name}
-                                  </Text>
-                                ) : null}
-
-                                {/* Show Title After Name */}
-                                {accomplishment.title ? (
-                                  <Text
-                                    style={{
-                                      color: 'gray',
-                                      fontWeight: 'bold',
-                                      marginBottom: 4,
-                                    }}>
+                        <ScrollView
+                          horizontal={true}
+                          showsHorizontalScrollIndicator={false}>
+                          <View
+                            style={{flexDirection: 'row', flexWrap: 'nowrap'}}>
+                            {groupedAccomplishments[name].map(
+                              (accomplishment, idx) => (
+                                <View
+                                  key={`accomplishment_${idx}`}
+                                  style={[
+                                    styles.section,
+                                    {
+                                      paddingHorizontal: 8,
+                                      paddingVertical: 12,
+                                      backgroundColor: '#fafafa',
+                                      borderRadius: 8,
+                                      width: width * 0.7,
+                                      marginRight: 8, // Space between items
+                                    },
+                                  ]}>
+                                  {/* Show Name First */}
+                                  {accomplishment.name && (
                                     <Text
                                       style={{
+                                        color: colors.primary,
                                         fontWeight: 'bold',
-                                        color: 'black',
+                                        marginBottom: 4,
                                       }}>
-                                      Title:{' '}
+                                      {accomplishment.name}
                                     </Text>
-                                    {accomplishment.title || 'N/A'}
-                                  </Text>
-                                ) : null}
+                                  )}
 
-                                {/* Show URL with a clickable link */}
-                                {accomplishment.url && (
-                                  <Text
-                                    style={styles.OutputAccomplishmentText}
+                                  {/* Show Title if present */}
+                                  {accomplishment.title && (
+                                    <Text
+                                      style={{
+                                        color: 'gray',
+                                        fontWeight: 'bold',
+                                        marginBottom: 4,
+                                      }}>
+                                      <Text
+                                        style={{
+                                          fontWeight: 'bold',
+                                          color: 'black',
+                                        }}>
+                                        Title:{' '}
+                                      </Text>
+                                      {accomplishment.title}
+                                    </Text>
+                                  )}
+
+                                  {/* Show URL with clickable link if present */}
+                                  {accomplishment.url && (
+                                    <Text
+                                      style={styles.OutputAccomplishmentText}
+                                      onPress={() =>
+                                        Linking.openURL(accomplishment.url)
+                                      }>
+                                      <Text
+                                        style={{
+                                          fontWeight: 'bold',
+                                          color: 'black',
+                                        }}>
+                                        Link:{' '}
+                                      </Text>
+                                      <Text style={{color: colors.secondary}}>
+                                        {accomplishment.url}
+                                      </Text>
+                                    </Text>
+                                  )}
+
+                                  <TouchableOpacity
                                     onPress={() =>
-                                      handleLinkPress(accomplishment.url)
-                                    }>
+                                      openAccomplishmentModal(accomplishment)
+                                    }
+                                    style={{
+                                      paddingVertical: 8,
+                                      borderRadius: 4,
+                                      marginTop: 10,
+                                      alignSelf: 'flex-start',
+                                    }}>
                                     <Text
                                       style={{
+                                        color: colors.secondary,
                                         fontWeight: 'bold',
-                                        color: 'black',
                                       }}>
-                                      Link:{' '}
+                                      View More
                                     </Text>
-                                    <Text style={{color: colors.secondary}}>
-                                      {accomplishment.url}
-                                    </Text>
-                                  </Text>
-                                )}
-
-                                {/* View More Button */}
-                                <TouchableOpacity
-                                  onPress={() =>
-                                    openAccomplishmentModal(accomplishment)
-                                  }
-                                  style={{
-                                    paddingVertical: 8,
-                                    borderRadius: 4,
-                                    marginTop: 10,
-                                    alignSelf: 'flex-start',
-                                  }}>
-                                  <Text
-                                    style={{
-                                      color: colors.secondary,
-                                      fontWeight: 'bold',
-                                    }}>
-                                    View More
-                                  </Text>
-                                </TouchableOpacity>
-                              </View>
-                            ),
-                          )}
-                        </View>
-                      </ScrollView>
-                    </View>
-                  ))}
-                </ScrollView>
+                                  </TouchableOpacity>
+                                </View>
+                              ),
+                            )}
+                          </View>
+                        </ScrollView>
+                      </View>
+                    ))}
+                  </ScrollView>
+                </>
               ) : null}
 
               {/* Modal for More Information */}
@@ -604,15 +606,14 @@ const UserDetailScreen = ({route, onShortlist}) => {
                         alignItems: 'center',
                         marginBottom: 4,
                       }}>
-                      {selectedAccomplishment &&
-                      selectedAccomplishment.title ? (
+                      {selectedAccomplishment?.title && (
                         <Text style={styles.OutputText}>
                           <Text style={{fontWeight: 'bold', color: 'black'}}>
                             Title:{' '}
                           </Text>
                           {selectedAccomplishment.title}
                         </Text>
-                      ) : null}
+                      )}
 
                       <TouchableOpacity
                         style={styles.closeButton}
@@ -620,57 +621,53 @@ const UserDetailScreen = ({route, onShortlist}) => {
                         <Ionicons name="close" size={24} color="red" />
                       </TouchableOpacity>
                     </View>
-                    {selectedAccomplishment && (
-                      <>
-                        {selectedAccomplishment.description ? (
-                          <View style={{marginBottom: 4}}>
-                            <Text style={{fontWeight: 'bold', color: 'black'}}>
-                              Description:
-                            </Text>
-                            <Text style={{color: 'gray'}}>
-                              {selectedAccomplishment.description}
-                            </Text>
-                          </View>
-                        ) : null}
 
-                        {selectedAccomplishment.issued_date ? (
-                          <Text style={styles.OutputText}>
-                            <Text style={{fontWeight: 'bold', color: 'black'}}>
-                              Issued Date:{' '}
-                            </Text>
-                            {moment(selectedAccomplishment.issued_date).format(
-                              'D MMM YY',
-                            )}
-                          </Text>
-                        ) : null}
+                    {selectedAccomplishment?.description && (
+                      <View style={{marginBottom: 4}}>
+                        <Text style={{fontWeight: 'bold', color: 'black'}}>
+                          Description:
+                        </Text>
+                        <Text style={{color: 'gray'}}>
+                          {selectedAccomplishment.description}
+                        </Text>
+                      </View>
+                    )}
 
-                        {selectedAccomplishment.published_date ? (
-                          <Text style={styles.OutputText}>
-                            <Text style={{fontWeight: 'bold', color: 'black'}}>
-                              Published Date:{' '}
-                            </Text>
-                            {moment(
-                              selectedAccomplishment.published_date,
-                            ).format('D MMM YY')}
-                          </Text>
-                        ) : null}
+                    {selectedAccomplishment?.issued_date && (
+                      <Text style={styles.OutputText}>
+                        <Text style={{fontWeight: 'bold', color: 'black'}}>
+                          Issued Date:{' '}
+                        </Text>
+                        {moment(selectedAccomplishment.issued_date).format(
+                          'D MMM YY',
+                        )}
+                      </Text>
+                    )}
 
-                        {/* Conditionally render URL with clickable link */}
-                        {selectedAccomplishment.url ? (
-                          <Text
-                            style={styles.OutputlinkText}
-                            onPress={() =>
-                              Linking.openURL(selectedAccomplishment.url)
-                            }>
-                            <Text style={{fontWeight: 'bold', color: 'black'}}>
-                              Link:{' '}
-                            </Text>
-                            <Text style={{color: 'blue'}}>
-                              {selectedAccomplishment.url}
-                            </Text>
-                          </Text>
-                        ) : null}
-                      </>
+                    {selectedAccomplishment?.published_date && (
+                      <Text style={styles.OutputText}>
+                        <Text style={{fontWeight: 'bold', color: 'black'}}>
+                          Published Date:{' '}
+                        </Text>
+                        {moment(selectedAccomplishment.published_date).format(
+                          'D MMM YY',
+                        )}
+                      </Text>
+                    )}
+
+                    {selectedAccomplishment?.url && (
+                      <Text
+                        style={styles.OutputlinkText}
+                        onPress={() =>
+                          Linking.openURL(selectedAccomplishment.url)
+                        }>
+                        <Text style={{fontWeight: 'bold', color: 'black'}}>
+                          Link:{' '}
+                        </Text>
+                        <Text style={{color: 'blue'}}>
+                          {selectedAccomplishment.url}
+                        </Text>
+                      </Text>
                     )}
                   </View>
                 </View>
@@ -705,9 +702,7 @@ const UserDetailScreen = ({route, onShortlist}) => {
       case 'Professional':
         return (
           <View>
-            <ScrollView
-              // contentContainerStyle={}
-              showsVerticalScrollIndicator={false}>
+            <ScrollView showsVerticalScrollIndicator={false}>
               {/* Project Details Section */}
               <Text style={styles.boldText}>Project Details</Text>
               {user?.project_details?.length > 0 ? (
@@ -735,13 +730,8 @@ const UserDetailScreen = ({route, onShortlist}) => {
                             <Ionicons name="time" size={16} color="gray" />
                             <Text
                               style={[styles.durationText, {marginLeft: 8}]}>
-                              {moment(pro.worked_duration.from).format(
-                                'D MMM YY',
-                              )}{' '}
-                              -{' '}
-                              {moment(pro.worked_duration.till).format(
-                                'D MMM YY',
-                              )}
+                              {formatDate(pro.worked_duration.from)} -{' '}
+                              {formatDate(pro.worked_duration.till)}
                             </Text>
                           </View>
                         )}
@@ -889,20 +879,26 @@ const UserDetailScreen = ({route, onShortlist}) => {
                     <View
                       style={{
                         flexDirection: 'row',
-                        marginHorizontal: 4,
                         justifyContent: 'space-between',
                       }}>
-                      <Text style={styles.companyName}>
-                        {employment.company_name || 'N/A'}
-                      </Text>
-                      <Text style={styles.employmentType}>
-                        {employment.employment_type || 'N/A'}
-                      </Text>
+                      {employment.company_name ? (
+                        <Text style={styles.companyName}>
+                          {employment.company_name}
+                        </Text>
+                      ) : null}
+
+                      {employment.employment_type ? (
+                        <Text style={styles.employmentType}>
+                          {employment.employment_type}
+                        </Text>
+                      ) : null}
                     </View>
 
-                    <Text style={styles.jobTitle}>
-                      {employment.job_title || 'N/A'}
-                    </Text>
+                    {employment.job_title ? (
+                      <Text style={styles.jobTitle}>
+                        {employment.job_title}
+                      </Text>
+                    ) : null}
 
                     {/* Dates */}
                     <View
@@ -916,19 +912,25 @@ const UserDetailScreen = ({route, onShortlist}) => {
                           <Ionicons name="calendar" size={16} color="gray" />
                           <Text style={styles.date}>
                             {employment.joining_date
-                              ? moment(employment.joining_date).format(
-                                  'D MMM YY',
-                                )
+                              ? moment(
+                                  employment.joining_date,
+                                  'DD-MM-YYYY',
+                                  true,
+                                ).format('D MMM YY')
                               : ''}
+
                             {employment.joining_date && employment.leaving_date
                               ? ' - '
                               : ''}
+
                             {employment.leaving_date
-                              ? moment(employment.leaving_date).format(
-                                  'D MMM YY',
-                                )
+                              ? moment(
+                                  employment.leaving_date,
+                                  'DD-MM-YYYY',
+                                  true,
+                                ).format('D MMM YY')
                               : employment.joining_date
-                              ? 'Present'
+                              ? ' - Present'
                               : ''}
                           </Text>
                         </>
@@ -937,7 +939,6 @@ const UserDetailScreen = ({route, onShortlist}) => {
 
                     {/* View More Button */}
                     <TouchableOpacity
-                      style={styles.viewMoreButton}
                       onPress={() => openEmploymentModal(employment)}>
                       <Text style={styles.viewMoreText}>View More</Text>
                     </TouchableOpacity>
@@ -1079,7 +1080,23 @@ const UserDetailScreen = ({route, onShortlist}) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>User Details</Text>
+      <View style={{flexDirection: 'row', alignItems: 'center',justifyContent:'space-between'}}>
+        <View style={{flexDirection:'row',alignItems: 'center'}}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <CustomHeader />
+        </TouchableOpacity>
+        <Text style={styles.title}>User Details</Text>
+        </View>
+        <View style={{flexDirection:'row',margin:4,gap:12}}>
+        <TouchableOpacity style={styles.iconButton}>
+          <Ionicons name="heart-outline" size={26} color="red" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.iconButton}>
+          <Ionicons name="bookmark-outline" size={26} color="#004466" />
+        </TouchableOpacity>
+       
+      </View>
+      </View>
       <View
         style={{
           flexDirection: 'row',
@@ -1088,32 +1105,73 @@ const UserDetailScreen = ({route, onShortlist}) => {
         }}>
         {showButtons && (
           <>
-            <TouchableOpacity
-              style={[
-                styles.shortlistButton,
-                {backgroundColor: isShortlisted ? '#f8d7da' : '#d4edda'},
-              ]}
-              onPress={handleToggle}>
-              <Text
-                style={{
-                  color: isShortlisted ? '#155724' : '#28a745',
-                }}>
-                {isShortlisted ? 'Unshortlist' : 'Shortlist'}
-              </Text>
-            </TouchableOpacity>
+            {/* Check if the page is 'application' to show both buttons */}
+            {(page === 'application' || page === 'job_invitation') && (
+              <>
+                <TouchableOpacity
+                  style={[
+                    styles.shortlistButton,
+                    {backgroundColor: isShortlisted ? '#f8d7da' : '#d4edda'},
+                  ]}
+                  onPress={handleToggle}>
+                  <Text
+                    style={{
+                      color: isShortlisted ? '#155724' : '#28a745',
+                    }}>
+                    {isShortlisted ? 'Unshortlist' : 'Shortlist'}
+                  </Text>
+                </TouchableOpacity>
 
-            <TouchableOpacity
-              style={[styles.shortlistButton, {backgroundColor: '#ffe0cc'}]}
-              // onPress={handleReject}
-            >
-              <Text style={{color: '#ff6600'}}>Cover Letter</Text>
-            </TouchableOpacity>
+                {page === 'application' && (
+                  <TouchableOpacity
+                    style={[
+                      styles.shortlistButton,
+                      {backgroundColor: '#ffe0cc'},
+                    ]}
+                    onPress={handleCoverLetterClick}>
+                    <Text style={{color: '#ff6600'}}>Cover Letter</Text>
+                  </TouchableOpacity>
+                )}
+
+                {/* Modal for Cover Letter */}
+                <Modal
+                  visible={isModalVisible}
+                  transparent={true}
+                  animationType="slide"
+                  onRequestClose={handleCloseModal} // Handle back button on Android
+                >
+                  <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          marginHorizontal: 2,
+                          justifyContent: 'space-between',
+                        }}>
+                        <Text style={styles.modalTitle}>Cover Letter</Text>
+                        <TouchableOpacity
+                          style={styles.closeButton}
+                          onPress={handleCloseModal}>
+                          <Ionicons name="close" size={24} color="red" />
+                        </TouchableOpacity>
+                      </View>
+                      <Text style={styles.coverLetterText}>
+                        {data?.cover_letter}
+                      </Text>
+                    </View>
+                  </View>
+                </Modal>
+              </>
+            )}
           </>
         )}
       </View>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        style={{flex: 1, marginBottom: 80}}>
+        style={{
+          flex: 1,
+          marginBottom: showButtons ? 80 : 0,
+        }}>
         <View
           style={{
             flex: 1,
@@ -1154,10 +1212,13 @@ const UserDetailScreen = ({route, onShortlist}) => {
                   {onlineStatus}
                 </Text>
               </View>
+
               <Text style={styles.OutputText}>
-                {getFormattedNoticePeriod(
-                  user?.career_preferences?.[0]?.notice_period,
-                ) || 'N/A'}
+                {user?.career_preferences?.[0]?.notice_period
+                  ? getFormattedNoticePeriod(
+                      user?.career_preferences?.[0]?.notice_period,
+                    )
+                  : null}
               </Text>
             </View>
             <Image
@@ -1346,15 +1407,13 @@ const UserDetailScreen = ({route, onShortlist}) => {
             {page === 'job_invitation' ? (
               <TouchableOpacity
                 style={styles.fixedButton}
-                onPress={handleSendInvitation} // Call the handler here
-              >
+                onPress={handleSendInvitation}>
                 <Text style={styles.buttonText}>Send Invitation</Text>
               </TouchableOpacity>
             ) : (
               <TouchableOpacity
                 // style={styles.fixedButton}
-                onPress={handleApplicationStatus} // Call the handler here
-              >
+                onPress={handleApplicationStatus}>
                 {data?.status === 'APPLICATION VIEWED' ? (
                   <View style={styles.buttonStatusContainer}>
                     <TouchableOpacity
@@ -1421,6 +1480,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'gray',
     fontSize: 18,
+    marginLeft: 8,
   },
 
   shortlistButton: {
@@ -1485,7 +1545,6 @@ const styles = StyleSheet.create({
   tabContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginTop: 4,
     width: '100%',
     borderBottomColor: 'lightgray',
     borderBottomWidth: 1,
@@ -1598,7 +1657,7 @@ const styles = StyleSheet.create({
   },
 
   buttonText: {
-    color: '#fff',
+    color: '#004466',
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -1613,7 +1672,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#ddd',
   },
   fixedButton: {
-    backgroundColor: colors.primary,
+    backgroundColor: '#cceeff',
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
@@ -1738,6 +1797,7 @@ const styles = StyleSheet.create({
     maxHeight: '90%',
     justifyContent: 'center',
   },
+
   modalContainer: {
     flex: 1,
     justifyContent: 'center',

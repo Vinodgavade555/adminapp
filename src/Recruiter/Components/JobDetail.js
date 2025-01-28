@@ -16,8 +16,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useDispatch, useSelector} from 'react-redux';
 import {useIsFocused} from '@react-navigation/native';
 import JobViewController from '../RecruiterRedux/Action/JobViewController';
-import { IMAGE_BASE_URL } from '../../Services/baseAPI';
-
+import {IMAGE_BASE_URL} from '../../Services/baseAPI';
 
 const JobDetailScreen = ({route, navigation}) => {
   const {jobId} = route.params; // Get company data from params
@@ -94,8 +93,7 @@ const JobDetailScreen = ({route, navigation}) => {
         <View style={styles.companyInfoContainer}>
           <View style={styles.companyInfo}>
             <View style={styles.logoContainer}>
-              {/* {console.log( JobDetails?.company?.logo)
-              } */}
+             
               <Image
                 source={
                   JobDetails?.company?.logo
@@ -132,16 +130,16 @@ const JobDetailScreen = ({route, navigation}) => {
                   value:
                     JobDetails?.salary?.yearly?.min &&
                     JobDetails?.salary?.yearly?.max
-                      ? `${formatAmount(
+                      ? `${
+                          JobDetails?.salary?.yearly?.currency || ''
+                        } ${formatAmount(
                           JobDetails?.salary?.yearly?.min,
-                        )} - ${formatAmount(JobDetails?.salary?.yearly?.max)} ${
-                          JobDetails?.salary?.yearly?.currency
-                        }`
-                      : 'Salary information not available',
+                        )} - ${formatAmount(JobDetails?.salary?.yearly?.max)}`
+                      : 'not available',
                 },
                 {
                   icon: 'signal-cellular-3',
-                  label: 'Level',
+                  label: 'Experience',
                   value: `${JobDetails?.experience_level?.minYear || 'N/A'} - ${
                     JobDetails?.experience_level?.maxYear || 'N/A'
                   } Years`,
@@ -173,9 +171,10 @@ const JobDetailScreen = ({route, navigation}) => {
                 <TouchableOpacity
                   style={[styles.cardButton, {backgroundColor: '#00BCD4'}]} // Unique background color for this button
                   onPress={() => {
-                    navigation.navigate('ApplicationPage', { jobId: JobDetails?.id });
-                    console.log(JobDetails?.id );
-                    
+                    navigation.navigate('ApplicationPage', {
+                      jobId: JobDetails?.id,
+                    });
+                    console.log(JobDetails?.id);
                   }}>
                   <Text style={styles.cardbuttonInviteText}>
                     View Applications ({JobDetails?.applicant_count || 0})
@@ -186,7 +185,9 @@ const JobDetailScreen = ({route, navigation}) => {
                 <TouchableOpacity
                   style={[styles.cardButton, {backgroundColor: '#FF7043'}]} // Green background for "Invite"
                   onPress={() => {
-                    navigation.navigate('InvitationPage', { jobId: JobDetails?.id });
+                    navigation.navigate('InvitationPage', {
+                      jobId: JobDetails?.id,
+                    });
                   }}>
                   <Text style={styles.cardbuttonInviteText}>Invite</Text>
                 </TouchableOpacity>
@@ -196,7 +197,9 @@ const JobDetailScreen = ({route, navigation}) => {
                 <TouchableOpacity
                   style={[styles.cardButton, {backgroundColor: '#FFC107'}]}
                   onPress={() => {
-                    navigation.navigate('ShortlistUser', { jobId: JobDetails?.id });
+                    navigation.navigate('ShortlistUser', {
+                      jobId: JobDetails?.id,
+                    });
                   }}>
                   <Text style={styles.cardbuttonText}>
                     Shortlisted Candidate
@@ -207,12 +210,11 @@ const JobDetailScreen = ({route, navigation}) => {
                 <TouchableOpacity
                   style={[styles.cardButton, {backgroundColor: '#dd99ff'}]}
                   onPress={() => {
-                    navigation.navigate('SaveUserPage', { jobId: JobDetails?.id });
+                    navigation.navigate('SaveUserPage', {
+                      jobId: JobDetails?.id,
+                    });
                   }}>
-                  
-                  <Text style={styles.cardbuttonText}>
-                    Saved User List
-                  </Text>
+                  <Text style={styles.cardbuttonText}>Saved User List</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -428,7 +430,6 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     resizeMode: 'contain', // Adjusts the image to cover the container uniformly
-
   },
 
   jobDetailsContainer: {
@@ -490,7 +491,6 @@ const styles = StyleSheet.create({
     color: '#fff', // White text color to contrast with the background
     fontSize: 12,
     fontWeight: 'bold',
-   
   },
   cardbuttonInviteText: {
     color: '#fff', // White text color to contrast with the background

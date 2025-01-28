@@ -23,7 +23,6 @@ const ApplicationsListScreen = ({route}) => {
     JobViewController();
   const {JobApplications} = useSelector(state => state.job);
   const isFocus = useIsFocused();
-  const [expandedSkills, setExpandedSkills] = useState({});
   const [id, setId] = useState('');
   const [selectedTab, setSelectedTab] = useState('matching');
 
@@ -31,6 +30,7 @@ const ApplicationsListScreen = ({route}) => {
     setSelectedTab(tab);
   };
 
+   
   useEffect(() => {
     const getUserData = async () => {
       try {
@@ -66,12 +66,16 @@ const ApplicationsListScreen = ({route}) => {
           <Text style={styles.matchchipText}>Non-Matching</Text>
         </TouchableOpacity>
       </View>
+   
+      
 
       {(selectedTab === 'matching'
         ? JobApplications?.matching_applies
         : JobApplications?.unmatching_applies
       )?.map((jobApplication, index) => {
         const user = jobApplication?.user_id;
+        const coverLetter = jobApplication?.cover_letter;
+        // console.log('get',jobApplication?.cover_letter);
 
         return (
           <UserCard
@@ -80,6 +84,8 @@ const ApplicationsListScreen = ({route}) => {
             jobId={jobId}
             page_name={'application'}
             index={index}
+            coverLetter = {coverLetter}
+            
           />
         );
       })}

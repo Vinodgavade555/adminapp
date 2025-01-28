@@ -324,7 +324,7 @@ const UsersList = () => {
       ...filters,
     });
 
-    console.log('Query Params:', filterParams);
+    // console.log('Query Params:', filterParams);
 
     dispatch(GetFilteredUsers(id, 1, filterParams));
 

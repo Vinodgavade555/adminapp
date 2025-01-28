@@ -387,8 +387,8 @@ const JobViewController = () => {
     dispatch({type: 'LOADING', payload: true});
 
     try {
-      const response = await axios.post(
-        `http://15.206.149.28/api/job-invitations/`,
+      const response = await instance.post(
+        `/job-invitations/`,
         data,
       );
 
@@ -688,9 +688,9 @@ const JobViewController = () => {
       const response = await axios.get(
         `http://15.206.149.28/api/filter-users/${user_id}/?page=${page}&${queryString}`,
       );
-      console.log(
-        '****************************job-GetFilteredUsers response***************************',
-      );
+      // console.log(
+      //   '****************************job-GetFilteredUsers response***************************',
+      // );
       // console.log('queryParams', queryParams);
       console.log(
         `http://15.206.149.28/api/filter-users/${user_id}/?page=${page}&${queryString}`,

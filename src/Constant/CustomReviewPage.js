@@ -93,7 +93,6 @@ const ReviewPage = ({data}) => {
       setReviewTitle('');
     }
   };
-  // console.log(data?.user.user_id);
 
   const handleRatingChange = text => {
     const sanitizedText = text.replace(/[^0-9.]/g, '');
@@ -110,12 +109,10 @@ const ReviewPage = ({data}) => {
 
   const confirmDeleteReview = () => {
     dispatch(DeleteReview(reviewToDelete));
-    // console.log('reviewToDelete',reviewToDelete);
 
     setShowDeleteModal(false); // Close modal after confirmation
   };
   const cancelDeleteReview = () => {
-    // If user cancels, just close the modal without deleting
     setShowDeleteModal(false);
   };
 
@@ -160,43 +157,61 @@ const ReviewPage = ({data}) => {
       </View>
 
       <View style={styles.reviewsContainer}>
-        <Text style={styles.reviewsTitle}>Reviews:</Text>
+        {CandidateReview?.results && CandidateReview?.results.length > 0 ? (
+          <>
+            <Text style={styles.reviewsTitle}>Reviews:</Text>
 
-        {CandidateReview?.results?.map(review => {
-          return (
-            <View key={review.id} style={styles.reviewCard}>
-              <View style={styles.reviewInfoRow}>
-                <Text style={styles.reviewInfo}>{review.given_by_name}</Text>
-                <Text style={styles.reviewInfo}>
-                  {moment(review.review_date).format('D MMM, YYYY')}
-                </Text>
-              </View>
+            {CandidateReview.results.map(review => {
+              return (
+                <View key={review.id} style={styles.reviewCard}>
+                  <View style={styles.reviewInfoRow}>
+                    <Text style={styles.reviewInfo}>
+                      {review.given_by_name}
+                    </Text>
+                    <Text style={styles.reviewInfo}>
+                      {moment(review.review_date).format('D MMM, YYYY')}
+                    </Text>
+                  </View>
 
-              <View style={styles.reviewTextContainer}>
-                {review.review_title && (
-                  <Text style={styles.reviewTitle}>{review.review_title}</Text>
-                )}
-                {review.review_body && review.review_body.trim() !== '' && (
-                  <Text style={styles.reviewBody}>{review.review_body}</Text>
-                )}
-              </View>
+                  <View style={styles.reviewTextContainer}>
+                    {/* Conditionally render review title */}
 
-              <View style={styles.reviewActionsRow}>
-                <View style={styles.reviewRating}>
-                  {renderStars(review.rating)}
+                    {review.review_title &&
+                      review.review_title.trim() !== '' && (
+                        <Text style={styles.reviewTitle}>
+                          {review.review_title}
+                        </Text>
+                      )}
+
+                    {review.review_body && review.review_body.trim() !== '' && (
+                      <Text style={styles.reviewBody}>
+                        {review.review_body}
+                      </Text>
+                    )}
+                  </View>
+
+                  <View style={styles.reviewActionsRow}>
+                    <View style={styles.reviewRating}>
+                      {renderStars(review.rating)}
+                    </View>
+
+                    {review.given_by == id && (
+                      <TouchableOpacity
+                        onPress={() => handleDeleteReview(review.id)}
+                        style={styles.deleteIconContainer}>
+                        <Ionicons
+                          name="trash-outline"
+                          size={20}
+                          color="#FF0000"
+                        />
+                      </TouchableOpacity>
+                    )}
+                  </View>
                 </View>
-
-                {review.given_by == id && (
-                  <TouchableOpacity
-                    onPress={() => handleDeleteReview(review.id)}
-                    style={styles.deleteIconContainer}>
-                    <Ionicons name="trash-outline" size={20} color="#FF0000" />
-                  </TouchableOpacity>
-                )}
-              </View>
-            </View>
-          );
-        })}
+              );
+            })}
+          </>
+        ) : null}
       </View>
 
       <ConfirmationModal
