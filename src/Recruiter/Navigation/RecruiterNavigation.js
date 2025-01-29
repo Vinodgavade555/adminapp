@@ -9,6 +9,7 @@ import SavedUserList from '../Components/SavedUserList.js';
 import ApplicationsListScreen from '../Components/ApplicationList.js';
 import InvitationList from '../Components/InvitationList.js';
 import JobDetailScreen from '../Components/JobDetail.js';
+import {colors} from '../../Global_CSS/TheamColors.js';
 
 const RecruiterNavigation = () => {
   const Stack = createNativeStackNavigator();
@@ -53,10 +54,36 @@ const RecruiterNavigation = () => {
       <Stack.Screen
         name="SaveUserPage"
         component={SavedUserList}
-        options={{headerShown: false}}
+        options={{
+          headerStyle: {
+            backgroundColor: colors.primary,
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            fontSize: 18,
+          },
+          title: 'Saved Users',
+          headerTitleAlign: 'center',
+        }}
       />
 
-      <Stack.Screen name="ShortlistUser" component={ShortlistCandidate} />
+      <Stack.Screen
+        name="ShortlistUser"
+        component={ShortlistCandidate}
+        options={{
+          headerStyle: {
+            backgroundColor: colors.primary,
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            fontSize: 18,
+          },
+          title: 'Shortlisted Users',
+          headerTitleAlign: 'center',
+        }}
+      />
     </Stack.Navigator>
   );
 };

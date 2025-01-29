@@ -86,7 +86,7 @@ const UserCard = ({
       recruiter_id: id,
       is_shortlist_by_recruiter: !isShortlisted,
     };
-    console.log('shortlistData', shortlistData);
+    console.log('------shortlistData----', shortlistData);
 
     dispatch(toggleshortlistUser(shortlistData));
   };
@@ -98,10 +98,10 @@ const UserCard = ({
       user_id: item.user_id,
       recruiter_id: id,
       page: 1,
-      job_id: jobId,
+      // job_id: jobId,
       // is_saved: !isSaved,
     };
-    // console.log('Toggling save action:', saveData);
+    console.log('Toggling save action:', saveData);
     dispatch(ToggleSaveUser(saveData));
   };
 
@@ -325,13 +325,13 @@ const UserCard = ({
             onPress={() => handleSaveToggle(userProfile)}>
             <Ionicons
               name={
-                item.isSaved || item?.user_id?.is_saved
+                item.is_saved || item?.user_id?.is_saved
                   ? 'bookmark'
                   : 'bookmark-outline'
               }
               size={24}
               color={
-                item.isSaved || item?.user_id?.is_saved ? '#1aa3ff' : '#808080'
+                item.is_saved || item?.user_id?.is_saved ? '#1aa3ff' : '#808080'
               }
             />
           </TouchableOpacity>

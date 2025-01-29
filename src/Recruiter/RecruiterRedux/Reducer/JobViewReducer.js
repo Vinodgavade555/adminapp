@@ -8,7 +8,7 @@ const initialState = {
   JobInvitations: [],
   JobInvitationsPagination: {},
   shortlistUser: null,
-  UserShortlitedList: [],
+  UserShortlistedList: [],
   UserShortlitedListPagination: {},
   CandidateReview: null,
   FilteredUsers: [],
@@ -43,13 +43,19 @@ const jobReducer = (state = initialState, action) => {
           next_page_number: action.payload.next_page_number,
           previous_page_number: action.payload.previous_page_number,
         },
-        JobList: [
-          ...state.JobList,
-          ...action.payload.results.filter(
-            newJob =>
-              !state.JobList.some(existingJob => existingJob.id === newJob.id),
-          ),
-        ],
+        JobList:
+          parseInt(action.payload?.current_page) > 1
+            ? [
+                ...state.JobList,
+                ...action.payload.results.filter(
+                  newJob =>
+                    !state.JobList.some(
+                      existingJob => existingJob.id === newJob.id,
+                    ),
+                ),
+              ]
+            : action?.payload?.results || [], // Replace if it's the first page
+
         error: null,
       };
 
@@ -195,16 +201,11 @@ const jobReducer = (state = initialState, action) => {
 
     // Job Shortlist Success
     case 'TOGGLE_TO_SHORTLIST_SUCCESS': {
-      // console.log(
-      //   '--------------------------------------------',
-      //   state.JobInvitations,
-      // );
-
       return {
         ...state,
         JobApplications: {
           ...state.JobApplications,
-          matching_applies: state.JobApplications.matching_applies.map(
+          matching_applies: (state.JobApplications?.matching_applies || []).map(
             application => {
               // Match based on job_id and user_id
               if (
@@ -225,7 +226,7 @@ const jobReducer = (state = initialState, action) => {
         },
 
         JobInvitations: state.JobInvitations.map(application =>
-          application.id === action.payload.user_id // Assuming user_id corresponds to the application's ID
+          application.job_seeker_profile.user_id === action.payload.user_id // Assuming user_id corresponds to the application's ID
             ? {
                 ...application,
                 // Toggle the is_shortlisted value
@@ -233,6 +234,16 @@ const jobReducer = (state = initialState, action) => {
               }
             : application,
         ),
+
+        UserShortlistedList: state.UserShortlistedList.map(application =>
+          application.user_id.id === action.payload.user_id
+            ? {
+                ...application,
+                is_shortlist_by_recruiter:
+                  !application.is_shortlist_by_recruiter,
+              }
+            : application,
+        ).filter(application => application.is_shortlist_by_recruiter),
 
         error: null,
       };
@@ -248,8 +259,28 @@ const jobReducer = (state = initialState, action) => {
     case 'USER_SHORTLIST_LIST_SUCCESS':
       return {
         ...state,
-        UserShortlitedList: action.payload,
-        loading: false,
+        UserShortlitedListPagination: {
+          count: action.payload.count,
+          total_pages: action.payload.total_pages,
+          current_page: action.payload.current_page,
+          items_per_page: action.payload.items_per_page,
+          previous: action.payload.previous,
+          next_page_number: action.payload.next_page_number,
+          previous_page_number: action.payload.previous_page_number,
+        },
+        UserShortlistedList:
+          parseInt(action.payload?.current_page) > 1
+            ? [
+                ...state.UserShortlistedList,
+                ...action.payload.results.filter(
+                  newUser =>
+                    !state.UserShortlistedList.some(
+                      existingUser => existingUser.id === newUser.id,
+                    ),
+                ),
+              ]
+            : action?.payload?.results || [],
+        error: null,
       };
 
     case 'USER_SHORTLIST_LIST_FAILURE':
@@ -263,7 +294,29 @@ const jobReducer = (state = initialState, action) => {
     case 'USER_SAVED_SUCCESSFULLY':
       return {
         ...state,
-        SaveUser: action.payload, // Store job details in the state
+        // SaveUser: action.payload, // Store job details in the state
+
+        FilteredUsers: state.FilteredUsers.map(application =>
+          application.id === action.payload // Assuming user_id corresponds to the application's ID
+            ? {
+                ...application,
+                // Toggle the is_shortlisted value
+                is_saved: !application.is_saved,
+              }
+            : application,
+        ),
+
+        SavedUsers: state.SavedUsers.map(application =>
+          application.user_id.id === action.payload
+            ? {
+                ...application,
+                user_id: {
+                  ...application.user_id,
+                  is_saved: !application.user_id.is_saved,
+                },
+              }
+            : application,
+        ).filter(application => application.user_id.is_saved),
         error: null,
       };
     case 'USER_SAVED_UNSUCCESSFULLY':

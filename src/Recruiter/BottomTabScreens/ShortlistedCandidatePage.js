@@ -11,13 +11,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useIsFocused} from '@react-navigation/native';
 import UserCard from '../../Constant/UserCard';
 import JobViewController from '../RecruiterRedux/Action/JobViewController';
+import {FlatList} from 'react-native-gesture-handler';
 
 const ShortlistCandidate = ({route}) => {
   const [id, setId] = useState();
   const {jobId} = route.params; // Get company data from params
   const dispatch = useDispatch();
   const {GetUserShortlistedList} = JobViewController();
-  const {UserShortlitedList, loading, error} = useSelector(state => state.job);
+  const {UserShortlistedList, isLoading, error, UserShortlitedListPagination} =
+    useSelector(state => state.job);
   const isFocus = useIsFocused();
 
   useEffect(() => {
@@ -25,7 +27,7 @@ const ShortlistCandidate = ({route}) => {
       try {
         const recruiter_id = await AsyncStorage.getItem('user_data');
         setId(recruiter_id);
-        dispatch(GetUserShortlistedList(jobId, recruiter_id));
+        dispatch(GetUserShortlistedList(jobId, recruiter_id, 1));
       } catch (error) {
         console.error('Error reading value from AsyncStorage', error);
       }
@@ -33,7 +35,7 @@ const ShortlistCandidate = ({route}) => {
     getUserData();
   }, [isFocus, dispatch]);
 
-  if (loading) {
+  if (isLoading) {
     return <ActivityIndicator size="large" style={styles.loader} />;
   }
 
@@ -46,29 +48,39 @@ const ShortlistCandidate = ({route}) => {
       </View>
     );
   }
-
+  console.log('UserShortlistedList', UserShortlistedList);
+  const loadMoreUsers = () => {
+    if (
+      !isLoading &&
+      id &&
+      UserShortlitedListPagination?.next_page_number != null
+    ) {
+      dispatch(
+        GetUserShortlistedList(
+          jobId,
+          id,
+          UserShortlitedListPagination.next_page_number,
+        ),
+      );
+    }
+  };
   return (
-    <ScrollView style={{paddingHorizontal: 12, paddingVertical: 18}}>
-      <Text>Shortlisted Candidates</Text>
-      {UserShortlitedList?.results && UserShortlitedList.results.length > 0 ? (
-        UserShortlitedList.results.map((item, index) => {
-          const user = item.recruiter_id; // Or item.user_id depending on your requirements
-          const job_Id = item.job_id; // Or item.user_id depending on your requirements
-
-          return (
-            <UserCard
-              key={index}
-              item={item}
-              userId={user}
-              jobId={job_Id}
-              page_name={'job_invitation'}
-            />
-          );
-        })
-      ) : (
-        <Text>No shortlisted candidates available</Text>
-      )}
-    </ScrollView>
+    <View style={{}}>
+      <FlatList
+        contentContainerStyle={{paddingHorizontal: 12, paddingVertical: 18}}
+        data={UserShortlistedList}
+        keyExtractor={(item, index) => `${item.id || index}`}
+        renderItem={({item, index}) => (
+          <UserCard item={item} jobId={jobId} page_name={''} index={index} />
+        )}
+        onEndReached={loadMoreUsers}
+        onEndReachedThreshold={0.5}
+        ListEmptyComponent={<Text>No shortlisted candidates available</Text>}
+        ListFooterComponent={
+          isLoading ? <ActivityIndicator size="large" /> : null
+        }
+      />
+    </View>
   );
 };
 

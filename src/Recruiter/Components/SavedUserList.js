@@ -43,6 +43,7 @@ const SavedJobScreen = ({route}) => {
       getUserData();
     }
   }, [isFocus, dispatch]);
+  // console.log('SavedUsers', SavedUsers);
 
   const loadMoreUsers = () => {
     if (!isLoading && id && SavedUsersPagination?.next_page_number != null) {
