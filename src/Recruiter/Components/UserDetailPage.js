@@ -42,8 +42,7 @@ const UserDetailScreen = ({route, navigation}) => {
   const [isShortlisted, setIsShortlisted] = useState(user.is_shortlisted);
   const [isSavedUser, setIsSavedUser] = useState(user.is_saved);
 
-  // console.log('.................', JSON.stringify(user, null, 2));
-  
+  // console.log('.................', JSON.stringify(data, null, 2));
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
@@ -51,8 +50,7 @@ const UserDetailScreen = ({route, navigation}) => {
   const [selectedEmployment, setSelectedEmployment] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedAccomplishment, setSelectedAccomplishment] = useState(null);
-  const [url, setUrl] = useState(null);
-  const [isWebViewVisible, setWebViewVisible] = useState(false);
+
   const [selectedMode, setSelectedMode] = useState(null);
 
   const webViewRef = useRef(null);
@@ -73,34 +71,6 @@ const UserDetailScreen = ({route, navigation}) => {
     setIsModalVisible(!isModalVisible);
   };
 
-  // const handleLinkPress = url => {
-  //   setUrl(url);
-  //   setWebViewVisible(true); // Show WebView modal when link is clicked
-  // };
-  // // Function to close WebView modal
-  // const closeWebView = () => {
-  //   setWebViewVisible(false); // Close the WebView
-  // };
-
-  // // Handle the hardware back button on Android to close the WebView
-  // useEffect(() => {
-  //   const backAction = () => {
-  //     if (isWebViewVisible) {
-  //       closeWebView(); // Close WebView on back button press
-  //       return true; // Prevent default back behavior (navigation)
-  //     }
-  //     return false; // Allow default back action if WebView is not visible
-  //   };
-
-  //   // Add event listener for the hardware back button
-  //   BackHandler.addEventListener('hardwareBackPress', backAction);
-
-  //   // Cleanup the event listener on component unmount
-  //   return () => {
-  //     BackHandler.removeEventListener('hardwareBackPress', backAction);
-  //   };
-  // }, [isWebViewVisible]);
-  // Open modal with the selected project details
   const openModal = project => {
     setSelectedProject(project);
     toggleModal();
@@ -146,9 +116,8 @@ const UserDetailScreen = ({route, navigation}) => {
       user_id: data?.user?.user_id,
       created_by: id,
     };
-    // console.log('**************************',invitationData);
+    console.log('**************************',invitationData);
     dispatch(SendInvitation(invitationData));
-    setIsInvitationSent(true);
   };
 
   const handleApplicationStatus = () => {
@@ -1447,11 +1416,11 @@ const UserDetailScreen = ({route, navigation}) => {
         <>
           <View style={styles.fixedButtonContainer}>
             {page === 'job_invitation' ? (
-              <TouchableOpacity
-                style={styles.fixedButton}
-                onPress={handleSendInvitation}>
-                <Text style={styles.buttonText}>Send Invitation</Text>
-              </TouchableOpacity>
+               <TouchableOpacity
+               style={styles.fixedButton}
+               onPress={handleSendInvitation}>
+               <Text style={styles.buttonText}>Send Invitation</Text>
+             </TouchableOpacity>
             ) : (
               <TouchableOpacity
                 // style={styles.fixedButton}
