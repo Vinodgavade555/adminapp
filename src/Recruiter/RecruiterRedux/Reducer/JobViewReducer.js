@@ -5,15 +5,18 @@ const initialState = {
   JobDetails: [],
   HomeData: [],
   JobApplications: null,
-  JobInvitations: null,
+  JobInvitations: [],
+  JobInvitationsPagination: {},
   shortlistUser: null,
   UserShortlitedList: [],
+  UserShortlitedListPagination: {},
   CandidateReview: null,
   FilteredUsers: [],
   FilteredUsersPagination: {},
   FilterUserMaster: [],
   SaveUser: [],
   SavedUsers: [],
+  SavedUsersPagination: {},
   error: null,
   isLoading: false, // Track loading for any API request
 };
@@ -136,9 +139,37 @@ const jobReducer = (state = initialState, action) => {
       };
 
     case 'JOB_INVITATION_SUCCESS':
+      // console.log(
+      //   '---------------------JobInvitations Before-----------------------',
+      //   state.JobInvitations,
+      // );
+      // console.log(
+      //   '---------------------Payload-----------------------',
+      //   JSON.stringify(action.payload, null, 2),
+      // );
       return {
         ...state,
-        JobInvitations: action.payload,
+        JobInvitationsPagination: {
+          count: action.payload.count,
+          total_pages: action.payload.total_pages,
+          current_page: action.payload.current_page,
+          items_per_page: action.payload.items_per_page,
+          previous: action.payload.previous,
+          next_page_number: action.payload.next_page_number,
+          previous_page_number: action.payload.previous_page_number,
+        },
+        JobInvitations:
+          parseInt(action.payload?.current_page) > 1
+            ? [
+                ...state.JobInvitations,
+                ...action.payload.results.filter(
+                  newUser =>
+                    !state.JobInvitations.some(
+                      existinguser => existinguser.id === newUser.id,
+                    ),
+                ),
+              ]
+            : action?.payload?.results || [],
         error: null,
       };
 
@@ -164,6 +195,11 @@ const jobReducer = (state = initialState, action) => {
 
     // Job Shortlist Success
     case 'TOGGLE_TO_SHORTLIST_SUCCESS': {
+      // console.log(
+      //   '--------------------------------------------',
+      //   state.JobInvitations,
+      // );
+
       return {
         ...state,
         JobApplications: {
@@ -188,18 +224,15 @@ const jobReducer = (state = initialState, action) => {
           ),
         },
 
-        JobInvitations: {
-          ...state.JobInvitations,
-          results: state.JobInvitations.results.map(application =>
-            application.id === action.payload.user_id // Assuming user_id has an `id` field to compare
-              ? {
-                  ...application,
-                  // Spread the existing user_id object to preserve other properties
-                  is_shortlisted: !application.is_shortlisted, // Toggle the is_shortlisted value
-                }
-              : application,
-          ),
-        },
+        JobInvitations: state.JobInvitations.map(application =>
+          application.id === action.payload.user_id // Assuming user_id corresponds to the application's ID
+            ? {
+                ...application,
+                // Toggle the is_shortlisted value
+                is_shortlisted: !application.is_shortlisted,
+              }
+            : application,
+        ),
 
         error: null,
       };
@@ -241,11 +274,38 @@ const jobReducer = (state = initialState, action) => {
 
     //get saves users
     case 'GET_USER_SAVED_SUCCESS':
+      console.log(
+        '---------------------SavedUsers Before-----------------------',
+        state.SavedUsers,
+      );
+
       return {
         ...state,
-        SavedUsers: action.payload, // Store job details in the state
+        SavedUsersPagination: {
+          count: action.payload.count,
+          total_pages: action.payload.total_pages,
+          current_page: action.payload.current_page,
+          items_per_page: action.payload.items_per_page,
+          previous: action.payload.previous,
+          next_page_number: action.payload.next_page_number,
+          previous_page_number: action.payload.previous_page_number,
+        },
+        SavedUsers:
+          parseInt(action.payload?.current_page) > 1
+            ? [
+                ...state.SavedUsers,
+                ...action.payload.results.filter(
+                  newUser =>
+                    !state.SavedUsers.some(
+                      existingUser =>
+                        existingUser.user_id.id === newUser.user_id.id,
+                    ),
+                ),
+              ]
+            : action?.payload?.results || [], // Replace if it's the first page
         error: null,
       };
+
     case 'GET_USER_SAVED_FAILURE':
       return {
         ...state,

@@ -172,6 +172,7 @@ const UserDetailScreen = ({route, navigation}) => {
     const saveData = {
       user_id: data.user?.user_id,
       recruiter_id: id,
+      job_id: data.jobId,
       // is_saved: !isSaved,
     };
     // console.log('Toggling save action:', saveData);

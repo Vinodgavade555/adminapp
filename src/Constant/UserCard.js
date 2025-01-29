@@ -86,21 +86,22 @@ const UserCard = ({
       recruiter_id: id,
       is_shortlist_by_recruiter: !isShortlisted,
     };
-    // console.log('shortlistData',shortlistData);
+    console.log('shortlistData', shortlistData);
 
     dispatch(toggleshortlistUser(shortlistData));
   };
 
-  const handleSaveToggle = (item) => {
+  const handleSaveToggle = item => {
     // setIsSaved(!isSaved); // Toggle the save state
 
     const saveData = {
       user_id: item.user_id,
       recruiter_id: id,
+      page: 1,
       job_id: jobId,
       // is_saved: !isSaved,
     };
-    console.log('Toggling save action:', saveData);
+    // console.log('Toggling save action:', saveData);
     dispatch(ToggleSaveUser(saveData));
   };
 

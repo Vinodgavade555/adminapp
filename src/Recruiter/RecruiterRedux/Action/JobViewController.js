@@ -293,12 +293,12 @@ const JobViewController = () => {
     }
   };
 
-  const GetJobInvitation = (job_id, recruiter_id) => async dispatch => {
+  const GetJobInvitation = (job_id, recruiter_id, page) => async dispatch => {
     dispatch({type: 'LOADING', payload: true});
 
     try {
       const response = await instance.get(
-        `/filter-users-for-job/${job_id}/?recruiter_id=${recruiter_id}`,
+        `/filter-users-for-job/${job_id}/?recruiter_id=${recruiter_id}&page=${page}`,
       );
       // console.log(
       //   `****************************job-GetJobInvitation response***************************
@@ -517,18 +517,17 @@ const JobViewController = () => {
 
   const ToggleSaveUser = requestData => async dispatch => {
     dispatch({type: 'LOADING', payload: true});
-    console.log('requestData', requestData);
 
     try {
       const response = await instance.post(`/save-candidate/`, requestData);
-      // console.log(response);
+      console.log('{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{',response);
       const jsonString = JSON.stringify(response.data);
       const data = JSON.parse(jsonString);
 
       dispatch({type: 'USER_SAVED_SUCCESSFULLY', payload: requestData.user_id});
       // console.log('requestData', requestData.user_id);
 
-      dispatch(GetSavedUser(requestData.recruiter_id, requestData.job_id));
+      dispatch(GetSavedUser(requestData.recruiter_id, requestData.job_id, requestData.page));
 
       dispatch({type: 'LOADING', payload: false});
     } catch (error) {
@@ -558,13 +557,18 @@ const JobViewController = () => {
     }
   };
 
-  const GetSavedUser = (recruiter_id, jobId) => async dispatch => {
+  const GetSavedUser = (recruiter_id, jobId, page) => async dispatch => {
     dispatch({type: 'LOADING', payload: true});
-    console.log('-----------------====================', recruiter_id, jobId);
+    console.log(
+      '-----------------====================',
+      recruiter_id,
+      jobId,
+      page,
+    );
 
     try {
       const response = await instance.get(
-        `/save-candidate/${recruiter_id}/?job_id=${jobId}`,
+        `/save-candidate/${recruiter_id}/?job_id=${jobId}&page=${page}`,
       );
       // console.log(
       //   '****************************job-saved response***************************',

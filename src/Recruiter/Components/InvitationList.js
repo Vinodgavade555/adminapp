@@ -16,7 +16,6 @@ import UserCard from '../../Constant/UserCard';
 import JobViewController from '../RecruiterRedux/Action/JobViewController';
 
 const InvitationList = ({route}) => {
-  
   const {jobId} = route.params;
   const dispatch = useDispatch();
   const {GetJobInvitation} = JobViewController();
@@ -32,13 +31,13 @@ const InvitationList = ({route}) => {
       [index]: !prevState[index],
     }));
   };
-  // console.log(JobInvitations?.results);
+  console.log('%%%%%%%%%%#############', JobInvitations);
 
   useEffect(() => {
     const getUserData = async () => {
       try {
         const recruiter_id = await AsyncStorage.getItem('user_data');
-        dispatch(GetJobInvitation(jobId, recruiter_id));
+        dispatch(GetJobInvitation(jobId, recruiter_id, 1));
       } catch (error) {
         console.error('Error reading value from AsyncStorage', error);
       }
@@ -56,7 +55,7 @@ const InvitationList = ({route}) => {
       return value?.toString() || 'N/A';
     }
   }
-  if (!JobInvitations?.results?.length) {
+  if (!JobInvitations?.length) {
     return (
       <View style={styles.container}>
         <Text>No Job Invitations available</Text>
@@ -68,7 +67,7 @@ const InvitationList = ({route}) => {
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <Text style={styles.header}>Job Invitation Details</Text>
 
-      {JobInvitations?.results?.map((jobInvitation, index) => {
+      {JobInvitations?.map((jobInvitation, index) => {
         const skills = jobInvitation?.job_seeker_profile?.key_skills || [];
         const initialSkills = skills.slice(0, 3); // Show only the first 3 skills initially
         const allSkills = skills; // All skills
@@ -83,12 +82,12 @@ const InvitationList = ({route}) => {
           //   index={index}
           // />
           <UserCard
-          key={jobInvitation?.id}  // Use a unique identifier for the key
-          item={jobInvitation}
-          jobId={jobId}
-          page_name={'job_invitation'}
-          index={index}  // or user?.id if it’s more appropriate
-        />
+            key={jobInvitation?.id} // Use a unique identifier for the key
+            item={jobInvitation}
+            jobId={jobId}
+            page_name={'job_invitation'}
+            index={index} // or user?.id if it’s more appropriate
+          />
         );
       })}
     </ScrollView>
