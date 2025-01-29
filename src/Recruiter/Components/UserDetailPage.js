@@ -43,7 +43,6 @@ const UserDetailScreen = ({route, navigation}) => {
   const [isSavedUser, setIsSavedUser] = useState(user.is_saved);
 
   // console.log('.................', JSON.stringify(user, null, 2));
-  
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
@@ -203,6 +202,7 @@ const UserDetailScreen = ({route, navigation}) => {
     const saveData = {
       user_id: data.user?.user_id,
       recruiter_id: id,
+      job_id: data.jobId,
       // is_saved: !isSaved,
     };
     // console.log('Toggling save action:', saveData);

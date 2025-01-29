@@ -97,6 +97,7 @@ const UserCard = ({
     const saveData = {
       user_id: item.user_id,
       recruiter_id: id,
+      page: 1,
       job_id: jobId,
       // is_saved: !isSaved,
     };

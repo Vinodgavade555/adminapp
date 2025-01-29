@@ -1,51 +1,87 @@
 import React, {useState, useEffect} from 'react';
-import {View, ScrollView, StyleSheet, Dimensions} from 'react-native';
+import {
+  View,
+  ScrollView,
+  StyleSheet,
+  Dimensions,
+  FlatList,
+  ActivityIndicator,
+} from 'react-native';
 import {useIsFocused} from '@react-navigation/native';
 import {useDispatch, useSelector} from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {colors} from '../../Global_CSS/TheamColors';
 import JobViewController from '../RecruiterRedux/Action/JobViewController';
 import UserCard from '../../Constant/UserCard';
+import {colors} from '../../Global_CSS/TheamColors';
+
 const {width} = Dimensions.get('window'); // Get the screen width
 
 const SavedJobScreen = ({route}) => {
   const {jobId} = route.params;
-  const [id, setId] = useState();
+  const [id, setId] = useState(null);
   const dispatch = useDispatch();
   const {GetSavedUser} = JobViewController();
-  const {SavedUsers} = useSelector(state => state.job);
+  const {SavedUsers, isLoading, SavedUsersPagination} = useSelector(
+    state => state.job,
+  );
   const isFocus = useIsFocused();
 
   useEffect(() => {
     const getUserData = async () => {
       try {
-        const recruiter_id = await AsyncStorage.getItem('user_data'); // Wait for the value to be retrieved
-        setId(recruiter_id);
-        dispatch(GetSavedUser(recruiter_id, jobId));
+        const recruiter_id = await AsyncStorage.getItem('user_data');
+        if (recruiter_id) {
+          setId(recruiter_id);
+          dispatch(GetSavedUser(recruiter_id, jobId, 1));
+        }
       } catch (error) {
         console.error('Error reading value from AsyncStorage', error);
       }
     };
 
-    getUserData();
+    if (isFocus) {
+      getUserData();
+    }
   }, [isFocus, dispatch]);
+
+  const loadMoreUsers = () => {
+    if (!isLoading && id && SavedUsersPagination?.next_page_number != null) {
+      dispatch(GetSavedUser(id, jobId, SavedUsersPagination.next_page_number));
+    }
+  };
 
   return (
     <View style={styles.container}>
-      <ScrollView>
-        {SavedUsers?.results && SavedUsers?.results?.length > 0
-          ? SavedUsers?.results.map((item, index) => {
-              return (
-                <UserCard
-                  key={item.id || index} // Use unique `id` if available
-                  item={item}
-                  jobId={jobId}
-                  page_name={'home'}
-                />
-              );
-            })
+      <FlatList
+        contentContainerStyle={styles.scrollContainer}
+        data={SavedUsers}
+        keyExtractor={(item, index) => `${item.id || index}`}
+        renderItem={({item, index}) => (
+          <UserCard
+            item={item}
+            jobId={jobId}
+            page_name={'home'}
+            index={index}
+          />
+        )}
+        onEndReached={loadMoreUsers}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={
+          isLoading ? <ActivityIndicator size="large" /> : null
+        }
+      />
+      {/* <ScrollView>
+        {SavedUsers && SavedUsers?.length > 0
+          ? SavedUsers?.map((item, index) => (
+              <UserCard
+                key={item.id || index}
+                item={item}
+                jobId={jobId}
+                page_name={'home'}
+              />
+            ))
           : null}
-      </ScrollView>
+      </ScrollView> */}
     </View>
   );
 };
@@ -62,7 +98,6 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     padding: 12,
   },
-
   cardContent: {
     flex: 1,
     backgroundColor: '#fafafa',
@@ -88,7 +123,6 @@ const styles = StyleSheet.create({
   locationContainer: {
     flexDirection: 'row',
   },
-
   detailsText: {
     fontSize: 12,
     color: colors.blackText,
@@ -117,7 +151,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
     alignItems: 'center',
   },
-
   iconMain: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -132,10 +165,9 @@ const styles = StyleSheet.create({
   logo: {
     width: 38,
     height: 38,
-    resizeMode: 'contain', // Adjusts the image to cover the container uniformly
+    resizeMode: 'contain',
     marginRight: 8,
   },
-
   companyText: {
     color: 'gray',
     fontSize: 12,
@@ -156,8 +188,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     alignItems: 'center',
     color: 'gray',
-
-    // textAlign:'right',
   },
 });
 
