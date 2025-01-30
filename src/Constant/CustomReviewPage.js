@@ -4,7 +4,6 @@ import {
   Text,
   ScrollView,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -15,6 +14,8 @@ import {useIsFocused} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import JobViewController from '../Recruiter/RecruiterRedux/Action/JobViewController';
 import ConfirmationModal from './CustomModal';
+import {TextInput} from 'react-native-paper';
+// import {TextInput} from 'react-native-paper';
 
 const ReviewPage = ({data}) => {
   const dispatch = useDispatch();
@@ -123,33 +124,44 @@ const ReviewPage = ({data}) => {
       </View>
 
       <View style={styles.commentBoxContainer}>
-        <Text style={styles.labelText}>Enter the Title:</Text>
         <TextInput
           style={styles.titleInput}
-          placeholder="Title or Subject for your review"
+          label="Enter the Title"
           value={reviewTitle}
           onChangeText={setReviewTitle}
+          mode="outlined"
+          outlineStyle={{ borderWidth: 1 }}
+          textColor="black"
+          activeOutlineColor="lightgrey"
         />
 
-        <Text style={styles.labelText}>Enter your comment:</Text>
         <TextInput
           style={styles.commentInput}
-          placeholder="Add your comment..."
+          label="Enter your comment"
           value={newComment}
           onChangeText={setNewComment}
           multiline
+          mode="outlined"
+          outlineStyle={{ borderWidth: 1 }}
+          textColor="black"
+          activeOutlineColor="lightgrey"
         />
 
-        <Text style={styles.labelText}>Enter your rating:</Text>
         <View style={styles.ratingRow}>
           <TextInput
             style={styles.ratingInput}
-            placeholder="0-5 ratings"
+            label="0-5 rating"
             keyboardType="numeric"
             value={userRating}
             onChangeText={handleRatingChange}
+            mode="outlined"
+            outlineStyle={{ borderWidth: 1 }}
+            textColor="black"
+            activeOutlineColor="lightgrey"
+            theme={{ colors: { background: 'white' } }}
           />
-          {renderStars(userRating)}
+          {/* Render Stars next to the input */}
+          <View style={styles.starDisplay}>{renderStars(userRating)}</View>
         </View>
         <TouchableOpacity style={styles.button} onPress={handleAddComment}>
           <Text style={styles.buttonText}>Add Comment</Text>
@@ -259,17 +271,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+ 
   ratingInput: {
-    width: 100, // Shorter width
+    width: 100,
     height: 48,
-    borderColor: '#e6e6e6',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 8,
     marginRight: 10,
-    textAlign: 'center',
   },
-  ratingText: {fontSize: 14, color: '#333', marginVertical: 8},
 
   commentBoxContainer: {
     backgroundColor: 'white',
@@ -279,22 +286,19 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderColor: '#e6e6e6',
     shadowOffset: {width: 0, height: 2},
+    marginTop:8
   },
   titleInput: {
     height: 48,
-    borderColor: '#e6e6e6',
-    borderWidth: 1,
-    padding: 10,
-    borderRadius: 8,
     marginBottom: 12,
+    backgroundColor: 'white',
+    borderRadius: 8,
   },
   commentInput: {
     height: 100,
-    borderColor: '#e6e6e6',
-    borderWidth: 1,
-    padding: 8,
+    marginBottom: 12,
+    backgroundColor: 'white',
     borderRadius: 12,
-    marginBottom: 10,
   },
   starDisplay: {
     flexDirection: 'row',

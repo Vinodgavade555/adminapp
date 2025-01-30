@@ -15,6 +15,7 @@ import {useIsFocused, useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useDispatch} from 'react-redux';
 import JobViewController from '../Recruiter/RecruiterRedux/Action/JobViewController';
+import InvitationDetailModal from './InvitationUserDetail';
 const _width = Dimensions.get('window').width;
 
 const UserCard = ({
@@ -28,6 +29,8 @@ const UserCard = ({
   const navigation = useNavigation();
   const [id, setId] = useState('');
   const isFocus = useIsFocused();
+  const [isModalVisible, setModalVisible] = useState(false);
+
   useEffect(() => {
     // console.log('Job Applications Updated_____________________', item);
   }, [item]);
@@ -138,7 +141,7 @@ const UserCard = ({
     job => job.is_current_company === 'true',
   );
   const experienceText = currentJob
-    ? `${currentJob?.job_title} at ${currentJob?.company_name}`
+    ? `${currentJob?.job_title}at ${currentJob?.company_name}`
     : null;
   return (
     <View
@@ -150,24 +153,33 @@ const UserCard = ({
       ]}>
       <TouchableOpacity
         onPress={() => {
-          // console.log("Stringified Transformed Data:", JSON.stringify(jobId));
-          navigation.navigate('RecruiterStack', {
-            screen: 'UserDetailScreen',
-            params: {
-              data: {
-                user: transformedData,
+          // console.log('Stringified Transformed Data:', JSON.stringify(jobId));
+          // navigation.navigate('RecruiterStack', {
+          //   // screen: 'UserDetailScreen',
+          //   screen: 'InvitationDetail',
+          //   params: {
+          //     data: {
+          //       user: transformedData,
+          //       jobId: jobId,
+          //       cover_letter: coverLetter,
+          //     },
+          //     page: page_name,
+          //   },
+          // });
+          setModalVisible(true);
+          
+        }}
+        style={styles.card}
+        >
+          <InvitationDetailModal
+        isVisible={isModalVisible}
+        onClose={() => setModalVisible(false)} // Close modal on overlay or close button press
+        data={{
+          user: transformedData,
                 jobId: jobId,
                 cover_letter: coverLetter,
-              },
-              page: page_name,
-            },
-          });
-
-          // navigation.navigate('UserDetailScreen', {
-          //   data: {user: transformedData, jobId: jobId},
-          //   page: page_name,
-          // });
-        }}>
+        }}
+      />
         <View
           style={{
             backgroundColor: '#fafafa',
@@ -317,7 +329,6 @@ const UserCard = ({
           </ScrollView>
         </View>
       </TouchableOpacity>
-      {/* {console.log('item.isSaved', item?.user_id?.is_saved)} */}
       <View style={styles.buttonContainer}>
         {page_name === 'home' ? (
           <TouchableOpacity
