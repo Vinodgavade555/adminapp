@@ -9,6 +9,8 @@ import SavedUserList from '../Components/SavedUserList.js';
 import ApplicationsListScreen from '../Components/ApplicationList.js';
 import InvitationList from '../Components/InvitationList.js';
 import JobDetailScreen from '../Components/JobDetail.js';
+import InvitationUserDetail from '../../Constant/InvitationUserDetail.js';
+import InvitationDetailModal from '../../Constant/InvitationUserDetail.js';
 
 const RecruiterNavigation = () => {
   const Stack = createNativeStackNavigator();
@@ -57,6 +59,12 @@ const RecruiterNavigation = () => {
       />
 
       <Stack.Screen name="ShortlistUser" component={ShortlistCandidate} />
+
+      <Stack.Screen
+        name="InvitationDetail"
+        component={InvitationDetailModal}
+        options={{headerShown: false}}
+      />
     </Stack.Navigator>
   );
 };

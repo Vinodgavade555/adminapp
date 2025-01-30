@@ -183,7 +183,7 @@ const jobReducer = (state = initialState, action) => {
     case 'SENDINVITATION_SUCCESS':
       return {
         ...state,
-        error: null,
+         error: null,
       };
 
     // Job Applications Failure

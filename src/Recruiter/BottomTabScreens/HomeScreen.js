@@ -17,6 +17,9 @@ import LinearGradient from 'react-native-linear-gradient';
 import {useNavigation} from '@react-navigation/native';
 import UserCard from '../../Constant/UserCard';
 import JobViewController from '../RecruiterRedux/Action/JobViewController';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import {BarChart} from 'react-native-chart-kit';
+const screenWidth = Dimensions.get('window').width - 40;
 
 const {width} = Dimensions.get('window');
 const HomeScreen = () => {
@@ -47,27 +50,43 @@ const HomeScreen = () => {
 
   const data = [
     {
-      title: 'Total Openings by Country',
+      title: 'Job Open',
       value: HomeData?.total_opening_jobs
         ? HomeData.total_opening_jobs.toLocaleString()
         : '0',
-      description: 'Jobs available worldwide',
+      icon: 'briefcase',
     },
     {
-      title: 'Total Hired by Platform',
-      value: HomeData?.total_hired_count
-        ? HomeData.total_hired_count.toLocaleString()
+      title: 'Active Jobs',
+      value: HomeData?.total_active_jobs
+        ? HomeData.total_active_jobs.toLocaleString()
         : '0',
-      description: 'Candidates hired successfully',
+      icon: 'checkmark-circle',
     },
     {
       title: 'Total Applications',
       value: HomeData?.total_application_count
         ? HomeData.total_application_count.toLocaleString()
         : '0',
-      description: 'Applications submitted',
+      icon: 'document-text',
     },
   ];
+
+  const weeklyData = {
+    labels: ['S', 'M', 'T', 'W', 'T', 'F', 'S'], // Days of the week
+    values: [20, 10, 40, 15, 25, 35, 5], // Applicants per day
+  };
+
+  const chartConfig = {
+    backgroundGradientFrom: '#ffffff',
+    backgroundGradientTo: '#ffffff',
+    decimalPlaces: 0,
+    color: (opacity = 1) => `rgba(34, 94, 190, ${opacity})`,
+    strokeWidth: 2,
+    barPercentage: 0.6,
+    fillShadowGradient: '#225EBE',
+    fillShadowGradientOpacity: 1,
+  };
 
   return (
     <View style={styles.Maincontainer}>
@@ -84,25 +103,85 @@ const HomeScreen = () => {
           />
         </View>
 
+        <Text style={styles.tableheading}>Job Summary</Text>
+
         <ScrollView
           horizontal
-          // pagingEnabled
           showsHorizontalScrollIndicator={false}
           style={styles.scrollView}>
           {data.map((item, index) => (
             <View key={index} style={[styles.card]}>
-              <LinearGradient
-                start={{x: 1, y: 0}}
-                end={{x: 1, y: 2}}
-                colors={['#0088cc', '#006699', '#004466']}
-                style={styles.linearGradient}>
-                <Text style={styles.title}>{item.title}</Text>
-                <Text style={styles.value}>{item.value}</Text>
-                <Text style={styles.description}>{item.description}</Text>
-              </LinearGradient>
+              <View style={styles.iconWrapper}>
+                <Ionicons
+                  name={item.icon}
+                  size={20}
+                  color={colors.secondary}
+                  style={styles.icon}
+                />
+              </View>
+              <Text style={styles.title}>{item.title}</Text>
+              <Text style={styles.value}>{item.value}</Text>
             </View>
           ))}
         </ScrollView>
+        <View style={styles.chartcard}>
+          {/* Header Section */}
+          <View style={{flexDirection: 'row', alignItems: 'center',justifyContent:'space-between',marginBottom:12}}>
+            <View>
+              <Text style={styles.title}>Total New Applicant</Text>
+              <Text style={styles.subtitle}>Last 7 days</Text>
+            </View>
+            {/* Total Count */}
+            <View style={styles.totalContainer}>
+              <Text style={styles.totalApplicants}>150</Text>
+              <Text style={styles.increase}>↑ +76</Text>
+            </View>
+          </View>
+
+          {/* Custom Chart with Labels */}
+          <View style={styles.chartContainer}>
+            <View style={styles.barContainer}>
+              {weeklyData.values.map((value, index) => {
+                const barWidth = screenWidth / weeklyData.labels.length - 5;
+
+                return (
+                  <View
+                    key={index}
+                    style={{width: barWidth, alignItems: 'center'}}>
+                    {/* Label Above Bar */}
+                    <Text
+                      style={[
+                        styles.barValue,
+                        {
+                          bottom:
+                            (value / Math.max(...weeklyData.values)) * 160 + 20,
+                        },
+                      ]}>
+                      {value}
+                    </Text>
+
+                    {/* Bar itself */}
+                    <View
+                      style={[
+                        styles.bar,
+                        {
+                          height:
+                            (value / Math.max(...weeklyData.values)) * 160,
+                          width: barWidth * 0.5,
+                        },
+                      ]}
+                    />
+
+                    {/* Label Below Bar */}
+                    <Text style={styles.barLabel}>
+                      {weeklyData.labels[index]}
+                    </Text>
+                  </View>
+                );
+              })}
+            </View>
+          </View>
+        </View>
 
         {HomeData.top_20_related_to_recent_jobs && (
           <View>
@@ -218,7 +297,11 @@ const HomeScreen = () => {
 
                       {job?.experience_level ? (
                         <View
-                          style={{flexDirection: 'row', alignItems: 'center',marginTop:4}}>
+                          style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            marginTop: 4,
+                          }}>
                           <Icon
                             name="briefcase"
                             size={14}
@@ -286,36 +369,39 @@ const styles = StyleSheet.create({
     flexGrow: 0,
     marginHorizontal: 12,
   },
+
   card: {
-    flex: 1,
-    width: '100%',
-    marginRight: 12,
+    backgroundColor: '#fff',
+    padding: 10,
     borderRadius: 8,
-    overflow: 'hidden',
-    marginBottom: 18,
+    marginRight: 10,
+    shadowColor: '#000',
+    shadowRadius: 5,
+    marginBottom: 12,
+    marginTop: 12,
+    width: 105,
   },
-  linearGradient: {
-    padding: 20,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+
   title: {
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: '600',
-    marginBottom: 10,
-    color: '#fff',
+    color: '#000',
   },
   value: {
-    fontSize: 36,
+    fontSize: 26,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#00',
   },
-  description: {
-    fontSize: 14,
-    marginTop: 10,
-    color: '#f0f0f0',
-    textAlign: 'center',
+  iconWrapper: {
+    backgroundColor: '#fff', // Change this to any color you want
+    width: 32, // Size of the circle
+    height: 32, // Size of the circle
+    borderRadius: 20, // Makes the background circular
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8, // Space between the icon and text
+    borderColor: '#1aa3ff',
+    borderWidth: 1,
   },
   welcomeBanner: {
     marginBottom: 12,
@@ -351,7 +437,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: colors.primary,
-    marginTop: 12,
     marginLeft: 12,
   },
 
@@ -398,7 +483,7 @@ const styles = StyleSheet.create({
   locationContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop:4
+    marginTop: 4,
   },
   locationIcon: {
     marginRight: 4, // Space between the icon and text
@@ -426,11 +511,66 @@ const styles = StyleSheet.create({
     color: colors.primary,
     marginLeft: 4,
   },
-  // jobDate: {
-  //   fontSize: 12,
-  //   color: '#888',
-  //   marginTop: 4,
-  // },
+  chartcard: {
+    backgroundColor: '#fff',
+    padding: 18,
+    borderRadius: 12,
+    marginHorizontal: 8,
+    marginBottom:12
+  },
+  title: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  subtitle: {
+    fontSize: 12,
+    color: '#888',
+    marginBottom: 8,
+  },
+  totalContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  totalApplicants: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#222',
+  },
+  increase: {
+    fontSize: 14,
+    color: 'green',
+    marginLeft: 10,
+    fontWeight: '600',
+  },
+  chartContainer: {
+    position: 'relative',
+    marginTop: 30,
+  },
+
+  barContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'flex-end',
+    height: 160,
+    position: 'relative',
+  },
+  bar: {
+    backgroundColor: '#A3C8FF',
+    borderRadius: 4,
+  },
+  barValue: {
+    position: 'absolute',
+    color: '#333',
+    fontSize: 12,
+    textAlign: 'center',
+  },
+  barLabel: {
+    marginTop: 2,
+    fontSize: 12,
+    color: '#777',
+    textAlign: 'center',
+  },
 });
 
 export default HomeScreen;

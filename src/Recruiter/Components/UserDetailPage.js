@@ -14,7 +14,7 @@ import {
 import {colors} from '../../Global_CSS/TheamColors';
 import moment from 'moment';
 const {width} = Dimensions.get('window');
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useIsFocused} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -37,23 +37,20 @@ const UserDetailScreen = ({route, navigation}) => {
   const [status, setStatus] = useState(data?.status || 'APPLIED');
   const [buttonPressed, setButtonPressed] = useState(false);
   const [activeTab, setActiveTab] = useState('Profile Details');
-  const [isInvitationSent, setIsInvitationSent] = useState(false);
   const user = data?.user ? data.user : data.user_id;
   const [isShortlisted, setIsShortlisted] = useState(user.is_shortlisted);
   const [isSavedUser, setIsSavedUser] = useState(user.is_saved);
-
-  // console.log('.................', JSON.stringify(data, null, 2));
-
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [isEmploymentModalVisible, setEmploymentModalVisible] = useState(false);
   const [selectedEmployment, setSelectedEmployment] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedAccomplishment, setSelectedAccomplishment] = useState(null);
-
   const [selectedMode, setSelectedMode] = useState(null);
-
   const webViewRef = useRef(null);
+
+  console.log('.................', JSON.stringify(data, null, 2));
+
   const handleBackPress = () => {
     if (webViewRef.current && webViewRef.current.canGoBack()) {
       webViewRef.current.goBack();
@@ -105,7 +102,6 @@ const UserDetailScreen = ({route, navigation}) => {
     }, {});
   };
 
-  // Group accomplishments by name
   const groupedAccomplishments = groupAccomplishmentsByName(
     user?.accomplishments || [],
   );
@@ -116,7 +112,7 @@ const UserDetailScreen = ({route, navigation}) => {
       user_id: data?.user?.user_id,
       created_by: id,
     };
-    console.log('**************************',invitationData);
+    // console.log('**************************', invitationData);
     dispatch(SendInvitation(invitationData));
   };
 
@@ -285,7 +281,7 @@ const UserDetailScreen = ({route, navigation}) => {
   );
 
   const experienceText = currentJob
-    ? `${currentJob?.job_title} at ${currentJob?.company_name}`
+    ? `${currentJob?.job_title}at ${currentJob?.company_name}`
     : null;
 
   const formatDate = date => {
@@ -304,123 +300,126 @@ const UserDetailScreen = ({route, navigation}) => {
             showsVerticalScrollIndicator={false}>
             {/* Skills */}
             <View>
-              <Text style={styles.boldText}>Skills</Text>
-              <View style={styles.chipContainer}>
-                {user?.key_skills?.length > 0 ? (
-                  user?.key_skills?.map((skill, index) => (
-                    <Text key={index} style={styles.chip}>
-                      {skill}
-                    </Text>
-                  ))
-                ) : (
-                  <Text style={styles.OutputText}>No skills available</Text>
-                )}
-              </View>
+              {user?.key_skills?.length > 0 && ( // Check if there are skills available
+                <>
+                  <Text style={styles.boldText}>Skills</Text>
+                  <View style={styles.chipContainer}>
+                    {user?.key_skills?.map((skill, index) => (
+                      <Text key={index} style={styles.chip}>
+                        {skill}
+                      </Text>
+                    ))}
+                  </View>
+                </>
+              )}
             </View>
 
             {/* It Skills ans experience */}
-            <View
-              style={{
-                paddingVertical: 12,
-              }}>
-              <Text style={[styles.boldTextSkill]}>IT Skills & Experience</Text>
-              <ScrollView
-                contentContainerStyle={{
-                  flexDirection: 'column',
-                  gap: 8,
-                }}>
-                {user?.it_skills?.length > 0 ? (
-                  user.it_skills.map((skill, index) => (
-                    <View
-                      key={`it_skill_${index}`}
-                      style={[
-                        styles.skillSection,
-                        {
-                          padding: 12,
-                          borderRadius: 8,
-                          backgroundColor: '#f1f1f1',
-                          flex: 1,
-                        },
-                      ]}>
-                      <Text style={{fontSize: 13}}>
-                        <Text
-                          style={{
-                            fontWeight: '600',
-                            color: colors.primary,
-                          }}>
-                          {skill?.name === 'Other'
-                            ? skill?.othername
-                            : skill?.name || 'N/A'}
+            <View style={{paddingVertical: 12}}>
+              {user?.it_skills?.length > 0 && ( // Only render if there are IT skills
+                <>
+                  <Text style={[styles.boldTextSkill]}>
+                    IT Skills & Experience
+                  </Text>
+                  <ScrollView
+                    contentContainerStyle={{
+                      flexDirection: 'column',
+                      gap: 8,
+                    }}>
+                    {user.it_skills.map((skill, index) => (
+                      <View
+                        key={`it_skill_${index}`}
+                        style={[
+                          styles.skillSection,
+                          {
+                            padding: 12,
+                            borderRadius: 8,
+                            backgroundColor: '#f1f1f1',
+                            flex: 1,
+                          },
+                        ]}>
+                        <Text style={{fontSize: 13}}>
+                          <Text
+                            style={{
+                              fontWeight: '600',
+                              color: colors.primary,
+                            }}>
+                            {skill?.name === 'Other'
+                              ? skill?.othername
+                              : skill?.name || 'N/A'}
+                          </Text>
+                          <Text
+                            style={{
+                              fontWeight: '400',
+                              color: 'gray',
+                            }}>
+                            {` (${skill?.exp?.years || 0}.${
+                              skill?.exp?.months || 0
+                            } year)`}
+                          </Text>
                         </Text>
-                        <Text
-                          style={{
-                            fontWeight: '400',
-                            color: 'gray',
-                          }}>
-                          {` (${skill?.exp?.years || 0}.${
-                            skill?.exp?.months || 0
-                          } year)`}
-                        </Text>
-                      </Text>
-                    </View>
-                  ))
-                ) : (
-                  <Text style={styles.OutputText}>No IT skills available.</Text>
-                )}
-              </ScrollView>
+                      </View>
+                    ))}
+                  </ScrollView>
+                </>
+              )}
             </View>
 
             {/* Education */}
             <View>
-              <Text style={styles.boldText}>Education</Text>
-              {user?.higher_edu?.length > 0 ? (
-                <ScrollView
-                  contentContainerStyle={{
-                    flexDirection: 'column',
-                    gap: 12,
-                  }}>
-                  {user.higher_edu.map((edu, index) => (
-                    <View
-                      key={`edu_${index}`}
-                      style={[
-                        styles.section,
-                        {
-                          padding: 12,
-                          borderRadius: 8,
-                          backgroundColor: '#fafafa',
-                          height: 'auto',
-                          flex: 1,
-                        },
-                      ]}>
-                      {edu.course_name && (
-                        <Text style={{color: colors.primary}}>
-                          {edu.course_name}
-                          {edu.specialization && (
-                            <Text style={{color: colors.primary}}>
-                              {' - '}
-                              {edu.specialization}
-                            </Text>
-                          )}
-                          {(edu.duration?.start_year ||
-                            edu.duration?.end_year) && (
-                            <Text style={{color: 'gray', fontSize: 12}}>
-                              {' '}
-                              ({edu.duration?.start_year || ''} -{' '}
-                              {edu.duration?.end_year || ''})
-                            </Text>
-                          )}
-                        </Text>
-                      )}
+              {user?.higher_edu?.length > 0 && ( // Only render if there are education records
+                <>
+                  <Text style={styles.boldText}>Education</Text>
+                  <ScrollView
+                    contentContainerStyle={{
+                      flexDirection: 'column',
+                      gap: 12,
+                    }}>
+                    {user.higher_edu.map((edu, index) => (
+                      <View
+                        key={`edu_${index}`}
+                        style={[
+                          styles.section,
+                          {
+                            padding: 12,
+                            borderRadius: 8,
+                            backgroundColor: '#fafafa',
+                            height: 'auto',
+                            flex: 1,
+                          },
+                        ]}>
+                        {edu.course_name && (
+                          <Text style={{color: colors.primary}}>
+                            {edu.course_name}
+                            {edu.specialization && (
+                              <Text style={{color: colors.primary}}>
+                                {' - '}
+                                {edu.specialization}
+                              </Text>
+                            )}
+                            {(edu.duration?.start_year ||
+                              edu.duration?.end_year) && (
+                              <Text style={{color: 'gray', fontSize: 12}}>
+                                {' ('}
+                                {edu.duration?.start_year || ''}
+                                {' - '}
+                                {edu.duration?.end_year || ''}
+                                {')'}
+                              </Text>
+                            )}
+                          </Text>
+                        )}
 
-                      {edu.university_name && (
-                        <Text style={[styles.OutputText]}>
-                          {edu.university_name}
-                        </Text>
-                      )}
-                    </View>
-                  ))}
-                </ScrollView>
-              ) : null}
+                        {edu.university_name && (
+                          <Text style={[styles.OutputText]}>
+                            {edu.university_name}
+                          </Text>
+                        )}
+                      </View>
+                    ))}
+                  </ScrollView>
+                </>
+              )}
             </View>
 
             {/* Languages */}
@@ -441,7 +440,7 @@ const UserDetailScreen = ({route, navigation}) => {
                           {
                             paddingVertical: 12,
                             paddingHorizontal: 12,
-                            backgroundColor: '#fff',
+                            backgroundColor: '#fafafa',
                             borderRadius: 8,
                             height: 'auto',
                             flex: 1,
@@ -697,54 +696,52 @@ const UserDetailScreen = ({route, navigation}) => {
       case 'Professional':
         return (
           <View>
+            {/* Project Details */}
             <ScrollView showsVerticalScrollIndicator={false}>
-              {/* Project Details Section */}
-              <Text style={styles.boldText}>Project Details</Text>
-              {user?.project_details?.length > 0 ? (
-                <ScrollView
-                  horizontal
-                  contentContainerStyle={styles.scrollContainer}
-                  showsHorizontalScrollIndicator={false}>
-                  {user?.project_details?.map((pro, index) => (
-                    <View key={`pro_${index}`} style={styles.projectCard}>
-                      {pro.title && (
-                        <Text style={styles.titleText}>Title: {pro.title}</Text>
-                      )}
-
-                      {pro.role && (
-                        <Text style={styles.roleText}>Role: {pro.role}</Text>
-                      )}
-
-                      {pro.worked_duration?.from &&
-                        pro.worked_duration?.till && (
-                          <View
-                            style={{
-                              flexDirection: 'row',
-                              alignItems: 'center',
-                            }}>
-                            <Ionicons name="time" size={16} color="gray" />
-                            <Text
-                              style={[styles.durationText, {marginLeft: 8}]}>
-                              {formatDate(pro.worked_duration.from)} -{' '}
-                              {formatDate(pro.worked_duration.till)}
-                            </Text>
-                          </View>
+              {/* Only render "Project Details" if there are project details */}
+              {user?.project_details?.length > 0 && (
+                <>
+                  <Text style={styles.boldText}>Project Details</Text>
+                  <ScrollView
+                    horizontal
+                    contentContainerStyle={styles.scrollContainer}
+                    showsHorizontalScrollIndicator={false}>
+                    {user?.project_details?.map((pro, index) => (
+                      <View key={`pro_${index}`} style={styles.projectCard}>
+                        {/* Only render these if they have data */}
+                        {pro.title && (
+                          <Text style={styles.titleText}>
+                            Title: {pro.title}
+                          </Text>
                         )}
-
-                      <TouchableOpacity onPress={() => openModal(pro)}>
-                        <Text style={styles.viewMoreText}>View More</Text>
-                      </TouchableOpacity>
-                    </View>
-                  ))}
-                </ScrollView>
-              ) : (
-                <Text style={styles.noDataText}>
-                  No project records available.
-                </Text>
+                        {pro.role && (
+                          <Text style={styles.roleText}>Role: {pro.role}</Text>
+                        )}
+                        {pro.worked_duration?.from &&
+                          pro.worked_duration?.till && (
+                            <View
+                              style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                              }}>
+                              <Ionicons name="time" size={16} color="gray" />
+                              <Text
+                                style={[styles.durationText, {marginLeft: 8}]}>
+                                {formatDate(pro.worked_duration.from)} -{' '}
+                                {formatDate(pro.worked_duration.till)}
+                              </Text>
+                            </View>
+                          )}
+                        <TouchableOpacity onPress={() => openModal(pro)}>
+                          <Text style={styles.viewMoreText}>View More</Text>
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                  </ScrollView>
+                </>
               )}
 
-              {/* Modal for showing full project details */}
-              {selectedProject && (
+              {selectedProject && isModalVisible && (
                 <Modal
                   visible={isModalVisible}
                   animationType="slide"
@@ -753,10 +750,7 @@ const UserDetailScreen = ({route, navigation}) => {
                   <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>
                       <View
-                        style={{
-                          marginHorizontal: 0,
-                          flexDirection: 'column',
-                        }}>
+                        style={{marginHorizontal: 0, flexDirection: 'column'}}>
                         {/* Title and Close Icon in the Same Row */}
                         <View
                           style={{
@@ -780,11 +774,7 @@ const UserDetailScreen = ({route, navigation}) => {
                         </View>
 
                         {selectedProject.nature_of_employment && (
-                          <Text
-                            style={{
-                              color: 'green',
-                              fontWeight: 'bold',
-                            }}>
+                          <Text style={{color: 'green', fontWeight: 'bold'}}>
                             {selectedProject.nature_of_employment}
                           </Text>
                         )}
@@ -792,6 +782,7 @@ const UserDetailScreen = ({route, navigation}) => {
 
                       <ScrollView
                         contentContainerStyle={styles.modalDetailsContainer}>
+                        {/* Conditionally render each detail if available */}
                         {selectedProject.role && (
                           <Text style={styles.modalText}>
                             <Text style={{color: 'black'}}>Role: </Text>
@@ -817,7 +808,6 @@ const UserDetailScreen = ({route, navigation}) => {
                               <Text style={{color: 'black', marginBottom: 4}}>
                                 Skills:
                               </Text>
-
                               <View style={styles.chipContainer}>
                                 {selectedProject.skills_used.map(
                                   (skill, index) => (
@@ -864,89 +854,86 @@ const UserDetailScreen = ({route, navigation}) => {
               )}
             </ScrollView>
 
+            {/* Employment Details */}
             <View>
-              <Text style={styles.sectionTitle}>Employment Details</Text>
-
               {user?.employment_details &&
               user?.employment_details.length > 0 ? (
-                user?.employment_details.map((employment, index) => (
-                  <View key={index} style={styles.Employmentcard}>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                      }}>
-                      {employment.company_name ? (
-                        <Text style={styles.companyName}>
-                          {employment.company_name}
-                        </Text>
-                      ) : null}
+                <>
+                  <Text style={styles.sectionTitle}>Employment Details</Text>
 
-                      {employment.employment_type ? (
-                        <Text style={styles.employmentType}>
-                          {employment.employment_type}
-                        </Text>
-                      ) : null}
-                    </View>
-
-                    {employment.job_title ? (
-                      <Text style={styles.jobTitle}>
-                        {employment.job_title}
-                      </Text>
-                    ) : null}
-
-                    {/* Dates */}
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        gap: 4,
-                      }}>
-                      {employment.joining_date || employment.leaving_date ? (
-                        <>
-                          <Ionicons name="calendar" size={16} color="gray" />
-                          <Text style={styles.date}>
-                            {employment.joining_date
-                              ? moment(
-                                  employment.joining_date,
-                                  'DD-MM-YYYY',
-                                  true,
-                                ).format('D MMM YY')
-                              : ''}
-
-                            {employment.joining_date && employment.leaving_date
-                              ? ' - '
-                              : ''}
-
-                            {employment.leaving_date
-                              ? moment(
-                                  employment.leaving_date,
-                                  'DD-MM-YYYY',
-                                  true,
-                                ).format('D MMM YY')
-                              : employment.joining_date
-                              ? ' - Present'
-                              : ''}
+                  {user?.employment_details.map((employment, index) => (
+                    <View key={index} style={styles.Employmentcard}>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+                        }}>
+                        {employment.company_name && (
+                          <Text style={styles.companyName}>
+                            {employment.company_name}
                           </Text>
-                        </>
-                      ) : null}
+                        )}
+
+                        {employment.employment_type && (
+                          <Text style={styles.employmentType}>
+                            {employment.employment_type}
+                          </Text>
+                        )}
+                      </View>
+
+                      {employment.job_title && (
+                        <Text style={styles.jobTitle}>
+                          {employment.job_title}
+                        </Text>
+                      )}
+
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: 4,
+                        }}>
+                        {employment.joining_date || employment.leaving_date ? (
+                          <>
+                            <Ionicons name="calendar" size={16} color="gray" />
+                            <Text style={styles.date}>
+                              {employment.joining_date
+                                ? moment(
+                                    employment.joining_date,
+                                    'DD-MM-YYYY',
+                                    true,
+                                  ).format('D MMM YY')
+                                : ''}
+
+                              {employment.joining_date &&
+                              employment.leaving_date
+                                ? ' - '
+                                : ''}
+
+                              {employment.leaving_date
+                                ? moment(
+                                    employment.leaving_date,
+                                    'DD-MM-YYYY',
+                                    true,
+                                  ).format('D MMM YY')
+                                : employment.joining_date
+                                ? ' - Present'
+                                : ''}
+                            </Text>
+                          </>
+                        ) : null}
+                      </View>
+
+                      <TouchableOpacity
+                        onPress={() => openEmploymentModal(employment)}>
+                        <Text style={styles.viewMoreText}>View More</Text>
+                      </TouchableOpacity>
                     </View>
+                  ))}
+                </>
+              ) : null}
 
-                    {/* View More Button */}
-                    <TouchableOpacity
-                      onPress={() => openEmploymentModal(employment)}>
-                      <Text style={styles.viewMoreText}>View More</Text>
-                    </TouchableOpacity>
-                  </View>
-                ))
-              ) : (
-                <Text style={styles.noDataText}>
-                  No employment details available.
-                </Text>
-              )}
-
-              {/* Modal for Detailed Employment Data */}
-              {selectedEmployment && (
+              {selectedEmployment && isEmploymentModalVisible && (
                 <Modal
                   visible={isEmploymentModalVisible}
                   animationType="slide"
@@ -966,7 +953,6 @@ const UserDetailScreen = ({route, navigation}) => {
                       </View>
 
                       <ScrollView contentContainerStyle={styles.modalDetails}>
-                        {/* Display all fields */}
                         {selectedEmployment.role && (
                           <Text style={styles.detail}>
                             <Text style={styles.label}>Role: </Text>
@@ -1002,6 +988,7 @@ const UserDetailScreen = ({route, navigation}) => {
                             </Text>
                           </Text>
                         )}
+
                         {selectedEmployment.joining_date && (
                           <Text style={styles.detail}>
                             <Text style={styles.label}>Joining Date: </Text>
@@ -1099,7 +1086,6 @@ const UserDetailScreen = ({route, navigation}) => {
           {page !== 'home' && (
             <>
               <TouchableOpacity
-                // style={[styles.shortlistButton]}
                 onPress={() => {
                   ToggleShortlist(user);
                 }}>
@@ -1121,61 +1107,6 @@ const UserDetailScreen = ({route, navigation}) => {
             </>
           )}
         </View>
-      </View>
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-aound',
-          // marginTop: 12,
-        }}>
-        {showButtons && (
-          <>
-            {page === 'application' && (
-              <>
-                <TouchableOpacity
-                  // style={[styles.shortlistButton, {backgroundColor: '#ffe0cc'}]}
-                  onPress={handleCoverLetterClick}>
-                  <Text
-                    style={{
-                      color: colors.secondary,
-                      textAlign: 'right',
-                      fontSize: 14,
-                      textDecorationLine: 'underline',
-                    }}>
-                    View Cover Letter
-                  </Text>
-                </TouchableOpacity>
-
-                <Modal
-                  visible={isModalVisible}
-                  transparent={true}
-                  animationType="slide"
-                  onRequestClose={handleCloseModal}>
-                  <View style={styles.modalContainer}>
-                    <View style={styles.modalContent}>
-                      <View
-                        style={{
-                          flexDirection: 'row',
-                          marginHorizontal: 2,
-                          justifyContent: 'space-between',
-                        }}>
-                        <Text style={styles.modalTitle}>Cover Letter</Text>
-                        <TouchableOpacity
-                          style={styles.closeButton}
-                          onPress={handleCloseModal}>
-                          <Ionicons name="close" size={24} color="red" />
-                        </TouchableOpacity>
-                      </View>
-                      <Text style={styles.coverLetterText}>
-                        {data?.cover_letter}
-                      </Text>
-                    </View>
-                  </View>
-                </Modal>
-              </>
-            )}
-          </>
-        )}
       </View>
 
       <ScrollView
@@ -1380,9 +1311,63 @@ const UserDetailScreen = ({route, navigation}) => {
               </View>
             )}
           </View>
+          <View>
+            {showButtons && (
+              <>
+                {page === 'application' && (
+                  <>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        marginHorizontal: 12,
+                        marginTop: 8,
+                      }}>
+                      <TouchableOpacity onPress={handleCoverLetterClick}>
+                        <Text
+                          style={{
+                            color: colors.secondary,
+                            fontSize: 14,
+                            textDecorationLine: 'underline',
+                          }}>
+                          View Cover Letter
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+
+                    <Modal
+                      visible={isModalVisible}
+                      transparent={true}
+                      animationType="slide"
+                      onRequestClose={handleCloseModal}>
+                      <View style={styles.modalContainer}>
+                        <View style={styles.modalContent}>
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              marginHorizontal: 2,
+                              justifyContent: 'space-between',
+                            }}>
+                            <Text style={styles.modalTitle}>Cover Letter</Text>
+                            <TouchableOpacity
+                              style={styles.closeButton}
+                              onPress={handleCloseModal}>
+                              <Ionicons name="close" size={24} color="red" />
+                            </TouchableOpacity>
+                          </View>
+                          <Text style={styles.coverLetterText}>
+                            {data?.cover_letter}
+                          </Text>
+                        </View>
+                      </View>
+                    </Modal>
+                  </>
+                )}
+              </>
+            )}
+          </View>
         </View>
 
-        <View style={{marginTop: 12, paddingVertical: 4}}>
+        <View style={{paddingVertical: 8}}>
           <View style={styles.tabContainer}>
             <TouchableOpacity
               style={[
@@ -1417,11 +1402,33 @@ const UserDetailScreen = ({route, navigation}) => {
         <>
           <View style={styles.fixedButtonContainer}>
             {page === 'job_invitation' ? (
-               <TouchableOpacity
-               style={styles.fixedButton}
-               onPress={handleSendInvitation}>
-               <Text style={styles.buttonText}>Send Invitation</Text>
-             </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.fixedButton,
+                  {
+                    backgroundColor: user?.is_invited ? '#d6f5d6' : '#cceeff',
+                  },
+                ]}
+                onPress={() => {
+                  // console.log('user?.is_invited', user?.is_invited);
+
+                  if (data?.is_invited) {
+                    Toast.show('Already invited!', {
+                      type: 'warning',
+                      placement: 'top',
+                      duration: 4000,
+                      offset: 100,
+                      animationType: 'slide-in',
+                    });
+                  } else {
+                    handleSendInvitation();
+                  }
+                }}
+                disabled={user?.is_invited}>
+                <Text style={styles.buttonText}>
+                  {user?.is_invited ? 'Invited' : 'Send Invitation'}{' '}
+                </Text>
+              </TouchableOpacity>
             ) : (
               <TouchableOpacity
                 // style={styles.fixedButton}
@@ -1495,14 +1502,6 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
 
-  shortlistButton: {
-    flex: 1,
-    padding: 10,
-    marginHorizontal: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 5,
-  },
   detailText: {
     flex: 1,
     flexDirection: 'row',
@@ -1714,7 +1713,6 @@ const styles = StyleSheet.create({
   RejectbuttonText: {
     color: '#dc3545',
   },
-
   projectCard: {
     paddingVertical: 12,
     paddingHorizontal: 8,
@@ -1735,7 +1733,6 @@ const styles = StyleSheet.create({
     color: 'gray',
     fontSize: 12,
   },
-
   viewMoreText: {
     color: colors.secondary,
     fontSize: 14,
@@ -1746,17 +1743,14 @@ const styles = StyleSheet.create({
     color: 'gray',
     textAlign: 'center',
   },
-
   closeButton: {
     alignSelf: 'flex-end',
     borderRadius: 50,
     padding: 2,
   },
-
   modalDetailsContainer: {
     marginTop: 8,
   },
-
   modalText: {
     fontSize: 14,
     color: '#666',
@@ -1792,7 +1786,6 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     borderRadius: 4,
   },
-
   modalAccomContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -1809,7 +1802,6 @@ const styles = StyleSheet.create({
     maxHeight: '90%',
     justifyContent: 'center',
   },
-
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -1845,11 +1837,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#000',
   },
-
   workchipsContainer: {
     flexDirection: 'row',
-    flexWrap: 'wrap', // Ensure chips don't overflow and wrap if needed
-    marginBottom: 20,
+    flexWrap: 'wrap',
+    marginBottom: 8,
     marginTop: 12,
   },
   workchip: {
@@ -1874,12 +1865,12 @@ const styles = StyleSheet.create({
   slotsTitle: {
     fontSize: 14,
     fontWeight: 'bold',
-    marginBottom: 8,
+    marginBottom: 4,
   },
   slotItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 8,
   },
   slotText: {
     marginLeft: 4,

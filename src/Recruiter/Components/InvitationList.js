@@ -31,7 +31,7 @@ const InvitationList = ({route}) => {
       [index]: !prevState[index],
     }));
   };
-  console.log('%%%%%%%%%%#############', JobInvitations);
+  // console.log('%%%%%%%%%%#############', JobInvitations);
 
   useEffect(() => {
     const getUserData = async () => {
