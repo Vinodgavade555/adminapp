@@ -86,8 +86,6 @@ const RecruiterNavigation = () => {
           headerTitleAlign: 'center',
         }}
       />
-      <Stack.Screen name="ShortlistUser" component={ShortlistCandidate} />
-
       <Stack.Screen
         name="InvitationDetail"
         component={InvitationDetailModal}

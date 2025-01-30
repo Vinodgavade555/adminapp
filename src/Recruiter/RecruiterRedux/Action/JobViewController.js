@@ -704,8 +704,8 @@ const JobViewController = () => {
     const queryString = new URLSearchParams(queryParams).toString();
 
     try {
-      const response = await axios.get(
-        `http://15.206.149.28/api/filter-users/${user_id}/?page=${page}&${queryString}`,
+      const response = await instance.get(
+        `/filter-users/${user_id}/?page=${page}&${queryString}`,
       );
       // console.log(
       //   '****************************job-GetFilteredUsers response***************************',
