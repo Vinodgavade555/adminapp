@@ -5,6 +5,8 @@ import {
   View,
   ScrollView,
   TouchableOpacity,
+  FlatList,
+  ActivityIndicator,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {useIsFocused, useNavigation} from '@react-navigation/native';
@@ -17,26 +19,25 @@ import JobViewController from '../RecruiterRedux/Action/JobViewController';
 
 const InvitationList = ({route}) => {
   const {jobId} = route.params;
+  const [id, setId] = useState(null);
+
   const dispatch = useDispatch();
   const {GetJobInvitation} = JobViewController();
-  const {JobInvitations} = useSelector(state => state.job);
+  const {JobInvitations, isLoading, JobInvitationsPagination} = useSelector(
+    state => state.job,
+  );
   const isFocus = useIsFocused();
   const navigation = useNavigation();
 
   const [expandedSkills, setExpandedSkills] = useState({});
 
-  const handleToggleViewMore = index => {
-    setExpandedSkills(prevState => ({
-      ...prevState,
-      [index]: !prevState[index],
-    }));
-  };
   // console.log('%%%%%%%%%%#############', JobInvitations);
 
   useEffect(() => {
     const getUserData = async () => {
       try {
         const recruiter_id = await AsyncStorage.getItem('user_data');
+        setId(recruiter_id);
         dispatch(GetJobInvitation(jobId, recruiter_id, 1));
       } catch (error) {
         console.error('Error reading value from AsyncStorage', error);
@@ -44,17 +45,7 @@ const InvitationList = ({route}) => {
     };
     getUserData();
   }, [isFocus]);
-  function formatAmount(value) {
-    if (value >= 10000000) {
-      return (value / 10000000).toFixed(1) + ' Cr';
-    } else if (value >= 100000) {
-      return (value / 100000).toFixed(1) + ' Lac';
-    } else if (value >= 1000) {
-      return (value / 1000).toFixed(1) + ' K';
-    } else {
-      return value?.toString() || 'N/A';
-    }
-  }
+
   if (!JobInvitations?.length) {
     return (
       <View style={styles.container}>
@@ -62,25 +53,41 @@ const InvitationList = ({route}) => {
       </View>
     );
   }
-
+  const loadMoreUsers = () => {
+    if (
+      !isLoading &&
+      id &&
+      JobInvitationsPagination?.next_page_number != null
+    ) {
+      dispatch(
+        GetJobInvitation(jobId, id, JobInvitationsPagination.next_page_number),
+      );
+    }
+  };
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <View style={styles.container}>
       <Text style={styles.header}>Job Invitation Details</Text>
+      <FlatList
+        contentContainerStyle={styles.scrollContainer}
+        data={JobInvitations}
+        keyExtractor={(item, index) => `${item?.id || index}`}
+        renderItem={({item, index}) => (
+          <UserCard
+            item={item}
+            jobId={jobId}
+            page_name={'job_invitation'} // Retaining original page_name value
+            index={index}
+          />
+        )}
+        onEndReached={loadMoreUsers}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={
+          isLoading ? <ActivityIndicator size="large" /> : null
+        }
+      />
 
-      {JobInvitations?.map((jobInvitation, index) => {
-        const skills = jobInvitation?.job_seeker_profile?.key_skills || [];
-        const initialSkills = skills.slice(0, 3); // Show only the first 3 skills initially
-        const allSkills = skills; // All skills
-        const showAllSkills = expandedSkills[index]; // Check if the skills are expanded
-
+      {/* {JobInvitations?.map((jobInvitation, index) => {
         return (
-          // <UserCard
-          //   key={index}
-          //   item={jobInvitation}
-          //   jobId={jobId}
-          //   page_name={'job_invitation'}
-          //   index={index}
-          // />
           <UserCard
             key={jobInvitation?.id} // Use a unique identifier for the key
             item={jobInvitation}
@@ -89,8 +96,8 @@ const InvitationList = ({route}) => {
             index={index} // or user?.id if it’s more appropriate
           />
         );
-      })}
-    </ScrollView>
+      })} */}
+    </View>
   );
 };
 

@@ -426,50 +426,50 @@ const JobViewController = () => {
     }
   };
 
-  const GetUserShortlistedList = (job_id, recruiter_id) => async dispatch => {
-    dispatch({type: 'LOADING', payload: true});
+  const GetUserShortlistedList =
+    (job_id, recruiter_id, page) => async dispatch => {
+      dispatch({type: 'LOADING', payload: true});
 
-    try {
-      const response = await instance.get(
-        `/shortlist-user/job/${job_id}/?recruiter_id=${recruiter_id}`,
-      );
-      const jsonString = JSON.stringify(response.data);
-      const data = JSON.parse(jsonString);
-      // console.log(data);
+      try {
+        const response = await instance.get(
+          `/shortlist-user/job/${job_id}/?recruiter_id=${recruiter_id}&page=${page}`,
+        );
+        const jsonString = JSON.stringify(response.data);
+        const data = JSON.parse(jsonString);
+        // console.log(data);
 
-      dispatch({type: 'USER_SHORTLIST_LIST_SUCCESS', payload: data});
+        dispatch({type: 'USER_SHORTLIST_LIST_SUCCESS', payload: data});
 
-      dispatch({type: 'LOADING', payload: false});
-    } catch (error) {
-      console.log('error', error.response);
+        dispatch({type: 'LOADING', payload: false});
+      } catch (error) {
+        console.log('error', error.response);
 
-      dispatch({type: 'LOADING', payload: false});
-      Toast.show(
-        error.response?.data?.non_field_errors[0]
-          ? error.response.data.non_field_errors[0]
-          : 'Something went wrong,Please Try again!',
-        {
-          type: 'danger',
-          placement: 'top',
-          duration: 4000,
-          offset: 100,
-          animationType: 'slide-in',
-        },
-      );
-      dispatch({
-        type: 'USER_SHORTLIST_LIST_FAILURE',
-        payload: {
-          error: error.response?.data?.non_field_errors
+        dispatch({type: 'LOADING', payload: false});
+        Toast.show(
+          error.response?.data?.non_field_errors[0]
             ? error.response.data.non_field_errors[0]
-            : error?.response?.data,
-        },
-      });
-    }
-  };
+            : 'Something went wrong,Please Try again!',
+          {
+            type: 'danger',
+            placement: 'top',
+            duration: 4000,
+            offset: 100,
+            animationType: 'slide-in',
+          },
+        );
+        dispatch({
+          type: 'USER_SHORTLIST_LIST_FAILURE',
+          payload: {
+            error: error.response?.data?.non_field_errors
+              ? error.response.data.non_field_errors[0]
+              : error?.response?.data,
+          },
+        });
+      }
+    };
 
   const toggleshortlistUser = requestData => async dispatch => {
     dispatch({type: 'LOADING', payload: true});
-    // console.log("requestData",requestData);
 
     try {
       const response = await instance.post(
@@ -483,9 +483,9 @@ const JobViewController = () => {
       dispatch({type: 'TOGGLE_TO_SHORTLIST_SUCCESS', payload: requestData});
       // console.log('requestData.job', requestData);
 
-      dispatch(
-        GetUserShortlistedList(requestData.job_id, requestData.recruiter_id),
-      );
+      // dispatch(
+      //   GetUserShortlistedList(requestData.job_id, requestData.recruiter_id),
+      // );
 
       dispatch({type: 'LOADING', payload: false});
     } catch (error) {
@@ -517,17 +517,23 @@ const JobViewController = () => {
 
   const ToggleSaveUser = requestData => async dispatch => {
     dispatch({type: 'LOADING', payload: true});
+      console.log('-----------ToggleSaveUser----------', requestData);
+
 
     try {
       const response = await instance.post(`/save-candidate/`, requestData);
-      console.log('{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{',response);
       const jsonString = JSON.stringify(response.data);
       const data = JSON.parse(jsonString);
 
       dispatch({type: 'USER_SAVED_SUCCESSFULLY', payload: requestData.user_id});
-      // console.log('requestData', requestData.user_id);
 
-      dispatch(GetSavedUser(requestData.recruiter_id, requestData.job_id, requestData.page));
+      // dispatch(
+      //   GetSavedUser(
+      //     requestData.recruiter_id,
+      //     // requestData.job_id,
+      //     requestData.page,
+      //   ),
+      // );
 
       dispatch({type: 'LOADING', payload: false});
     } catch (error) {
@@ -560,7 +566,7 @@ const JobViewController = () => {
   const GetSavedUser = (recruiter_id, jobId, page) => async dispatch => {
     dispatch({type: 'LOADING', payload: true});
     console.log(
-      '-----------------====================',
+      '----------------- GetSavedUser ====================',
       recruiter_id,
       jobId,
       page,
@@ -693,13 +699,13 @@ const JobViewController = () => {
 
   const GetFilteredUsers = (user_id, page, queryParams) => async dispatch => {
     dispatch({type: 'LOADING', payload: true});
-    console.log('-----------------------', user_id, page, queryParams);
+    // console.log('-----------------------', user_id, page, queryParams);
 
     const queryString = new URLSearchParams(queryParams).toString();
 
     try {
-      const response = await axios.get(
-        `http://15.206.149.28/api/filter-users/${user_id}/?page=${page}&${queryString}`,
+      const response = await instance.get(
+        `/filter-users/${user_id}/?page=${page}&${queryString}`,
       );
       // console.log(
       //   '****************************job-GetFilteredUsers response***************************',
