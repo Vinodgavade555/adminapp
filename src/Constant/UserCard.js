@@ -60,7 +60,7 @@ const UserCard = ({
 
   const [expandedSkills, setExpandedSkills] = useState({});
   const skills = userProfile?.key_skills || [];
-  const initialSkills = skills.slice(0, 3);
+  const initialSkills = skills.slice(0, 2);
   const allSkills = skills;
   const showAllSkills = expandedSkills[index];
   const dispatch = useDispatch();
@@ -167,19 +167,18 @@ const UserCard = ({
           //   },
           // });
           setModalVisible(true);
-          
         }}
-        style={styles.card}
-        >
-          <InvitationDetailModal
-        isVisible={isModalVisible}
-        onClose={() => setModalVisible(false)} // Close modal on overlay or close button press
-        data={{
-          user: transformedData,
-                jobId: jobId,
-                cover_letter: coverLetter,
-        }}
-      />
+        style={styles.card}>
+        <InvitationDetailModal
+          isVisible={isModalVisible}
+          onClose={() => setModalVisible(false)} // Close modal on overlay or close button press
+          data={{
+            user: transformedData,
+            jobId: jobId,
+            cover_letter: coverLetter,
+            page: page_name,
+          }}
+        />
         <View
           style={{
             backgroundColor: '#fafafa',
@@ -243,7 +242,16 @@ const UserCard = ({
               <View style={styles.iconTextContainer}>
                 <Ionicons name="time" size={14} color="gray" />
                 <Text style={styles.applicationNoticeText}>
-                  {userProfile?.career_preferences?.[0]?.notice_period}
+                  {
+                    // If the notice period includes "more than", extract the number of months dynamically
+                    userProfile?.career_preferences?.[0]?.notice_period.includes(
+                      'more than',
+                    )
+                      ? userProfile?.career_preferences?.[0]?.notice_period.split(
+                          ' ',
+                        )[2] + ' months'
+                      : userProfile?.career_preferences?.[0]?.notice_period
+                  }
                 </Text>
               </View>
             ) : null}
@@ -307,7 +315,7 @@ const UserCard = ({
 
           <ScrollView contentContainerStyle={styles.chipContainer}>
             {(page_name === 'home'
-              ? allSkills.slice(0, 3)
+              ? allSkills.slice(0, 2)
               : showAllSkills
               ? allSkills
               : initialSkills
@@ -317,7 +325,7 @@ const UserCard = ({
               </View>
             ))}
 
-            {page_name != 'home' && userProfile?.key_skills?.length > 3 && (
+            {page_name != 'home' && userProfile?.key_skills?.length > 2 && (
               <TouchableOpacity onPress={() => handleToggleViewMore(index)}>
                 <View style={styles.chip}>
                   <Text style={styles.chipViewText}>

@@ -73,20 +73,29 @@ const HomeScreen = () => {
   ];
 
   const weeklyData = {
-    labels: ['S', 'M', 'T', 'W', 'T', 'F', 'S'], // Days of the week
-    values: [20, 10, 40, 15, 25, 35, 5], // Applicants per day
+    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], // Days of the week
+    datasets: [
+      {
+        data: [20, 35, 40, 60, 30, 50, 70], // Job application counts
+        color: (opacity = 1) => `rgba(34, 94, 190, ${opacity})`, // Bar color
+        strokeWidth: 2, // Bar border thickness
+      },
+    ],
   };
 
   const chartConfig = {
     backgroundGradientFrom: '#ffffff',
     backgroundGradientTo: '#ffffff',
     decimalPlaces: 0,
-    color: (opacity = 1) => `rgba(34, 94, 190, ${opacity})`,
+    color: (opacity = 1) => `rgba(34, 94, 190, ${opacity})`, // Bar color
+    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`, // Label color
     strokeWidth: 2,
     barPercentage: 0.6,
     fillShadowGradient: '#225EBE',
     fillShadowGradientOpacity: 1,
   };
+
+  // const screenWidth = Dimensions.get('window').width;
 
   return (
     <View style={styles.Maincontainer}>
@@ -124,62 +133,31 @@ const HomeScreen = () => {
             </View>
           ))}
         </ScrollView>
+
         <View style={styles.chartcard}>
-          {/* Header Section */}
-          <View style={{flexDirection: 'row', alignItems: 'center',justifyContent:'space-between',marginBottom:12}}>
-            <View>
-              <Text style={styles.title}>Total New Applicant</Text>
-              <Text style={styles.subtitle}>Last 7 days</Text>
-            </View>
-            {/* Total Count */}
+          <View style={styles.upperContainer}>
+            <Text style={styles.title}>Job Applications</Text>
+            <Text style={styles.subtitle}>Last 7 days</Text>
             <View style={styles.totalContainer}>
               <Text style={styles.totalApplicants}>150</Text>
               <Text style={styles.increase}>↑ +76</Text>
             </View>
           </View>
 
-          {/* Custom Chart with Labels */}
           <View style={styles.chartContainer}>
-            <View style={styles.barContainer}>
-              {weeklyData.values.map((value, index) => {
-                const barWidth = screenWidth / weeklyData.labels.length - 5;
-
-                return (
-                  <View
-                    key={index}
-                    style={{width: barWidth, alignItems: 'center'}}>
-                    {/* Label Above Bar */}
-                    <Text
-                      style={[
-                        styles.barValue,
-                        {
-                          bottom:
-                            (value / Math.max(...weeklyData.values)) * 160 + 20,
-                        },
-                      ]}>
-                      {value}
-                    </Text>
-
-                    {/* Bar itself */}
-                    <View
-                      style={[
-                        styles.bar,
-                        {
-                          height:
-                            (value / Math.max(...weeklyData.values)) * 160,
-                          width: barWidth * 0.5,
-                        },
-                      ]}
-                    />
-
-                    {/* Label Below Bar */}
-                    <Text style={styles.barLabel}>
-                      {weeklyData.labels[index]}
-                    </Text>
-                  </View>
-                );
-              })}
-            </View>
+            <BarChart
+              data={weeklyData}
+              width={screenWidth}
+              height={220}
+              chartConfig={chartConfig}
+              verticalLabelRotation={0}
+              withHorizontalLabels={false}
+              withInnerLines={false}
+              yAxisLabel=""
+              yAxisInterval={1}
+              showBarTops={true}
+              showValuesOnTopOfBars={true}
+            />
           </View>
         </View>
 
@@ -368,6 +346,7 @@ const styles = StyleSheet.create({
   scrollView: {
     flexGrow: 0,
     marginHorizontal: 12,
+    width: '100%',
   },
 
   card: {
@@ -382,11 +361,6 @@ const styles = StyleSheet.create({
     width: 105,
   },
 
-  title: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#000',
-  },
   value: {
     fontSize: 26,
     fontWeight: 'bold',
@@ -513,29 +487,30 @@ const styles = StyleSheet.create({
   },
   chartcard: {
     backgroundColor: '#fff',
-    padding: 18,
     borderRadius: 12,
-    marginHorizontal: 8,
-    marginBottom:12
+    marginBottom: 18,
+  },
+  upperContainer: {
+  paddingHorizontal: 20,
+  marginTop:10
   },
   title: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#000',
   },
   subtitle: {
-    fontSize: 12,
+    fontSize: 14,
     color: '#888',
-    marginBottom: 8,
   },
   totalContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   totalApplicants: {
-    fontSize: 28,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#222',
+    color: '#000',
   },
   increase: {
     fontSize: 14,
@@ -544,8 +519,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   chartContainer: {
-    position: 'relative',
-    marginTop: 30,
+    width: '100%',
   },
 
   barContainer: {
